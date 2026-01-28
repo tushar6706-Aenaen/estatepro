@@ -24,40 +24,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-        <div className="flex min-h-screen flex-col bg-background text-foreground">
-          <header className="border-b border-neutral-200 bg-white/80 backdrop-blur">
-            <nav className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4">
-              <div className="text-sm font-semibold tracking-tight">
-                realestate<span className="text-blue-600">.mvp</span>
-              </div>
-              <div className="flex items-center gap-4 text-xs font-medium text-neutral-600">
-                <a href="/properties" className="hover:text-neutral-900">
-                  Marketplace
-                </a>
-                <a href="/agent" className="hidden hover:text-neutral-900 md:inline">
-                  Agent
-                </a>
-                <a href="/admin" className="hidden hover:text-neutral-900 md:inline">
-                  Admin
-                </a>
-                <a
-                  href="/auth/sign-in"
-                  className="rounded-full border border-neutral-300 px-3 py-1 text-xs hover:border-neutral-900 hover:text-neutral-900"
-                >
-                  Sign in
-                </a>
-              </div>
-            </nav>
-          </header>
-          <div className="flex-1">{children}</div>
-          <footer className="border-t border-neutral-200 bg-white/80">
-            <div className="mx-auto flex h-12 w-full max-w-6xl items-center justify-between px-4 text-xs text-neutral-500">
-              <span>Real-estate MVP</span>
-              <span>Built with Next.js & Supabase</span>
-            </div>
-          </footer>
-        </div>
+      <body
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
+        {children}
       </body>
     </html>
   );
