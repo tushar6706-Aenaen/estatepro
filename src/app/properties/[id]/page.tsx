@@ -69,11 +69,11 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
   const galleryRest = images.filter((img) => img !== primaryImage).slice(0, 4);
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur">
+    <div className="min-h-screen bg-neutral-950 text-white">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center gap-6 px-6 py-4">
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15 text-blue-300">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-500/15 text-neutral-300">
               <LogoIcon />
             </span>
             <span className="text-lg font-semibold tracking-tight">
@@ -81,16 +81,16 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
             </span>
           </div>
 
-          <div className="hidden flex-1 items-center gap-3 rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 text-sm text-slate-300 md:flex">
-            <SearchIcon className="text-slate-400" />
+          <div className="hidden flex-1 items-center gap-3 rounded-full border border-white/10 bg-neutral-900/60 px-4 py-2 text-sm text-neutral-300 md:flex">
+            <SearchIcon className="text-neutral-400" />
             <input
               type="text"
               placeholder="Search"
-              className="w-full bg-transparent text-sm text-slate-200 placeholder:text-slate-500 outline-none"
+              className="w-full bg-transparent text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
             />
           </div>
 
-          <nav className="ml-auto hidden items-center gap-6 text-sm text-slate-300 md:flex">
+          <nav className="ml-auto hidden items-center gap-6 text-sm text-neutral-300 md:flex">
             {["Buy", "Sell", "Agents", "Market Insights"].map((link) => (
               <a key={link} className="transition hover:text-white" href="#">
                 {link}
@@ -99,10 +99,10 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
           </nav>
 
           <div className="hidden items-center gap-3 md:flex">
-            <button className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-200 transition hover:text-white">
+            <button className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-neutral-200 transition hover:text-white">
               <BellIcon />
             </button>
-            <button className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-slate-200 transition hover:text-white">
+            <button className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-neutral-200 transition hover:text-white">
               <UserIcon />
             </button>
           </div>
@@ -110,14 +110,14 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
       </header>
 
       <main className="mx-auto w-full max-w-6xl px-6 pb-20 pt-10">
-        <div className="text-sm text-slate-400">
+        <div className="text-sm text-neutral-400">
           Home / Buy / <span className="text-white">{property.city}</span>
         </div>
 
         <section className="mt-6 grid gap-4 lg:grid-cols-[2fr,1fr]">
-          <div className="grid gap-4 rounded-3xl border border-white/10 bg-slate-900/40 p-4 md:grid-cols-4 md:grid-rows-2">
+          <div className="grid gap-4 rounded-3xl border border-white/10 bg-neutral-900/40 p-4 md:grid-cols-4 md:grid-rows-2">
             <div
-              className={`relative col-span-2 row-span-2 overflow-hidden rounded-2xl bg-cover bg-center`}
+              className="relative col-span-2 row-span-2 overflow-hidden rounded-2xl bg-neutral-800 bg-cover bg-center"
               style={
                 primaryImage?.image_url
                   ? {
@@ -131,13 +131,13 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               <div className="absolute bottom-4 left-4 rounded-full bg-black/50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
                 Featured
               </div>
-              <div className="absolute inset-0 bg-[linear-gradient(120deg,_rgba(2,6,23,0.2),_rgba(2,6,23,0.05))]" />
+              <div className="absolute inset-0 bg-black/20" />
             </div>
 
             {galleryRest.map((item, index) => (
               <div
                 key={item.image_url ?? `image-${index}`}
-                className="relative overflow-hidden rounded-2xl bg-cover bg-center"
+                className="relative overflow-hidden rounded-2xl bg-neutral-800 bg-cover bg-center"
                 style={
                   item.image_url
                     ? {
@@ -148,26 +148,26 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                     : undefined
                 }
               >
-                <div className="absolute inset-0 bg-[linear-gradient(120deg,_rgba(2,6,23,0.2),_rgba(2,6,23,0.05))]" />
+                <div className="absolute inset-0 bg-black/20" />
               </div>
             ))}
           </div>
 
-          <aside className="space-y-4 rounded-3xl border border-white/10 bg-slate-900/60 p-6">
+          <aside className="space-y-4 rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
             <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-slate-200">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-neutral-200">
                 SJ
               </div>
               <div>
-                <div className="text-xs uppercase tracking-[0.3em] text-slate-400">
+                <div className="text-xs uppercase tracking-[0.3em] text-neutral-400">
                   Listed by
                 </div>
                 <div className="text-base font-semibold text-white">
                   Sarah Jenkins
                 </div>
-                <div className="text-xs text-blue-300">DRE# 01234567</div>
+                <div className="text-xs text-neutral-300">DRE# 01234567</div>
                 {property.agent_phone && (
-                  <div className="text-xs text-slate-300">
+                  <div className="text-xs text-neutral-300">
                     Phone: {property.agent_phone}
                   </div>
                 )}
@@ -178,7 +178,7 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
               <button className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white">
                 Schedule Tour
               </button>
-              <button className="flex-1 rounded-xl border border-white/10 bg-white/0 px-4 py-2 text-sm font-semibold text-slate-300">
+              <button className="flex-1 rounded-xl border border-white/10 bg-white/0 px-4 py-2 text-sm font-semibold text-neutral-300">
                 Request Info
               </button>
             </div>
@@ -192,10 +192,10 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
             <div className="text-3xl font-semibold text-white">
               ${Number(property.price).toLocaleString()}
             </div>
-            <div className="text-slate-400">
+            <div className="text-neutral-400">
               {property.title}
             </div>
-            <div className="flex flex-wrap gap-6 border-y border-white/10 py-4 text-sm text-slate-300">
+            <div className="flex flex-wrap gap-6 border-y border-white/10 py-4 text-sm text-neutral-300">
               <span className="flex items-center gap-2">
                 <BedIcon />
                 {property.bedrooms ?? "—"} Beds
@@ -215,13 +215,13 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
             </div>
           </div>
 
-          <div className="space-y-4 text-sm text-slate-300">
+          <div className="space-y-4 text-sm text-neutral-300">
             <h2 className="text-lg font-semibold text-white">About this home</h2>
             <p>
               {property.description ??
                 "Modern luxury living with open floor plan, generous natural light, and seamless indoor-outdoor flow."}
             </p>
-            <button className="text-sm font-semibold text-blue-300">
+            <button className="text-sm font-semibold text-neutral-300">
               Read more v
             </button>
           </div>
@@ -234,9 +234,9 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
                 return (
                   <div
                     key={highlight}
-                    className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-slate-200"
+                    className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-neutral-200"
                   >
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-blue-500/15 text-blue-300">
+                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-500/15 text-neutral-300">
                       <Icon />
                     </span>
                     <span>{highlight}</span>
@@ -248,10 +248,9 @@ export default async function PropertyDetailPage({ params }: PropertyDetailPageP
 
           <div className="space-y-4">
             <h3 className="text-lg font-semibold text-white">Location</h3>
-            <div className="relative h-64 overflow-hidden rounded-3xl border border-white/10 bg-slate-900/40">
-              <div className="absolute inset-0 bg-[linear-gradient(90deg,_rgba(15,23,42,0.8),_rgba(15,23,42,0.4))]" />
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.35),_transparent_60%)]" />
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-blue-500 p-3 text-white shadow-lg">
+            <div className="relative h-64 overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/40">
+              <div className="absolute inset-0 bg-neutral-950/60" />
+              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neutral-500 p-3 text-white shadow-lg">
                 <PinIcon />
               </div>
               <div className="absolute bottom-4 right-4 rounded-full bg-black/50 px-3 py-1 text-xs text-white">

@@ -85,11 +85,11 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
   ];
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-slate-950/80 backdrop-blur">
+    <div className="min-h-screen bg-neutral-950 text-white">
+      <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/80 backdrop-blur">
         <div className="mx-auto flex w-full max-w-6xl items-center gap-6 px-6 py-4">
           <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-500/15 text-blue-300">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-500/15 text-neutral-300">
               <svg
                 width="18"
                 height="18"
@@ -111,7 +111,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
             </span>
           </div>
 
-          <div className="hidden flex-1 items-center gap-3 rounded-full border border-white/10 bg-slate-900/60 px-4 py-2 text-sm text-slate-300 md:flex">
+          <div className="hidden flex-1 items-center gap-3 rounded-full border border-white/10 bg-neutral-900/60 px-4 py-2 text-sm text-neutral-300 md:flex">
             <svg
               width="16"
               height="16"
@@ -121,7 +121,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
-              className="text-slate-400"
+              className="text-neutral-400"
             >
               <circle cx="11" cy="11" r="8" />
               <path d="m21 21-4.3-4.3" />
@@ -129,11 +129,11 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
             <input
               type="text"
               placeholder="Search for city, neighborhood, or zip"
-              className="w-full bg-transparent text-sm text-slate-200 placeholder:text-slate-500 outline-none"
+              className="w-full bg-transparent text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
             />
           </div>
 
-          <nav className="ml-auto hidden items-center gap-6 text-sm text-slate-300 md:flex">
+          <nav className="ml-auto hidden items-center gap-6 text-sm text-neutral-300 md:flex">
             {navLinks.map((link) => (
               <a key={link} className="transition hover:text-white" href="#">
                 {link}
@@ -144,13 +144,13 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           <div className="hidden items-center gap-4 md:flex">
             <Link
               href="/auth"
-              className="text-sm font-semibold text-slate-300 transition hover:text-white"
+              className="text-sm font-semibold text-neutral-300 transition hover:text-white"
             >
               Sign In
             </Link>
             <Link
               href="/auth?mode=signup&redirect=/agent"
-              className="rounded-full bg-blue-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_-20px_rgba(59,130,246,0.8)] transition hover:bg-blue-400"
+              className="rounded-full bg-neutral-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_-20px_rgba(0,0,0,0.8)] transition hover:bg-neutral-400"
             >
               List Property
             </Link>
@@ -179,23 +179,22 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
       <main>
         <section className="relative overflow-hidden">
           <div className="absolute inset-0 bg-[url('/landing_page.png')] bg-cover bg-center" />
-          <div className="absolute inset-0 bg-[radial-gradient(circle_at_top,_rgba(59,130,246,0.25),_transparent_55%)]" />
-          <div className="absolute inset-0 bg-[linear-gradient(120deg,_rgba(15,23,42,0.9),_rgba(15,23,42,0.4))]" />
+          <div className="absolute inset-0 bg-neutral-950/70" />
           <div className="relative mx-auto grid min-h-[520px] w-full max-w-6xl items-center px-6 py-16">
             <div className="space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-slate-300">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-neutral-300">
                 Premium listings
               </div>
               <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl">
                 Find Your Dream Home
               </h1>
-              <p className="max-w-2xl text-base text-slate-300">
+              <p className="max-w-2xl text-base text-neutral-300">
                 Discover luxury properties in exclusive locations tailored to your
                 lifestyle.
               </p>
 
-              <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-slate-900/80 p-4 shadow-[0_30px_80px_-60px_rgba(15,23,42,0.9)] md:flex-row md:items-center">
-                <div className="flex flex-1 items-center gap-3 rounded-xl bg-slate-950/60 px-4 py-3 text-sm text-slate-300">
+              <div className="flex flex-col gap-3 rounded-2xl border border-white/10 bg-neutral-900/80 p-4 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.9)] md:flex-row md:items-center">
+                <div className="flex flex-1 items-center gap-3 rounded-xl bg-neutral-950/60 px-4 py-3 text-sm text-neutral-300">
                   <svg
                     width="18"
                     height="18"
@@ -205,7 +204,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
                     strokeWidth="2"
                     strokeLinecap="round"
                     strokeLinejoin="round"
-                    className="text-slate-400"
+                    className="text-neutral-400"
                   >
                     <path d="M12 21s-6-4.4-6-10a6 6 0 1 1 12 0c0 5.6-6 10-6 10z" />
                     <circle cx="12" cy="11" r="2" />
@@ -213,10 +212,10 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
                   <input
                     type="text"
                     placeholder="Enter an address, neighborhood, city, or ZIP"
-                    className="w-full bg-transparent text-sm text-slate-200 placeholder:text-slate-500 outline-none"
+                    className="w-full bg-transparent text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
                   />
                 </div>
-                <button className="flex items-center justify-center gap-2 rounded-xl bg-blue-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_-24px_rgba(59,130,246,0.8)] transition hover:bg-blue-400">
+                <button className="flex items-center justify-center gap-2 rounded-xl bg-neutral-500 px-6 py-3 text-sm font-semibold text-white shadow-[0_14px_40px_-24px_rgba(0,0,0,0.8)] transition hover:bg-neutral-400">
                   <svg
                     width="16"
                     height="16"
@@ -237,7 +236,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           </div>
         </section>
 
-        <section className="border-y border-white/10 bg-slate-950">
+        <section className="border-y border-white/10 bg-neutral-950">
           <form
             className="mx-auto flex w-full max-w-6xl flex-wrap items-center gap-3 px-6 py-5 text-sm"
             method="get"
@@ -246,13 +245,13 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
               name="city"
               defaultValue={searchParams.city ?? ""}
               placeholder="City"
-              className="w-40 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 placeholder:text-slate-500 outline-none"
+              className="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none sm:w-40"
             />
 
             <select
               name="type"
               defaultValue={searchParams.type ?? ""}
-              className="w-44 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 outline-none"
+              className="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-200 outline-none sm:w-44"
             >
               <option value="">Property Type</option>
               <option value="apartment">Apartment</option>
@@ -264,7 +263,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
             <select
               name="priceMin"
               defaultValue={searchParams.priceMin ?? ""}
-              className="w-40 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 outline-none"
+              className="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-200 outline-none sm:w-40"
             >
               <option value="">Min Price</option>
               {priceRanges.map(
@@ -280,7 +279,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
             <select
               name="priceMax"
               defaultValue={searchParams.priceMax ?? ""}
-              className="w-40 rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-slate-200 outline-none"
+              className="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-200 outline-none sm:w-40"
             >
               <option value="">Max Price</option>
               {priceRanges.map(
@@ -293,13 +292,13 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
               )}
             </select>
 
-            <button className="flex items-center gap-2 rounded-full border border-white/10 bg-blue-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-blue-400">
+            <button className="flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-neutral-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-neutral-400 sm:w-auto">
               Apply Filters
             </button>
 
             <Link
               href="/"
-              className="text-sm font-semibold text-slate-400 hover:text-white"
+              className="text-sm font-semibold text-neutral-400 hover:text-white"
             >
               Reset
             </Link>
@@ -312,11 +311,11 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
               <h2 className="text-2xl font-semibold text-white">
                 Newly Listed Properties
               </h2>
-              <p className="mt-2 text-sm text-slate-400">
+              <p className="mt-2 text-sm text-neutral-400">
                 Fresh on the market in your favorite areas.
               </p>
             </div>
-            <button className="text-sm font-semibold text-blue-300 transition hover:text-blue-200">
+            <button className="text-sm font-semibold text-neutral-300 transition hover:text-neutral-200">
               View All
             </button>
           </div>
@@ -329,7 +328,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
             )}
 
             {!loadError && properties.length === 0 && (
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-sm text-slate-300">
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-sm text-neutral-300">
                 No properties match these filters yet.
               </div>
             )}
@@ -343,10 +342,10 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
                 <Link
                   key={listing.id}
                   href={`/properties/${listing.id}`}
-                  className="group overflow-hidden rounded-3xl border border-white/10 bg-slate-900/60 shadow-[0_25px_60px_-40px_rgba(15,23,42,0.8)] transition hover:border-white/20"
+                  className="group overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/60 shadow-[0_25px_60px_-40px_rgba(0,0,0,0.8)] transition hover:border-white/20"
                 >
                   <div
-                    className={`relative h-44 bg-gradient-to-br from-slate-800 via-slate-700 to-slate-600`}
+                    className="relative h-44 bg-neutral-800"
                     style={
                       primaryImage?.image_url
                         ? {
@@ -357,7 +356,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
                         : undefined
                     }
                   >
-                    <div className="absolute left-4 top-4 rounded-full bg-slate-900/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
+                    <div className="absolute left-4 top-4 rounded-full bg-neutral-900/80 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
                       {listing.badge ?? "For Sale"}
                     </div>
                     <button className="absolute right-4 top-4 flex h-9 w-9 items-center justify-center rounded-full bg-white/15 text-white backdrop-blur transition group-hover:bg-white/25">
@@ -384,9 +383,9 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
                       <h3 className="text-lg font-semibold text-white">
                         {listing.title}
                       </h3>
-                      <p className="text-sm text-slate-400">{listing.city}</p>
+                      <p className="text-sm text-neutral-400">{listing.city}</p>
                     </div>
-                    <div className="flex items-center gap-3 text-xs text-slate-400">
+                    <div className="flex items-center gap-3 text-xs text-neutral-400">
                       <span className="flex items-center gap-1">
                         <svg
                           width="14"
@@ -449,22 +448,22 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
           </div>
 
           <div className="mt-12 flex justify-center">
-            <button className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-slate-200 transition hover:border-white/30 hover:text-white">
+            <button className="rounded-full border border-white/15 bg-white/5 px-6 py-3 text-sm font-semibold text-neutral-200 transition hover:border-white/30 hover:text-white">
               Load More Properties
             </button>
           </div>
         </section>
       </main>
 
-      <footer className="border-t border-white/10 bg-slate-950/90">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 text-sm text-slate-400 md:flex-row md:items-center md:justify-between">
+      <footer className="border-t border-white/10 bg-neutral-950/90">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 text-sm text-neutral-400 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-blue-300">
+            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-white/5 text-neutral-300">
               *
             </span>
             <span>(c) 2023 LuxEstate Inc.</span>
           </div>
-          <div className="flex flex-wrap items-center gap-6 text-slate-400">
+          <div className="flex flex-wrap items-center gap-6 text-neutral-400">
             <a className="transition hover:text-white" href="#">
               About Us
             </a>

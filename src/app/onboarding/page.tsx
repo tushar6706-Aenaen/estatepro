@@ -151,16 +151,16 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-stone-100 px-4 py-12 text-slate-900">
+    <div className="min-h-screen bg-neutral-950 px-4 py-12 text-white">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-10">
         <header className="space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full border border-slate-200 bg-white px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-slate-500">
+          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-neutral-300">
             Profile setup
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight text-slate-900 md:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
             Tell us how you want to use the platform.
           </h1>
-          <p className="max-w-2xl text-base text-slate-600">
+          <p className="max-w-2xl text-base text-neutral-300">
             This helps us tailor your experience. You can change this later in
             settings if your goals change.
           </p>
@@ -168,13 +168,13 @@ export default function OnboardingPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-3xl border border-slate-200 bg-white/90 p-8 shadow-[0_30px_80px_-60px_rgba(15,23,42,0.35)] backdrop-blur"
+          className="rounded-3xl border border-white/10 bg-neutral-900/70 p-8 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.65)] backdrop-blur"
         >
           {loading ? (
             <div className="animate-pulse space-y-3">
-              <div className="h-4 w-32 rounded bg-slate-200" />
-              <div className="h-10 rounded bg-slate-200" />
-              <div className="h-10 rounded bg-slate-200" />
+              <div className="h-4 w-32 rounded bg-neutral-800" />
+              <div className="h-10 rounded bg-neutral-800" />
+              <div className="h-10 rounded bg-neutral-800" />
             </div>
           ) : (
             <div className="space-y-6">
@@ -184,8 +184,8 @@ export default function OnboardingPage() {
                   onClick={() => setRoleChoice("buyer")}
                   className={`flex h-full flex-col gap-3 rounded-2xl border p-5 text-left transition ${
                     roleChoice === "buyer"
-                      ? "border-slate-900 bg-slate-900 text-white shadow-lg"
-                      : "border-slate-200 bg-white text-slate-900 hover:border-slate-400"
+                      ? "border-neutral-400/60 bg-neutral-900 text-white shadow-lg"
+                      : "border-white/10 bg-neutral-900/40 text-neutral-200 hover:border-white/20"
                   }`}
                 >
                   <span className="text-sm font-semibold uppercase tracking-[0.18em]">
@@ -196,7 +196,7 @@ export default function OnboardingPage() {
                   </span>
                   <span
                     className={`text-sm ${
-                      roleChoice === "buyer" ? "text-white/80" : "text-slate-500"
+                      roleChoice === "buyer" ? "text-white/80" : "text-neutral-400"
                     }`}
                   >
                     See approved listings only.
@@ -208,8 +208,8 @@ export default function OnboardingPage() {
                   onClick={() => setRoleChoice("agent")}
                   className={`flex h-full flex-col gap-3 rounded-2xl border p-5 text-left transition ${
                     roleChoice === "agent"
-                      ? "border-slate-900 bg-slate-900 text-white shadow-lg"
-                      : "border-slate-200 bg-white text-slate-900 hover:border-slate-400"
+                      ? "border-neutral-400/60 bg-neutral-900 text-white shadow-lg"
+                      : "border-white/10 bg-neutral-900/40 text-neutral-200 hover:border-white/20"
                   }`}
                 >
                   <span className="text-sm font-semibold uppercase tracking-[0.18em]">
@@ -220,7 +220,7 @@ export default function OnboardingPage() {
                   </span>
                   <span
                     className={`text-sm ${
-                      roleChoice === "agent" ? "text-white/80" : "text-slate-500"
+                      roleChoice === "agent" ? "text-white/80" : "text-neutral-400"
                     }`}
                   >
                     We&apos;ll ask for a contact number.
@@ -230,11 +230,11 @@ export default function OnboardingPage() {
 
               {roleChoice === "agent" && (
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-700">
+                  <label className="text-sm font-semibold text-neutral-200">
                     Phone number
                   </label>
-                  <div className="flex items-center gap-2 rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-                    <span className="text-sm font-semibold text-slate-600">
+                  <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-neutral-900/60 px-4 py-3">
+                    <span className="text-sm font-semibold text-neutral-300">
                       +1
                     </span>
                     <input
@@ -243,23 +243,23 @@ export default function OnboardingPage() {
                       placeholder="98765 43210"
                       value={phone}
                       onChange={(event) => setPhone(event.target.value)}
-                      className="w-full bg-transparent text-sm text-slate-900 outline-none placeholder:text-slate-400"
+                      className="w-full bg-transparent text-sm text-neutral-100 outline-none placeholder:text-neutral-500"
                     />
                   </div>
-                  <p className="text-xs text-slate-500">
+                  <p className="text-xs text-neutral-400">
                     This will appear on your listings for buyers to contact you.
                   </p>
                 </div>
               )}
 
               {error && (
-                <div className="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-600">
+                <div className="rounded-xl border border-red-300/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
+                <div className="rounded-xl border border-emerald-300/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
                   You&apos;re all set. Your profile has been updated.
                 </div>
               )}
@@ -268,14 +268,14 @@ export default function OnboardingPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex items-center justify-center rounded-full bg-slate-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-slate-800 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="inline-flex items-center justify-center rounded-full bg-neutral-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-neutral-400 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {saving ? "Saving..." : "Continue"}
                 </button>
                 <button
                   type="button"
                   onClick={() => router.push("/")}
-                  className="text-sm font-semibold text-slate-500 hover:text-slate-700"
+                  className="text-sm font-semibold text-neutral-400 hover:text-white"
                 >
                   Skip for now
                 </button>
@@ -285,7 +285,7 @@ export default function OnboardingPage() {
         </form>
 
         {!loading && !hasUser && (
-          <div className="rounded-2xl border border-blue-200 bg-blue-50 px-4 py-3 text-sm text-blue-800">
+          <div className="rounded-2xl border border-neutral-300/30 bg-neutral-500/10 px-4 py-3 text-sm text-neutral-200">
             You need to sign in to save your profile.{" "}
             <Link
               href="/auth?redirect=/onboarding"
@@ -298,7 +298,7 @@ export default function OnboardingPage() {
         )}
 
         {!isSupabaseConfigured && (
-          <div className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-700">
+          <div className="rounded-2xl border border-amber-300/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
             Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to
             your `.env.local` to enable profile updates.
           </div>

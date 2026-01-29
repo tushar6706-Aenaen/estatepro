@@ -106,9 +106,13 @@ export default function AuthPage() {
           throw new Error("We could not finish sign-up. Please try again.");
         }
 
-        await ensureProfileRow(userId);
-        setNotice("Account created. Let's finish your profile.");
-        router.push("/onboarding");
+        if (data.session) {
+          await ensureProfileRow(userId);
+          setNotice("Account created. Let's finish your profile.");
+          router.push("/onboarding");
+        } else {
+          setNotice("Check your email to confirm your account, then sign in.");
+        }
       } else {
         const { data, error } =
           await supabaseBrowserClient.auth.signInWithPassword({
@@ -147,15 +151,15 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="relative min-h-screen overflow-hidden bg-slate-950 text-white">
+    <div className="relative min-h-screen overflow-hidden bg-neutral-950 text-white">
       <div className="pointer-events-none absolute inset-0 opacity-70">
-        <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-gradient-to-br from-sky-500/25 via-cyan-400/20 to-emerald-300/10 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-gradient-to-br from-emerald-400/20 via-sky-400/15 to-blue-500/10 blur-3xl" />
+        <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-neutral-900/40 blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-neutral-800/30 blur-3xl" />
       </div>
 
       <main className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-6 py-16">
-        <div className="mb-10 flex items-center gap-3 text-sm text-slate-300">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-sky-200">
+        <div className="mb-10 flex items-center gap-3 text-sm text-neutral-300">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-neutral-200">
             <svg
               width="18"
               height="18"
@@ -173,7 +177,7 @@ export default function AuthPage() {
             </svg>
           </span>
           <div>
-            <div className="text-xs uppercase tracking-[0.28em] text-slate-500">
+            <div className="text-xs uppercase tracking-[0.28em] text-neutral-500">
               Phase 2
             </div>
             <div className="font-semibold text-white">Authentication & Roles</div>
@@ -181,28 +185,26 @@ export default function AuthPage() {
         </div>
 
         <div className="grid gap-8 lg:grid-cols-[1.05fr,1fr]">
-          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_30px_80px_-60px_rgba(59,130,246,0.6)] backdrop-blur">
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(94,234,212,0.08),transparent_45%)]" />
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_80%_0%,rgba(56,189,248,0.09),transparent_40%)]" />
+          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.6)] backdrop-blur">
             <div className="relative space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-sky-200">
+              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-neutral-200">
                 Secure access
               </div>
               <h1 className="text-3xl font-semibold leading-tight text-white md:text-4xl">
                 Sign in to list homes or track your inquiries.
               </h1>
-              <p className="max-w-2xl text-base text-slate-200/80">
+              <p className="max-w-2xl text-base text-neutral-200/80">
                 Use email and password - no magic links required. New accounts
                 start as public; switch to agent during onboarding to unlock
                 listing tools.
               </p>
-              <div className="grid gap-3 text-sm text-slate-200/80 md:grid-cols-2">
+              <div className="grid gap-3 text-sm text-neutral-200/80 md:grid-cols-2">
                 <FeatureCard title="Email auth" body="Password-based entry built on Supabase Auth." />
                 <FeatureCard title="Profile auto-sync" body="We create or update your profile row after sign-in." />
                 <FeatureCard title="Role-aware redirects" body="Public users land in onboarding, agents jump to their space." />
                 <FeatureCard title="Ready for dashboards" body="Guards are in place for agent/admin-only pages." />
               </div>
-              <div className="text-xs text-slate-400">
+              <div className="text-xs text-neutral-400">
                 Need help? Check your `.env.local` values for
                 `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
               </div>
@@ -211,7 +213,7 @@ export default function AuthPage() {
 
           <form
             onSubmit={handleAuth}
-            className="relative space-y-6 rounded-3xl border border-white/10 bg-slate-900/70 p-8 shadow-[0_30px_80px_-60px_rgba(15,23,42,0.9)]"
+            className="relative space-y-6 rounded-3xl border border-white/10 bg-neutral-900/70 p-8 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.9)]"
           >
             <div className="flex items-center justify-between gap-3">
               <div className="flex gap-2 rounded-full bg-white/5 p-1 text-xs font-semibold text-white">
@@ -220,8 +222,8 @@ export default function AuthPage() {
                   onClick={() => setMode("signin")}
                   className={`rounded-full px-4 py-2 transition ${
                     mode === "signin"
-                      ? "bg-white text-slate-900"
-                      : "text-slate-200/80 hover:text-white"
+                      ? "bg-white text-neutral-900"
+                      : "text-neutral-200/80 hover:text-white"
                   }`}
                 >
                   Sign in
@@ -231,8 +233,8 @@ export default function AuthPage() {
                   onClick={() => setMode("signup")}
                   className={`rounded-full px-4 py-2 transition ${
                     mode === "signup"
-                      ? "bg-white text-slate-900"
-                      : "text-slate-200/80 hover:text-white"
+                      ? "bg-white text-neutral-900"
+                      : "text-neutral-200/80 hover:text-white"
                   }`}
                 >
                   Create account
@@ -240,7 +242,7 @@ export default function AuthPage() {
               </div>
               <Link
                 href="/"
-                className="text-xs font-semibold text-slate-400 transition hover:text-white"
+                className="text-xs font-semibold text-neutral-400 transition hover:text-white"
               >
                 Back home
               </Link>
@@ -248,7 +250,7 @@ export default function AuthPage() {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-200">
+                <label className="text-sm font-semibold text-neutral-200">
                   Email
                 </label>
                 <input
@@ -257,15 +259,15 @@ export default function AuthPage() {
                   required
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-400/40"
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none focus:border-neutral-300/50 focus:ring-2 focus:ring-neutral-400/40"
                   placeholder="you@example.com"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="flex items-center justify-between text-sm font-semibold text-slate-200">
+                <label className="flex items-center justify-between text-sm font-semibold text-neutral-200">
                   <span>Password</span>
-                  <span className="text-xs font-normal text-slate-400">
+                  <span className="text-xs font-normal text-neutral-400">
                     Minimum 6 characters
                   </span>
                 </label>
@@ -275,14 +277,14 @@ export default function AuthPage() {
                   required
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-400/40"
+                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none focus:border-neutral-300/50 focus:ring-2 focus:ring-neutral-400/40"
                   placeholder="********"
                 />
               </div>
 
               {mode === "signup" && (
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-slate-200">
+                  <label className="text-sm font-semibold text-neutral-200">
                     Confirm password
                   </label>
                   <input
@@ -291,7 +293,7 @@ export default function AuthPage() {
                     required
                     value={confirmPassword}
                     onChange={(event) => setConfirmPassword(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-slate-500 outline-none focus:border-sky-300/50 focus:ring-2 focus:ring-sky-400/40"
+                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none focus:border-neutral-300/50 focus:ring-2 focus:ring-neutral-400/40"
                     placeholder="Repeat password"
                   />
                 </div>
@@ -312,12 +314,12 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={busy}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gradient-to-r from-sky-500 via-cyan-500 to-emerald-400 px-4 py-3 text-sm font-semibold text-slate-950 shadow-[0_20px_50px_-35px_rgba(56,189,248,0.8)] transition hover:brightness-110 disabled:cursor-not-allowed disabled:opacity-70"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-neutral-400 px-4 py-3 text-sm font-semibold text-neutral-950 shadow-[0_20px_50px_-35px_rgba(0,0,0,0.8)] transition hover:bg-neutral-300 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {busy ? "Working..." : mode === "signup" ? "Create account" : "Sign in"}
             </button>
 
-            <div className="space-y-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-xs text-slate-300">
+            <div className="space-y-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-xs text-neutral-300">
               <div className="font-semibold text-white">What happens next</div>
               <ul className="space-y-1">
                 <li>- We keep your session in the browser via Supabase Auth.</li>
@@ -334,11 +336,11 @@ export default function AuthPage() {
 
 function FeatureCard({ title, body }: { title: string; body: string }) {
   return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-[0_12px_32px_-24px_rgba(15,23,42,0.8)]">
-      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-slate-300">
+    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-[0_12px_32px_-24px_rgba(0,0,0,0.8)]">
+      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-300">
         {title}
       </div>
-      <div className="mt-2 text-sm text-slate-200/90">{body}</div>
+      <div className="mt-2 text-sm text-neutral-200/90">{body}</div>
     </div>
   );
 }
