@@ -40,11 +40,19 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# GitHub Copilot
+.agents
+.codex
 
 # supabase folder
 /supabase
 /supabase/migrations
 /supabase/.temp
 /supabase/.local
+
+
+
+# skills md files
+*.md
 
 

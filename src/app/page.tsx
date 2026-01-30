@@ -1,8 +1,7 @@
 import Link from "next/link";
 
+import { HomeHeader } from "@/src/components/layout/home-header";
 import { createSupabaseServerClient } from "@/src/lib/supabase/server";
-
-const navLinks = ["Buy", "Rent", "Sell", "Agents"];
 
 type SearchParams = {
   city?: string;
@@ -86,95 +85,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/80 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center gap-6 px-6 py-4">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-500/15 text-neutral-300">
-              <svg
-                width="18"
-                height="18"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M12 2v20" />
-                <path d="M2 12h20" />
-                <path d="m4.9 4.9 14.2 14.2" />
-                <path d="m19.1 4.9-14.2 14.2" />
-              </svg>
-            </span>
-            <span className="text-lg font-semibold tracking-tight">
-              LuxEstate
-            </span>
-          </div>
-
-          <div className="hidden flex-1 items-center gap-3 rounded-full border border-white/10 bg-neutral-900/60 px-4 py-2 text-sm text-neutral-300 md:flex">
-            <svg
-              width="16"
-              height="16"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              className="text-neutral-400"
-            >
-              <circle cx="11" cy="11" r="8" />
-              <path d="m21 21-4.3-4.3" />
-            </svg>
-            <input
-              type="text"
-              placeholder="Search for city, neighborhood, or zip"
-              className="w-full bg-transparent text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
-            />
-          </div>
-
-          <nav className="ml-auto hidden items-center gap-6 text-sm text-neutral-300 md:flex">
-            {navLinks.map((link) => (
-              <a key={link} className="transition hover:text-white" href="#">
-                {link}
-              </a>
-            ))}
-          </nav>
-
-          <div className="hidden items-center gap-4 md:flex">
-            <Link
-              href="/auth"
-              className="text-sm font-semibold text-neutral-300 transition hover:text-white"
-            >
-              Sign In
-            </Link>
-            <Link
-              href="/auth?mode=signup&redirect=/agent"
-              className="rounded-full bg-neutral-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_-20px_rgba(0,0,0,0.8)] transition hover:bg-neutral-400"
-            >
-              List Property
-            </Link>
-          </div>
-
-          <button className="md:hidden">
-            <span className="sr-only">Open menu</span>
-            <svg
-              width="24"
-              height="24"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M3 12h18" />
-              <path d="M3 6h18" />
-              <path d="M3 18h18" />
-            </svg>
-          </button>
-        </div>
-      </header>
+      <HomeHeader />
 
       <main>
         <section className="relative overflow-hidden">

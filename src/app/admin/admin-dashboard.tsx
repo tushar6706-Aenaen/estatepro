@@ -139,7 +139,10 @@ export function AdminDashboard() {
           ),
         );
 
-        let propertyMap = new Map<string, { title: string | null; city: string | null }>();
+        const propertyMap = new Map<
+          string,
+          { title: string | null; city: string | null }
+        >();
 
         if (propertyIds.length > 0) {
           const { data: propertyData } = await supabaseBrowserClient
@@ -170,6 +173,7 @@ export function AdminDashboard() {
   );
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     loadData("initial");
   }, [loadData]);
 

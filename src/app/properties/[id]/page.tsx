@@ -1,38 +1,35 @@
-import { notFound } from "next/navigation";
+﻿import Link from "next/link";
+import { Cormorant_Garamond, Manrope } from "next/font/google";
 
 import { createSupabaseServerClient } from "@/src/lib/supabase/server";
-import { RequestTourForm } from "./request-tour-form";
-
-const highlightIcons: Record<string, () => JSX.Element> = {
-  "Private Pool": PoolIcon,
-  "Central Air": AirIcon,
-  "EV Charging": EvIcon,
-  Gym: GymIcon,
-  "Wine Cellar": WineIcon,
-  "Smart Security": ShieldIcon,
-};
-
-type PropertyDetailPageProps = {
-  params: {
-    id: string;
-  };
-};
+import { HomeHeader } from "@/src/components/layout/home-header";
 
 type PropertyDetail = {
   id: string;
   title: string;
-  description: string | null;
   city: string;
-  price: number | string;
+  price: number;
   property_type: string;
-  bedrooms: number | null;
-  bathrooms: number | null;
-  area_sqft: number | null;
-  agent_phone: string | null;
-  property_images: { image_url: string | null; is_primary: boolean | null }[];
+  bedrooms?: number;
+  bathrooms?: number;
+  area_sqft?: number;
+  description?: string;
+  property_images?: { image_url: string | null; is_primary: boolean | null }[];
 };
 
-const defaultHighlights = [
+const displayFont = Cormorant_Garamond({
+  subsets: ["latin"],
+  variable: "--font-display",
+  weight: ["400", "500", "600", "700"],
+});
+
+const bodyFont = Manrope({
+  subsets: ["latin"],
+  variable: "--font-body",
+  weight: ["300", "400", "500", "600", "700"],
+});
+
+const highlights = [
   "Private Pool",
   "Central Air",
   "EV Charging",
@@ -41,512 +38,327 @@ const defaultHighlights = [
   "Smart Security",
 ];
 
-export default async function PropertyDetailPage({ params }: PropertyDetailPageProps) {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!supabaseUrl || !supabaseAnonKey) {
-    notFound();
-  }
-
+export default async function PropertyDetailPage({
+  params,
+}: {
+  params: Promise<{ id: string }>;
+}) {
+  const { id } = await params;
   const supabase = createSupabaseServerClient();
 
   const { data: property, error } = await supabase
     .from("properties")
     .select(
-      "id,title,description,city,price,property_type,bedrooms,bathrooms,area_sqft,agent_phone,status,property_images(image_url,is_primary)",
+      "id,title,city,price,property_type,bedrooms,bathrooms,area_sqft,description,property_images(image_url,is_primary)",
     )
-    .eq("id", params.id)
-    .eq("status", "approved")
-    .maybeSingle<PropertyDetail>();
+    .eq("id", id)
+    .maybeSingle();
 
-  if (error || !property) {
-    notFound();
+  if (error) {
+    return (
+      <div
+        className="min-h-screen bg-neutral-950 text-white"
+      >
+        <HomeHeader />
+
+        <div className={`${bodyFont.variable} ${displayFont.variable} font-[var(--font-body)]`}>
+          <main className="mx-auto w-full max-w-6xl px-6 py-12">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center">
+              <h1 className="text-2xl font-semibold">Unable to load property</h1>
+              <p className="mt-3 text-sm text-neutral-300">{error.message}</p>
+              <p className="mt-2 text-xs text-neutral-400">
+                Check RLS policies and ensure the property exists in Supabase.
+              </p>
+              <Link
+                href="/"
+                className="mt-6 inline-flex rounded-full border border-white/20 px-5 py-2 text-sm font-semibold transition hover:border-white/40 hover:bg-white/5"
+              >
+                Browse listings
+              </Link>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
   }
 
-  const images = property.property_images ?? [];
-  const primaryImage = images.find((img) => img.is_primary) || images[0];
-  const galleryRest = images.filter((img) => img !== primaryImage).slice(0, 4);
+  if (!property) {
+    return (
+      <div
+        className="min-h-screen bg-neutral-950 text-white"
+      >
+        <HomeHeader />
+
+        <div className={`${bodyFont.variable} ${displayFont.variable} font-[var(--font-body)]`}>
+          <main className="mx-auto w-full max-w-6xl px-6 py-12">
+            <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center">
+              <h1 className="text-2xl font-semibold">Property not found</h1>
+              <p className="mt-3 text-sm text-neutral-300">
+                We couldn&#39;t find a listing for this property.
+              </p>
+              <Link
+                href="/"
+                className="mt-6 inline-flex rounded-full border border-white/20 px-5 py-2 text-sm font-semibold transition hover:border-white/40 hover:bg-white/5"
+              >
+                Browse listings
+              </Link>
+            </div>
+          </main>
+        </div>
+      </div>
+    );
+  }
+
+  const typedProperty = property as PropertyDetail;
+  const price = Number(typedProperty.price);
+  const formattedPrice = Number.isFinite(price)
+    ? price.toLocaleString()
+    : String(typedProperty.price);
+
+  const galleryImages = (typedProperty.property_images ?? [])
+    .map((img) => img.image_url)
+    .filter((img): img is string => Boolean(img));
+
+  const gallerySlots = Array.from({ length: 5 }, (_, index) => {
+    return galleryImages[index] ?? null;
+  });
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white">
-      <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/80 backdrop-blur">
-        <div className="mx-auto flex w-full max-w-6xl items-center gap-6 px-6 py-4">
-          <div className="flex items-center gap-3">
-            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-500/15 text-neutral-300">
-              <LogoIcon />
-            </span>
-            <span className="text-lg font-semibold tracking-tight">
-              LuxeEstates
-            </span>
-          </div>
+      <HomeHeader />
 
-          <div className="hidden flex-1 items-center gap-3 rounded-full border border-white/10 bg-neutral-900/60 px-4 py-2 text-sm text-neutral-300 md:flex">
-            <SearchIcon className="text-neutral-400" />
-            <input
-              type="text"
-              placeholder="Search"
-              className="w-full bg-transparent text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
-            />
-          </div>
-
-          <nav className="ml-auto hidden items-center gap-6 text-sm text-neutral-300 md:flex">
-            {["Buy", "Sell", "Agents", "Market Insights"].map((link) => (
-              <a key={link} className="transition hover:text-white" href="#">
-                {link}
-              </a>
-            ))}
-          </nav>
-
-          <div className="hidden items-center gap-3 md:flex">
-            <button className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-neutral-200 transition hover:text-white">
-              <BellIcon />
-            </button>
-            <button className="flex h-9 w-9 items-center justify-center rounded-full border border-white/10 bg-white/5 text-neutral-200 transition hover:text-white">
-              <UserIcon />
-            </button>
-          </div>
-        </div>
-      </header>
-
-      <main className="mx-auto w-full max-w-6xl px-6 pb-20 pt-10">
-        <div className="text-sm text-neutral-400">
-          Home / Buy / <span className="text-white">{property.city}</span>
+      <main
+        className={`relative mx-auto w-full max-w-6xl px-6 pb-16 pt-6 ${bodyFont.variable} ${displayFont.variable} font-[var(--font-body)]`}
+      >
+        <div className="text-xs text-neutral-400">
+          Home / Buy / <span className="text-white/90">{typedProperty.city}</span>
         </div>
 
-        <section className="mt-6 grid gap-4 lg:grid-cols-[2fr,1fr]">
-          <div className="grid gap-4 rounded-3xl border border-white/10 bg-neutral-900/40 p-4 md:grid-cols-4 md:grid-rows-2">
-            <div
-              className="relative col-span-2 row-span-2 overflow-hidden rounded-2xl bg-neutral-800 bg-cover bg-center"
-              style={
-                primaryImage?.image_url
-                  ? {
-                      backgroundImage: `url(${primaryImage.image_url})`,
-                      backgroundSize: "cover",
-                      backgroundPosition: "center",
-                    }
-                  : undefined
-              }
-            >
-              <div className="absolute bottom-4 left-4 rounded-full bg-black/50 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
-                Featured
-              </div>
-              <div className="absolute inset-0 bg-black/20" />
-            </div>
-
-            {galleryRest.map((item, index) => (
+        <section className="mt-6 grid gap-4 lg:grid-cols-[2.2fr_1fr]">
+          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+            {gallerySlots[0] ? (
               <div
-                key={item.image_url ?? `image-${index}`}
-                className="relative overflow-hidden rounded-2xl bg-neutral-800 bg-cover bg-center"
-                style={
-                  item.image_url
-                    ? {
-                        backgroundImage: `url(${item.image_url})`,
-                        backgroundSize: "cover",
-                        backgroundPosition: "center",
-                      }
-                    : undefined
-                }
-              >
-                <div className="absolute inset-0 bg-black/20" />
-              </div>
-            ))}
+                className="h-72 w-full bg-cover bg-center md:h-[420px]"
+                style={{ backgroundImage: `url(${gallerySlots[0]})` }}
+              />
+            ) : (
+              <div className="h-72 w-full bg-white/5 md:h-[420px]" />
+            )}
+            <span className="absolute bottom-4 left-4 rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
+              Featured
+            </span>
           </div>
 
-          <aside className="space-y-4 rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
-            <div className="flex items-center gap-3">
-              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-neutral-200">
-                SJ
-              </div>
-              <div>
-                <div className="text-xs uppercase tracking-[0.3em] text-neutral-400">
-                  Listed by
-                </div>
-                <div className="text-base font-semibold text-white">
-                  Sarah Jenkins
-                </div>
-                <div className="text-xs text-neutral-300">DRE# 01234567</div>
-                {property.agent_phone && (
-                  <div className="text-xs text-neutral-300">
-                    Phone: {property.agent_phone}
-                  </div>
+          <div className="grid grid-cols-2 gap-4">
+            {gallerySlots.slice(1).map((imageUrl, index) => (
+              <div
+                key={`${typedProperty.id}-gallery-${index}`}
+                className="overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+              >
+                {imageUrl ? (
+                  <div
+                    className="h-36 w-full bg-cover bg-center md:h-[200px]"
+                    style={{ backgroundImage: `url(${imageUrl})` }}
+                  />
+                ) : (
+                  <div className="h-36 w-full bg-white/5 md:h-[200px]" />
                 )}
               </div>
-            </div>
-
-            <div className="flex gap-2">
-              <button className="flex-1 rounded-xl border border-white/10 bg-white/5 px-4 py-2 text-sm font-semibold text-white">
-                Schedule Tour
-              </button>
-              <button className="flex-1 rounded-xl border border-white/10 bg-white/0 px-4 py-2 text-sm font-semibold text-neutral-300">
-                Request Info
-              </button>
-            </div>
-
-            <RequestTourForm propertyId={property.id} propertyTitle={property.title} />
-          </aside>
+            ))}
+          </div>
         </section>
 
-        <section className="mt-10 space-y-10">
-          <div className="space-y-3">
-            <div className="text-3xl font-semibold text-white">
-              ${Number(property.price).toLocaleString()}
+        <section className="mt-10 grid gap-8 lg:grid-cols-[1.6fr_1fr]">
+          <div className="space-y-8">
+            <div className="space-y-3">
+              <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl font-[var(--font-display)]">
+                ${formattedPrice}
+              </h1>
+              <p className="text-sm text-neutral-300">{typedProperty.title}</p>
+              <p className="text-sm text-neutral-400">{typedProperty.city}</p>
             </div>
-            <div className="text-neutral-400">
-              {property.title}
-            </div>
-            <div className="flex flex-wrap gap-6 border-y border-white/10 py-4 text-sm text-neutral-300">
-              <span className="flex items-center gap-2">
-                <BedIcon />
-                {property.bedrooms ?? "—"} Beds
-              </span>
-              <span className="flex items-center gap-2">
-                <BathIcon />
-                {property.bathrooms ?? "—"} Baths
-              </span>
-              <span className="flex items-center gap-2">
-                <AreaIcon />
-                {property.area_sqft ?? "—"} Sqft
-              </span>
-              <span className="flex items-center gap-2">
-                <GarageIcon />
-                Garage
-              </span>
-            </div>
-          </div>
 
-          <div className="space-y-4 text-sm text-neutral-300">
-            <h2 className="text-lg font-semibold text-white">About this home</h2>
-            <p>
-              {property.description ??
-                "Modern luxury living with open floor plan, generous natural light, and seamless indoor-outdoor flow."}
-            </p>
-            <button className="text-sm font-semibold text-neutral-300">
-              Read more v
-            </button>
-          </div>
+            <div className="grid gap-4 rounded-3xl border border-white/10 bg-white/5 px-6 py-5 text-sm text-neutral-400 md:grid-cols-4">
+              <div className="flex items-center gap-2">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-neutral-400"
+                >
+                  <path d="M3 10h18" />
+                  <path d="M7 10V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3" />
+                  <path d="M5 20v-6h14v6" />
+                </svg>
+                {typedProperty.bedrooms ?? "-"} Beds
+              </div>
+              <div className="flex items-center gap-2">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-neutral-400"
+                >
+                  <path d="M9 6h6" />
+                  <path d="M7 6h10l1 6H6l1-6z" />
+                  <path d="M6 12v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6" />
+                </svg>
+                {typedProperty.bathrooms ?? "-"} Baths
+              </div>
+              <div className="flex items-center gap-2">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-neutral-400"
+                >
+                  <rect x="4" y="4" width="16" height="16" rx="2" />
+                  <path d="M4 12h16" />
+                  <path d="M12 4v16" />
+                </svg>
+                {typedProperty.area_sqft
+                  ? `${typedProperty.area_sqft.toLocaleString()} Sqft`
+                  : "- Sqft"}
+              </div>
+              <div className="flex items-center gap-2">
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="text-neutral-400"
+                >
+                  <path d="M3 11l9-7 9 7" />
+                  <path d="M9 22V12h6v10" />
+                </svg>
+                2 Garage
+              </div>
+            </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">Highlights</h3>
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {defaultHighlights.map((highlight) => {
-                const Icon = highlightIcons[highlight] ?? ShieldIcon;
-                return (
+            <div className="space-y-4">
+              <h2 className="text-lg font-semibold font-[var(--font-display)]">
+                About this home
+              </h2>
+              <p className="text-sm leading-relaxed text-neutral-400">
+                {typedProperty.description ??
+                  "Experience refined living with thoughtful finishes, expansive entertaining spaces, and a seamless indoor-outdoor flow designed for modern comfort."}
+              </p>
+              <button className="text-xs font-semibold text-neutral-300 transition hover:text-white">
+                Read more
+              </button>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold font-[var(--font-display)]">Highlights</h3>
+              <div className="grid gap-3 text-sm text-neutral-400 sm:grid-cols-3">
+                {highlights.map((item) => (
                   <div
-                    key={highlight}
-                    className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-neutral-200"
+                    key={item}
+                    className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
                   >
-                    <span className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-500/15 text-neutral-300">
-                      <Icon />
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-500/20 text-neutral-200">
+                      <svg
+                        width="14"
+                        height="14"
+                        viewBox="0 0 24 24"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="2"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                      >
+                        <path d="M5 12h14" />
+                        <path d="M12 5v14" />
+                      </svg>
                     </span>
-                    <span>{highlight}</span>
+                    {item}
                   </div>
-                );
-              })}
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <h3 className="text-lg font-semibold font-[var(--font-display)]">Location</h3>
+              <div className="relative h-56 overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+                <div className="absolute bottom-4 right-4 rounded-full bg-black/60 px-3 py-1 text-xs text-white">
+                  {typedProperty.city}
+                </div>
+                <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neutral-500 shadow-[0_0_16px_rgba(163,163,163,0.6)]" />
+              </div>
             </div>
           </div>
 
-          <div className="space-y-4">
-            <h3 className="text-lg font-semibold text-white">Location</h3>
-            <div className="relative h-64 overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/40">
-              <div className="absolute inset-0 bg-neutral-950/60" />
-              <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neutral-500 p-3 text-white shadow-lg">
-                <PinIcon />
+          <aside className="space-y-6">
+            <div className="rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
+              <div className="flex items-center gap-4">
+                <div className="h-12 w-12 rounded-full bg-white/10" />
+                <div>
+                  <p className="text-xs text-neutral-400">Listed by</p>
+                  <p className="text-sm font-semibold">Luxe Estates</p>
+                  <p className="text-xs text-neutral-400">DRE-01234567</p>
+                </div>
               </div>
-              <div className="absolute bottom-4 right-4 rounded-full bg-black/50 px-3 py-1 text-xs text-white">
-                {property.city}
+
+              <div className="mt-5 grid grid-cols-2 gap-3">
+                <button className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20">
+                  Schedule Tour
+                </button>
+                <button className="rounded-full border border-white/10 px-4 py-2 text-sm text-neutral-300 transition hover:border-white/30 hover:text-white">
+                  Request Info
+                </button>
               </div>
+
+              <div className="mt-5 space-y-3">
+                <input
+                  placeholder="Name"
+                  className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+                />
+                <input
+                  placeholder="Email"
+                  className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+                />
+                <input
+                  placeholder="Phone"
+                  className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+                />
+                <textarea
+                  placeholder={`I am interested in ${typedProperty.title}...`}
+                  rows={4}
+                  className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+                />
+              </div>
+
+              <button className="mt-5 w-full rounded-xl bg-neutral-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-neutral-400">
+                Request a Tour
+              </button>
+              <p className="mt-3 text-center text-[11px] text-neutral-400">
+                By sending a request, you agree to our Terms & Privacy Policy.
+              </p>
             </div>
-          </div>
+          </aside>
         </section>
       </main>
     </div>
   );
 }
 
-function LogoIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 2v20" />
-      <path d="M2 12h20" />
-      <path d="m4.9 4.9 14.2 14.2" />
-      <path d="m19.1 4.9-14.2 14.2" />
-    </svg>
-  );
-}
 
-function SearchIcon({ className }: { className?: string }) {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      className={className}
-    >
-      <circle cx="11" cy="11" r="8" />
-      <path d="m21 21-4.3-4.3" />
-    </svg>
-  );
-}
-
-function BellIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 7h18s-3 0-3-7" />
-      <path d="M13.7 21a2 2 0 0 1-3.4 0" />
-    </svg>
-  );
-}
-
-function UserIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-      <circle cx="12" cy="7" r="4" />
-    </svg>
-  );
-}
-
-function BedIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 10h18" />
-      <path d="M7 10V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3" />
-      <path d="M5 20v-6h14v6" />
-    </svg>
-  );
-}
-
-function BathIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M9 6h6" />
-      <path d="M7 6h10l1 6H6l1-6z" />
-      <path d="M6 12v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6" />
-    </svg>
-  );
-}
-
-function AreaIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <rect x="4" y="4" width="16" height="16" rx="2" />
-      <path d="M4 12h16" />
-      <path d="M12 4v16" />
-    </svg>
-  );
-}
-
-function GarageIcon() {
-  return (
-    <svg
-      width="16"
-      height="16"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M3 12 12 4l9 8" />
-      <path d="M5 10v10h14V10" />
-      <path d="M9 20v-6h6v6" />
-    </svg>
-  );
-}
-
-function PoolIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M2 20c2 2 6 2 8 0s6-2 8 0" />
-      <path d="M2 16c2 2 6 2 8 0s6-2 8 0" />
-      <path d="M12 4v8" />
-      <path d="M8 8h8" />
-    </svg>
-  );
-}
-
-function AirIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M4 8h10a2 2 0 1 0-2-2" />
-      <path d="M4 12h14a2 2 0 1 0-2-2" />
-      <path d="M4 16h8a2 2 0 1 1-2 2" />
-    </svg>
-  );
-}
-
-function EvIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M14 2h-2l-2 4h4l-2 4" />
-      <rect x="6" y="8" width="12" height="10" rx="2" />
-      <path d="M10 18v2" />
-      <path d="M14 18v2" />
-    </svg>
-  );
-}
-
-function GymIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M2 12h4" />
-      <path d="M18 12h4" />
-      <path d="M6 10v4" />
-      <path d="M18 8v8" />
-      <path d="M8 12h8" />
-    </svg>
-  );
-}
-
-function WineIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M7 3h10" />
-      <path d="M7 3v7a5 5 0 0 0 10 0V3" />
-      <path d="M12 10v9" />
-      <path d="M8 22h8" />
-    </svg>
-  );
-}
-
-function ShieldIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 2 4 5v6c0 5 3.5 9.5 8 11 4.5-1.5 8-6 8-11V5z" />
-      <path d="m9 12 2 2 4-4" />
-    </svg>
-  );
-}
-
-function PinIcon() {
-  return (
-    <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    >
-      <path d="M12 21s-6-4.4-6-10a6 6 0 1 1 12 0c0 5.6-6 10-6 10z" />
-      <circle cx="12" cy="11" r="2" />
-    </svg>
-  );
-}

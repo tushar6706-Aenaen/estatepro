@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabaseBrowserClient } from "../../lib/supabase/client";
 
 type RoleChoice = "buyer" | "agent";
@@ -19,6 +19,7 @@ const roleMap: Record<RoleChoice, ProfileRow["role"]> = {
 
 export default function OnboardingPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [roleChoice, setRoleChoice] = useState<RoleChoice | null>(null);
   const [phone, setPhone] = useState("");
   const [loading, setLoading] = useState(true);
@@ -29,6 +30,12 @@ export default function OnboardingPage() {
   const [existingRole, setExistingRole] = useState<ProfileRow["role"] | null>(
     null,
   );
+  const redirectParam = searchParams.get("redirect") ?? "";
+
+  const resolveRedirect = (value: string) => {
+    if (!value.startsWith("/")) return "/";
+    return value;
+  };
 
   const isSupabaseConfigured = useMemo(() => {
     return Boolean(
@@ -148,6 +155,8 @@ export default function OnboardingPage() {
 
     setSuccess(true);
     setSaving(false);
+    const destination = resolveRedirect(redirectParam);
+    router.push(destination);
   };
 
   return (

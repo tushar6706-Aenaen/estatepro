@@ -25,8 +25,10 @@ export default function AuthPage() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [busy, setBusy] = useState(false);
+  const [resendBusy, setResendBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
+  const [pendingEmail, setPendingEmail] = useState<string | null>(null);
 
   const supabaseReady = useMemo(() => {
     return Boolean(
@@ -95,6 +97,9 @@ export default function AuthPage() {
         const { data, error } = await supabaseBrowserClient.auth.signUp({
           email,
           password,
+          options: {
+            emailRedirectTo: `${window.location.origin}/auth?mode=signin`,
+          },
         });
 
         if (error) {
@@ -109,8 +114,10 @@ export default function AuthPage() {
         if (data.session) {
           await ensureProfileRow(userId);
           setNotice("Account created. Let's finish your profile.");
+          setPendingEmail(null);
           router.push("/onboarding");
         } else {
+          setPendingEmail(email);
           setNotice("Check your email to confirm your account, then sign in.");
         }
       } else {
@@ -121,6 +128,11 @@ export default function AuthPage() {
           });
 
         if (error) {
+          if (error.message.toLowerCase().includes("email not confirmed")) {
+            setPendingEmail(email);
+            setNotice("Confirm your email first. We can resend the link below.");
+            return;
+          }
           throw new Error(error.message);
         }
 
@@ -150,8 +162,37 @@ export default function AuthPage() {
     }
   };
 
+  const handleResend = async () => {
+    if (!pendingEmail) return;
+    setError(null);
+    setNotice(null);
+    setResendBusy(true);
+
+    try {
+      const { error } = await supabaseBrowserClient.auth.resend({
+        type: "signup",
+        email: pendingEmail,
+        options: {
+          emailRedirectTo: `${window.location.origin}/auth?mode=signin`,
+        },
+      });
+
+      if (error) {
+        throw new Error(error.message);
+      }
+
+      setNotice("Confirmation email sent. Check your inbox.");
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Unable to resend email.";
+      setError(message);
+    } finally {
+      setResendBusy(false);
+    }
+  };
+
   return (
-    <div className="relative min-h-screen overflow-hidden bg-neutral-950 text-white">
+    <div className="relative max-h-screen overflow-hidden bg-neutral-950 text-white">
       <div className="pointer-events-none absolute inset-0 opacity-70">
         <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-neutral-900/40 blur-3xl" />
         <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-neutral-800/30 blur-3xl" />
@@ -184,33 +225,8 @@ export default function AuthPage() {
           </div>
         </div>
 
-        <div className="grid gap-8 lg:grid-cols-[1.05fr,1fr]">
-          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5 p-8 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.6)] backdrop-blur">
-            <div className="relative space-y-6">
-              <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/10 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.24em] text-neutral-200">
-                Secure access
-              </div>
-              <h1 className="text-3xl font-semibold leading-tight text-white md:text-4xl">
-                Sign in to list homes or track your inquiries.
-              </h1>
-              <p className="max-w-2xl text-base text-neutral-200/80">
-                Use email and password - no magic links required. New accounts
-                start as public; switch to agent during onboarding to unlock
-                listing tools.
-              </p>
-              <div className="grid gap-3 text-sm text-neutral-200/80 md:grid-cols-2">
-                <FeatureCard title="Email auth" body="Password-based entry built on Supabase Auth." />
-                <FeatureCard title="Profile auto-sync" body="We create or update your profile row after sign-in." />
-                <FeatureCard title="Role-aware redirects" body="Public users land in onboarding, agents jump to their space." />
-                <FeatureCard title="Ready for dashboards" body="Guards are in place for agent/admin-only pages." />
-              </div>
-              <div className="text-xs text-neutral-400">
-                Need help? Check your `.env.local` values for
-                `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`.
-              </div>
-            </div>
-          </div>
-
+        <div className="max-w-xl mx-auto w-full">
+          
           <form
             onSubmit={handleAuth}
             className="relative space-y-6 rounded-3xl border border-white/10 bg-neutral-900/70 p-8 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.9)]"
@@ -219,7 +235,12 @@ export default function AuthPage() {
               <div className="flex gap-2 rounded-full bg-white/5 p-1 text-xs font-semibold text-white">
                 <button
                   type="button"
-                  onClick={() => setMode("signin")}
+                  onClick={() => {
+                    setMode("signin");
+                    setPendingEmail(null);
+                    setError(null);
+                    setNotice(null);
+                  }}
                   className={`rounded-full px-4 py-2 transition ${
                     mode === "signin"
                       ? "bg-white text-neutral-900"
@@ -230,7 +251,12 @@ export default function AuthPage() {
                 </button>
                 <button
                   type="button"
-                  onClick={() => setMode("signup")}
+                  onClick={() => {
+                    setMode("signup");
+                    setPendingEmail(null);
+                    setError(null);
+                    setNotice(null);
+                  }}
                   className={`rounded-full px-4 py-2 transition ${
                     mode === "signup"
                       ? "bg-white text-neutral-900"
@@ -311,6 +337,26 @@ export default function AuthPage() {
               </div>
             )}
 
+            {pendingEmail && (
+              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-neutral-300">
+                <div className="font-semibold text-white">
+                  Waiting for confirmation
+                </div>
+                <div className="mt-1">
+                  We sent a confirmation link to {pendingEmail}. If you do not
+                  see it, check your spam folder or resend below.
+                </div>
+                <button
+                  type="button"
+                  onClick={handleResend}
+                  disabled={resendBusy}
+                  className="mt-3 inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-neutral-100 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                >
+                  {resendBusy ? "Sending..." : "Resend confirmation email"}
+                </button>
+              </div>
+            )}
+
             <button
               type="submit"
               disabled={busy}
@@ -319,14 +365,7 @@ export default function AuthPage() {
               {busy ? "Working..." : mode === "signup" ? "Create account" : "Sign in"}
             </button>
 
-            <div className="space-y-2 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-xs text-neutral-300">
-              <div className="font-semibold text-white">What happens next</div>
-              <ul className="space-y-1">
-                <li>- We keep your session in the browser via Supabase Auth.</li>
-                <li>- A profile row is created or updated automatically.</li>
-                <li>- Public users are routed to onboarding to pick a role.</li>
-              </ul>
-            </div>
+            
           </form>
         </div>
       </main>
@@ -334,13 +373,4 @@ export default function AuthPage() {
   );
 }
 
-function FeatureCard({ title, body }: { title: string; body: string }) {
-  return (
-    <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 shadow-[0_12px_32px_-24px_rgba(0,0,0,0.8)]">
-      <div className="text-xs font-semibold uppercase tracking-[0.18em] text-neutral-300">
-        {title}
-      </div>
-      <div className="mt-2 text-sm text-neutral-200/90">{body}</div>
-    </div>
-  );
-}
+
