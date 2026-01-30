@@ -12,6 +12,7 @@ type ProfileRow = {
   state: string | null;
   is_premium: boolean | null;
   created_at: string | null;
+  avatar_url: string | null;
 };
 
 type InquiryRow = {
@@ -70,13 +71,18 @@ export default function UserProfilePage() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   const [email, setEmail] = useState<string | null>(null);
   const [fullName, setFullName] = useState("");
+  const [city, setCity] = useState("");
+  const [regionState, setRegionState] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [profile, setProfile] = useState<ProfileRow | null>(null);
   const [totalInquiries, setTotalInquiries] = useState(0);
+  const [inquiryDelta, setInquiryDelta] = useState(0);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
 
   useEffect(() => {
@@ -107,17 +113,38 @@ export default function UserProfilePage() {
 
       setEmail(user.email ?? null);
 
-      const [profileResponse, inquiriesCount, inquiryActivity] =
+      const now = new Date();
+      const currentStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const previousStart = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+      const [
+        profileResponse,
+        inquiriesCount,
+        inquiriesCurrent,
+        inquiriesPrevious,
+        inquiryActivity,
+      ] =
         await Promise.all([
           supabaseBrowserClient
             .from("profiles")
-            .select("full_name, city, state, is_premium, created_at")
+            .select("full_name, city, state, is_premium, created_at, avatar_url")
             .eq("id", user.id)
             .maybeSingle<ProfileRow>(),
           supabaseBrowserClient
             .from("inquiries")
             .select("id", { count: "exact", head: true })
             .eq("user_id", user.id),
+          supabaseBrowserClient
+            .from("inquiries")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .gte("created_at", currentStart.toISOString()),
+          supabaseBrowserClient
+            .from("inquiries")
+            .select("id", { count: "exact", head: true })
+            .eq("user_id", user.id)
+            .gte("created_at", previousStart.toISOString())
+            .lt("created_at", currentStart.toISOString()),
           supabaseBrowserClient
             .from("inquiries")
             .select(
@@ -138,6 +165,14 @@ export default function UserProfilePage() {
         setError(inquiriesCount.error.message);
       }
 
+      if (inquiriesCurrent.error) {
+        setError(inquiriesCurrent.error.message);
+      }
+
+      if (inquiriesPrevious.error) {
+        setError(inquiriesPrevious.error.message);
+      }
+
       if (inquiryActivity.error) {
         setError(inquiryActivity.error.message);
       }
@@ -145,9 +180,15 @@ export default function UserProfilePage() {
       if (profileResponse.data) {
         setProfile(profileResponse.data);
         setFullName(profileResponse.data.full_name ?? "");
+        setCity(profileResponse.data.city ?? "");
+        setRegionState(profileResponse.data.state ?? "");
+        setAvatarUrl(profileResponse.data.avatar_url ?? null);
       }
 
       setTotalInquiries(inquiriesCount.count ?? 0);
+      setInquiryDelta(
+        (inquiriesCurrent.count ?? 0) - (inquiriesPrevious.count ?? 0),
+      );
 
       const inquiryRows = (inquiryActivity.data ?? []) as InquiryRow[];
       const mapped = inquiryRows.map((item) => {
@@ -182,6 +223,46 @@ export default function UserProfilePage() {
     };
   }, [supabaseReady]);
 
+  const handleAvatarUpload = async (file: File) => {
+    if (!supabaseReady) {
+      setError("Supabase environment variables are missing in .env.local.");
+      return;
+    }
+
+    setUploading(true);
+    setError(null);
+    setSuccess(null);
+
+    const { data, error: authError } =
+      await supabaseBrowserClient.auth.getUser();
+
+    if (authError || !data.user) {
+      setError(authError?.message ?? "Sign in to upload an avatar.");
+      setUploading(false);
+      return;
+    }
+
+    const extension = file.name.split(".").pop() ?? "png";
+    const filePath = `${data.user.id}/${Date.now()}.${extension}`;
+
+    const { error: uploadError } = await supabaseBrowserClient.storage
+      .from("avatars")
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) {
+      setError(uploadError.message);
+      setUploading(false);
+      return;
+    }
+
+    const { data: publicUrlData } = supabaseBrowserClient.storage
+      .from("avatars")
+      .getPublicUrl(filePath);
+
+    setAvatarUrl(publicUrlData.publicUrl);
+    setUploading(false);
+  };
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
@@ -213,6 +294,9 @@ export default function UserProfilePage() {
     const payload = {
       id: user.id,
       full_name: fullName.trim() ? fullName.trim() : null,
+      city: city.trim() ? city.trim() : null,
+      state: regionState.trim() ? regionState.trim() : null,
+      avatar_url: avatarUrl,
     };
 
     const { error: updateError } = await supabaseBrowserClient
@@ -223,6 +307,14 @@ export default function UserProfilePage() {
       setError(updateError.message);
     } else {
       setSuccess("Profile updated successfully.");
+      setProfile((prev) => ({
+        full_name: fullName.trim() ? fullName.trim() : null,
+        city: city.trim() ? city.trim() : null,
+        state: regionState.trim() ? regionState.trim() : null,
+        is_premium: prev?.is_premium ?? null,
+        created_at: prev?.created_at ?? null,
+        avatar_url: avatarUrl,
+      }));
     }
 
     setSaving(false);
@@ -238,13 +330,21 @@ export default function UserProfilePage() {
     .toUpperCase();
 
   const locationText =
-    profile?.city && profile?.state
-      ? `${profile.city}, ${profile.state}`
-      : profile?.city
-        ? profile.city
-        : "Location not set";
+    city && regionState
+      ? `${city}, ${regionState}`
+      : city
+        ? city
+        : profile?.city && profile?.state
+          ? `${profile.city}, ${profile.state}`
+          : profile?.city
+            ? profile.city
+            : "Location not set";
 
   const joinedText = formatMonthYear(profile?.created_at ?? null);
+  const deltaLabel = loading
+    ? "--"
+    : `${inquiryDelta >= 0 ? "+" : ""}${inquiryDelta}`;
+  const deltaText = loading ? "Loading activity..." : `${deltaLabel} since last month`;
 
   return (
     <div className="min-h-screen bg-neutral-950 text-white">
@@ -255,19 +355,47 @@ export default function UserProfilePage() {
           href="/"
           className="flex items-center gap-2 text-sm text-neutral-400 transition hover:text-white"
         >
-          <span className="text-lg">←</span>
+          <span className="text-lg"><-</span>
           Dashboard
         </Link>
 
         <section className="mt-6 rounded-3xl border border-white/10 bg-neutral-900/60 p-6 md:p-8">
           <div className="flex flex-wrap items-center gap-6">
-            <div className="relative h-20 w-20 overflow-hidden rounded-full border border-white/15 bg-neutral-800 text-lg font-semibold text-white">
-              <div className="flex h-full w-full items-center justify-center">
-                {initials || "U"}
-              </div>
-              <span className="absolute bottom-0 right-0 flex h-8 w-8 items-center justify-center rounded-full border-4 border-neutral-900 bg-neutral-500 text-xs font-bold">
-                ✎
-              </span>
+            <div
+              className="relative h-20 w-20 overflow-hidden rounded-full border border-white/15 bg-neutral-800 text-lg font-semibold text-white"
+              style={
+                avatarUrl
+                  ? {
+                      backgroundImage: `url(${avatarUrl})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }
+                  : undefined
+              }
+            >
+              {!avatarUrl && (
+                <div className="flex h-full w-full items-center justify-center">
+                  {initials || "U"}
+                </div>
+              )}
+              <label
+                htmlFor="user-avatar-upload"
+                className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-4 border-neutral-900 bg-neutral-500 text-xs font-bold"
+              >
+                E
+              </label>
+              <input
+                id="user-avatar-upload"
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) {
+                    handleAvatarUpload(file);
+                  }
+                }}
+              />
             </div>
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-3">
@@ -283,7 +411,7 @@ export default function UserProfilePage() {
               </p>
               <div className="mt-3 flex flex-wrap gap-2 text-xs text-neutral-300">
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
-                  📍 {locationText}
+                  Location: {locationText}
                 </span>
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
                   {joinedText}
@@ -303,7 +431,6 @@ export default function UserProfilePage() {
             <label className="space-y-2 text-sm text-neutral-300">
               Full Name
               <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2">
-                <span className="text-neutral-500">👤</span>
                 <input
                   value={fullName}
                   onChange={(event) => setFullName(event.target.value)}
@@ -315,11 +442,32 @@ export default function UserProfilePage() {
             <label className="space-y-2 text-sm text-neutral-300">
               Email Address (Read only)
               <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2">
-                <span className="text-neutral-500">✉️</span>
                 <input
                   value={email ?? ""}
                   readOnly
                   className="w-full bg-transparent text-sm text-neutral-400 outline-none"
+                />
+              </div>
+            </label>
+            <label className="space-y-2 text-sm text-neutral-300">
+              City
+              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2">
+                <input
+                  value={city}
+                  onChange={(event) => setCity(event.target.value)}
+                  placeholder="City"
+                  className="w-full bg-transparent text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+                />
+              </div>
+            </label>
+            <label className="space-y-2 text-sm text-neutral-300">
+              State
+              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2">
+                <input
+                  value={regionState}
+                  onChange={(event) => setRegionState(event.target.value)}
+                  placeholder="State"
+                  className="w-full bg-transparent text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
                 />
               </div>
             </label>
@@ -337,7 +485,7 @@ export default function UserProfilePage() {
               )}
               <button
                 type="submit"
-                disabled={saving || loading}
+                disabled={saving || loading || uploading}
                 className="rounded-full bg-neutral-500 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-400 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {saving ? "Saving..." : "Save Changes"}
@@ -350,13 +498,15 @@ export default function UserProfilePage() {
           <div className="rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
             <div className="flex items-center justify-between text-xs text-neutral-500">
               <span>THIS MONTH</span>
-              <span className="rounded-full bg-white/5 px-2 py-1">+2</span>
+              <span className="rounded-full bg-white/5 px-2 py-1">
+                {deltaLabel}
+              </span>
             </div>
             <div className="mt-6 text-4xl font-semibold text-white">
               {loading ? "--" : totalInquiries}
             </div>
             <p className="mt-2 text-sm text-neutral-400">Total Inquiries</p>
-            <p className="mt-8 text-xs text-emerald-300">+2 since last week</p>
+            <p className="mt-8 text-xs text-emerald-300">{deltaText}</p>
           </div>
 
           <div className="rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
@@ -412,3 +562,5 @@ export default function UserProfilePage() {
     </div>
   );
 }
+
+

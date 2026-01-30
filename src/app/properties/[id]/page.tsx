@@ -3,6 +3,7 @@ import { Cormorant_Garamond, Manrope } from "next/font/google";
 
 import { createSupabaseServerClient } from "@/src/lib/supabase/server";
 import { HomeHeader } from "@/src/components/layout/home-header";
+import { InquiryForm } from "./inquiry-form";
 
 type PropertyDetail = {
   id: string;
@@ -318,41 +319,12 @@ export default async function PropertyDetailPage({
                 </div>
               </div>
 
-              <div className="mt-5 grid grid-cols-2 gap-3">
-                <button className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20">
-                  Schedule Tour
-                </button>
-                <button className="rounded-full border border-white/10 px-4 py-2 text-sm text-neutral-300 transition hover:border-white/30 hover:text-white">
-                  Request Info
-                </button>
-              </div>
-
-              <div className="mt-5 space-y-3">
-                <input
-                  placeholder="Name"
-                  className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
-                />
-                <input
-                  placeholder="Email"
-                  className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
-                />
-                <input
-                  placeholder="Phone"
-                  className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
-                />
-                <textarea
-                  placeholder={`I am interested in ${typedProperty.title}...`}
-                  rows={4}
-                  className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+              <div className="mt-5">
+                <InquiryForm
+                  propertyId={typedProperty.id}
+                  propertyTitle={typedProperty.title}
                 />
               </div>
-
-              <button className="mt-5 w-full rounded-xl bg-neutral-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-neutral-400">
-                Request a Tour
-              </button>
-              <p className="mt-3 text-center text-[11px] text-neutral-400">
-                By sending a request, you agree to our Terms & Privacy Policy.
-              </p>
             </div>
           </aside>
         </section>

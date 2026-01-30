@@ -285,7 +285,7 @@ export default function AgentProfilePage() {
   const profileName = profile?.full_name || "Your Agent Profile";
   const profileTitle = profile?.agent_title || "Real Estate Agent";
   const profileRating = profile?.rating
-    ? `${profile.rating.toFixed(1)} ★ (${profile.reviews_count ?? 0} Reviews)`
+    ? `${profile.rating.toFixed(1)} * (${profile.reviews_count ?? 0} Reviews)`
     : "New agent";
   const profileLocation =
     profile?.city && profile?.state
@@ -343,7 +343,7 @@ export default function AgentProfilePage() {
                   </span>
                 </div>
                 <p className="mt-2 text-sm text-neutral-300">
-                  {loading ? "" : `${profileTitle} · ${profileRating}`}
+                  {loading ? "" : `${profileTitle} - ${profileRating}`}
                 </p>
                 <p className="mt-1 text-sm text-neutral-500">{profileLocation}</p>
               </div>
@@ -494,7 +494,7 @@ export default function AgentProfilePage() {
                 href="/agent"
                 className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-neutral-300 transition hover:text-white"
               >
-                Go to Dashboard →
+                Go to Dashboard ->
               </Link>
             </div>
           </section>
@@ -575,3 +575,4 @@ export default function AgentProfilePage() {
     </div>
   );
 }
+

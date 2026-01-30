@@ -7,6 +7,9 @@ import { supabaseBrowserClient } from "@/src/lib/supabase/client";
 type ProfileRow = {
   full_name: string | null;
   phone: string | null;
+  city: string | null;
+  state: string | null;
+  avatar_url: string | null;
   role: "public" | "agent" | "admin" | null;
 };
 
@@ -20,12 +23,16 @@ export function AdminProfileForm() {
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [uploading, setUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
 
   const [email, setEmail] = useState<string | null>(null);
   const [fullName, setFullName] = useState("");
   const [phone, setPhone] = useState("");
+  const [city, setCity] = useState("");
+  const [regionState, setRegionState] = useState("");
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [role, setRole] = useState<ProfileRow["role"]>(null);
 
   useEffect(() => {
@@ -57,7 +64,7 @@ export function AdminProfileForm() {
       const { data: profile, error: profileError } =
         await supabaseBrowserClient
           .from("profiles")
-          .select("full_name, phone, role")
+          .select("full_name, phone, city, state, avatar_url, role")
           .eq("id", user.id)
           .maybeSingle<ProfileRow>();
 
@@ -70,6 +77,9 @@ export function AdminProfileForm() {
       if (profile) {
         setFullName(profile.full_name ?? "");
         setPhone(profile.phone ?? "");
+        setCity(profile.city ?? "");
+        setRegionState(profile.state ?? "");
+        setAvatarUrl(profile.avatar_url ?? null);
         setRole(profile.role ?? "admin");
       } else {
         setRole("admin");
@@ -80,6 +90,46 @@ export function AdminProfileForm() {
 
     loadProfile();
   }, [supabaseReady]);
+
+  const handleAvatarUpload = async (file: File) => {
+    if (!supabaseReady) {
+      setError("Supabase environment variables are missing in .env.local.");
+      return;
+    }
+
+    setUploading(true);
+    setError(null);
+    setSuccess(null);
+
+    const { data, error: authError } =
+      await supabaseBrowserClient.auth.getUser();
+
+    if (authError || !data.user) {
+      setError(authError?.message ?? "Sign in to upload an avatar.");
+      setUploading(false);
+      return;
+    }
+
+    const extension = file.name.split(".").pop() ?? "png";
+    const filePath = `${data.user.id}/${Date.now()}.${extension}`;
+
+    const { error: uploadError } = await supabaseBrowserClient.storage
+      .from("avatars")
+      .upload(filePath, file, { upsert: true });
+
+    if (uploadError) {
+      setError(uploadError.message);
+      setUploading(false);
+      return;
+    }
+
+    const { data: publicUrlData } = supabaseBrowserClient.storage
+      .from("avatars")
+      .getPublicUrl(filePath);
+
+    setAvatarUrl(publicUrlData.publicUrl);
+    setUploading(false);
+  };
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -113,6 +163,9 @@ export function AdminProfileForm() {
       id: user.id,
       full_name: fullName.trim() ? fullName.trim() : null,
       phone: phone.trim() ? phone.trim() : null,
+      city: city.trim() ? city.trim() : null,
+      state: regionState.trim() ? regionState.trim() : null,
+      avatar_url: avatarUrl,
       role: role ?? "admin",
     };
 
@@ -154,6 +207,56 @@ export function AdminProfileForm() {
         </div>
       ) : (
         <div className="mt-5 space-y-4">
+          <div className="flex items-center gap-4">
+            <div
+              className="relative h-16 w-16 overflow-hidden rounded-full border border-white/10 bg-neutral-800"
+              style={
+                avatarUrl
+                  ? {
+                      backgroundImage: `url(${avatarUrl})`,
+                      backgroundSize: "cover",
+                      backgroundPosition: "center",
+                    }
+                  : undefined
+              }
+            >
+              {!avatarUrl && (
+                <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-white">
+                  {fullName
+                    .split(" ")
+                    .filter(Boolean)
+                    .map((part) => part[0])
+                    .slice(0, 2)
+                    .join("")
+                    .toUpperCase() || "AD"}
+                </div>
+              )}
+              <label
+                htmlFor="admin-avatar-upload"
+                className="absolute bottom-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-2 border-neutral-900 bg-neutral-500 text-[10px] font-semibold text-white"
+              >
+                E
+              </label>
+              <input
+                id="admin-avatar-upload"
+                type="file"
+                accept="image/*"
+                className="sr-only"
+                onChange={(event) => {
+                  const file = event.target.files?.[0];
+                  if (file) {
+                    handleAvatarUpload(file);
+                  }
+                }}
+              />
+            </div>
+            <div>
+              <p className="text-sm font-semibold text-white">Avatar</p>
+              <p className="text-xs text-neutral-500">
+                {uploading ? "Uploading..." : "PNG, JPG up to 5MB"}
+              </p>
+            </div>
+          </div>
           <div className="space-y-2">
             <label className="text-xs uppercase tracking-[0.2em] text-neutral-500">
               Full Name
@@ -186,6 +289,30 @@ export function AdminProfileForm() {
               className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
             />
           </div>
+          <div className="grid gap-4 md:grid-cols-2">
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+                City
+              </label>
+              <input
+                value={city}
+                onChange={(event) => setCity(event.target.value)}
+                placeholder="City"
+                className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+                State
+              </label>
+              <input
+                value={regionState}
+                onChange={(event) => setRegionState(event.target.value)}
+                placeholder="State"
+                className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+              />
+            </div>
+          </div>
           <div className="space-y-2">
             <label className="text-xs uppercase tracking-[0.2em] text-neutral-500">
               Role
@@ -213,7 +340,7 @@ export function AdminProfileForm() {
 
       <button
         type="submit"
-        disabled={saving || loading}
+        disabled={saving || loading || uploading}
         className="mt-5 w-full rounded-full bg-neutral-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-neutral-400 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {saving ? "Saving..." : "Save Changes"}
@@ -221,3 +348,4 @@ export function AdminProfileForm() {
     </form>
   );
 }
+
