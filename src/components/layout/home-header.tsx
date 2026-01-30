@@ -82,7 +82,11 @@ export function HomeHeader() {
   const isAdmin = role === "admin";
   const avatarFallback = userEmail?.[0]?.toUpperCase() ?? "?";
   const accountDestination = isAdmin ? "/admin" : "/onboarding";
-  const profileDestination = isAdmin ? "/admin/profile" : "/onboarding";
+  const profileDestination = isAdmin
+    ? "/admin/profile"
+    : isAgent
+      ? "/agent/profile"
+      : "/profile";
 
   const handleSignOut = async () => {
     await supabaseBrowserClient.auth.signOut();

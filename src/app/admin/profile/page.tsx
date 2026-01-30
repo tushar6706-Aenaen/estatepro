@@ -1,14 +1,44 @@
-﻿import Link from "next/link";
+﻿"use client";
+
+import Link from "next/link";
+import { useEffect, useMemo, useState } from "react";
 
 import { HomeHeader } from "@/src/components/layout/home-header";
 import { RoleGuard } from "@/src/components/auth/role-guard";
+import { supabaseBrowserClient } from "@/src/lib/supabase/client";
 import { AdminProfileForm } from "./admin-profile-form";
 
-const statCards = [
+type StatState = {
+  pending: number;
+  users: number;
+  properties: number;
+  pendingDelta: number;
+  usersDelta: number;
+  propertiesDelta: number;
+};
+
+type ApprovalRow = {
+  id: string;
+  title: string | null;
+  city: string | null;
+  created_at: string | null;
+  property_images?: { image_url: string | null; is_primary: boolean | null }[];
+  profiles?: { full_name: string | null } | null;
+};
+
+type ApprovalItem = {
+  id: string;
+  title: string;
+  location: string;
+  agent: string;
+  time: string;
+  imageUrl: string | null;
+};
+
+const statDefinitions = [
   {
+    key: "pending",
     label: "Pending Listings",
-    value: "12",
-    delta: "+2%",
     icon: (
       <svg
         width="20"
@@ -27,9 +57,8 @@ const statCards = [
     ),
   },
   {
+    key: "users",
     label: "Total Users",
-    value: "1,450",
-    delta: "+12%",
     icon: (
       <svg
         width="20"
@@ -49,9 +78,8 @@ const statCards = [
     ),
   },
   {
+    key: "properties",
     label: "Total Properties",
-    value: "328",
-    delta: "+5%",
     icon: (
       <svg
         width="20"
@@ -70,40 +98,204 @@ const statCards = [
   },
 ];
 
-const approvals = [
-  {
-    title: "Downtown Loft",
-    address: "123 Main St, Apt 4B",
-    agent: "Sarah Jenkins",
-    time: "2 hours ago",
-  },
-  {
-    title: "Family Home",
-    address: "456 Oak Lane",
-    agent: "Mike Ross",
-    time: "5 hours ago",
-  },
-  {
-    title: "City Center Condo",
-    address: "789 Pine St, Unit 12",
-    agent: "Jessica Pearson",
-    time: "1 day ago",
-  },
-  {
-    title: "Seaside Villa",
-    address: "101 Ocean Dr",
-    agent: "Louis Litt",
-    time: "1 day ago",
-  },
-  {
-    title: "Cozy Cabin",
-    address: "88 Forest Rd",
-    agent: "Harvey Specter",
-    time: "2 days ago",
-  },
-];
+const formatDelta = (value: number) => {
+  if (!Number.isFinite(value)) return "--";
+  const rounded = Math.round(value);
+  const prefix = rounded > 0 ? "+" : "";
+  return `${prefix}${rounded}%`;
+};
+
+const calculateDelta = (current: number, previous: number) => {
+  if (previous === 0) {
+    return current === 0 ? 0 : 100;
+  }
+  return ((current - previous) / previous) * 100;
+};
+
+const timeAgo = (dateString: string | null) => {
+  if (!dateString) return "Just now";
+  const date = new Date(dateString);
+  const seconds = Math.floor((Date.now() - date.getTime()) / 1000);
+  if (seconds < 60) return "Just now";
+  const minutes = Math.floor(seconds / 60);
+  if (minutes < 60) return `${minutes} min ago`;
+  const hours = Math.floor(minutes / 60);
+  if (hours < 24) return `${hours} hours ago`;
+  const days = Math.floor(hours / 24);
+  return `${days} days ago`;
+};
 
 export default function AdminProfilePage() {
+  const supabaseReady = useMemo(() => {
+    return Boolean(
+      process.env.NEXT_PUBLIC_SUPABASE_URL &&
+        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY,
+    );
+  }, []);
+
+  const [loading, setLoading] = useState(true);
+  const [loadError, setLoadError] = useState<string | null>(null);
+  const [stats, setStats] = useState<StatState>({
+    pending: 0,
+    users: 0,
+    properties: 0,
+    pendingDelta: 0,
+    usersDelta: 0,
+    propertiesDelta: 0,
+  });
+  const [approvals, setApprovals] = useState<ApprovalItem[]>([]);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const loadData = async () => {
+      if (!supabaseReady) {
+        setLoadError("Supabase environment variables are missing in .env.local.");
+        setLoading(false);
+        return;
+      }
+
+      setLoading(true);
+      setLoadError(null);
+
+      const { data: authData, error: authError } =
+        await supabaseBrowserClient.auth.getUser();
+
+      if (authError || !authData.user) {
+        setLoadError("Sign in with an admin account to view this profile.");
+        setLoading(false);
+        return;
+      }
+
+      const now = new Date();
+      const currentStart = new Date(now.getTime() - 30 * 24 * 60 * 60 * 1000);
+      const previousStart = new Date(now.getTime() - 60 * 24 * 60 * 60 * 1000);
+
+      const [
+        pendingCount,
+        userCount,
+        propertyCount,
+        pendingCurrent,
+        pendingPrevious,
+        userCurrent,
+        userPrevious,
+        propertyCurrent,
+        propertyPrevious,
+        approvalsResponse,
+      ] = await Promise.all([
+        supabaseBrowserClient
+          .from("properties")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending"),
+        supabaseBrowserClient
+          .from("profiles")
+          .select("id", { count: "exact", head: true }),
+        supabaseBrowserClient
+          .from("properties")
+          .select("id", { count: "exact", head: true }),
+        supabaseBrowserClient
+          .from("properties")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending")
+          .gte("created_at", currentStart.toISOString()),
+        supabaseBrowserClient
+          .from("properties")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "pending")
+          .gte("created_at", previousStart.toISOString())
+          .lt("created_at", currentStart.toISOString()),
+        supabaseBrowserClient
+          .from("profiles")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", currentStart.toISOString()),
+        supabaseBrowserClient
+          .from("profiles")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", previousStart.toISOString())
+          .lt("created_at", currentStart.toISOString()),
+        supabaseBrowserClient
+          .from("properties")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", currentStart.toISOString()),
+        supabaseBrowserClient
+          .from("properties")
+          .select("id", { count: "exact", head: true })
+          .gte("created_at", previousStart.toISOString())
+          .lt("created_at", currentStart.toISOString()),
+        supabaseBrowserClient
+          .from("properties")
+          .select(
+            "id,title,city,created_at,property_images(image_url,is_primary),profiles:agent_id(full_name)",
+          )
+          .eq("status", "pending")
+          .order("created_at", { ascending: false })
+          .limit(5),
+      ]);
+
+      if (cancelled) return;
+
+      const errors = [
+        pendingCount.error,
+        userCount.error,
+        propertyCount.error,
+        pendingCurrent.error,
+        pendingPrevious.error,
+        userCurrent.error,
+        userPrevious.error,
+        propertyCurrent.error,
+        propertyPrevious.error,
+        approvalsResponse.error,
+      ].filter(Boolean);
+
+      if (errors.length > 0) {
+        setLoadError(errors[0]?.message ?? "Unable to load admin data.");
+      }
+
+      setStats({
+        pending: pendingCount.count ?? 0,
+        users: userCount.count ?? 0,
+        properties: propertyCount.count ?? 0,
+        pendingDelta: calculateDelta(
+          pendingCurrent.count ?? 0,
+          pendingPrevious.count ?? 0,
+        ),
+        usersDelta: calculateDelta(
+          userCurrent.count ?? 0,
+          userPrevious.count ?? 0,
+        ),
+        propertiesDelta: calculateDelta(
+          propertyCurrent.count ?? 0,
+          propertyPrevious.count ?? 0,
+        ),
+      });
+
+      const approvalData = (approvalsResponse.data ?? []) as ApprovalRow[];
+      const mappedApprovals = approvalData.map((item) => {
+        const images = item.property_images ?? [];
+        const primaryImage =
+          images.find((image) => image.is_primary) ?? images[0];
+
+        return {
+          id: item.id,
+          title: item.title ?? "Untitled listing",
+          location: item.city ?? "Location pending",
+          agent: item.profiles?.full_name ?? "Unknown agent",
+          time: timeAgo(item.created_at),
+          imageUrl: primaryImage?.image_url ?? null,
+        };
+      });
+
+      setApprovals(mappedApprovals);
+      setLoading(false);
+    };
+
+    loadData();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [supabaseReady]);
+
   return (
     <div className="min-h-screen bg-neutral-950 text-white">
       <HomeHeader />
@@ -151,26 +343,47 @@ export default function AdminProfilePage() {
             </div>
           </div>
 
+          {loadError && (
+            <div className="mt-6 rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
+              {loadError}
+            </div>
+          )}
+
           <section className="mt-8 grid gap-4 md:grid-cols-3">
-            {statCards.map((card) => (
-              <div
-                key={card.label}
-                className="rounded-3xl border border-white/10 bg-neutral-900/60 p-5 shadow-[0_20px_40px_-32px_rgba(0,0,0,0.85)]"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-neutral-200">
-                    {card.icon}
+            {statDefinitions.map((card) => {
+              const valueMap = {
+                pending: stats.pending,
+                users: stats.users,
+                properties: stats.properties,
+              };
+              const deltaMap = {
+                pending: stats.pendingDelta,
+                users: stats.usersDelta,
+                properties: stats.propertiesDelta,
+              };
+              const value = valueMap[card.key as keyof typeof valueMap];
+              const delta = deltaMap[card.key as keyof typeof deltaMap];
+
+              return (
+                <div
+                  key={card.label}
+                  className="rounded-3xl border border-white/10 bg-neutral-900/60 p-5 shadow-[0_20px_40px_-32px_rgba(0,0,0,0.85)]"
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-neutral-200">
+                      {card.icon}
+                    </div>
+                    <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-300">
+                      {loading ? "--" : formatDelta(delta)}
+                    </span>
                   </div>
-                  <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-300">
-                    {card.delta}
-                  </span>
+                  <p className="mt-4 text-sm text-neutral-400">{card.label}</p>
+                  <p className="mt-1 text-2xl font-semibold text-white">
+                    {loading ? "--" : value.toLocaleString()}
+                  </p>
                 </div>
-                <p className="mt-4 text-sm text-neutral-400">{card.label}</p>
-                <p className="mt-1 text-2xl font-semibold text-white">
-                  {card.value}
-                </p>
-              </div>
-            ))}
+              );
+            })}
           </section>
 
           <section className="mt-8 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
@@ -189,34 +402,61 @@ export default function AdminProfilePage() {
                   <span className="text-right">Actions</span>
                 </div>
                 <div className="divide-y divide-white/5">
-                  {approvals.map((item) => (
-                    <div
-                      key={`${item.title}-${item.agent}`}
-                      className="grid grid-cols-[2fr_1.2fr_1fr_0.8fr] gap-4 py-4 text-sm text-neutral-300"
-                    >
-                      <div>
-                        <p className="text-white">{item.title}</p>
-                        <p className="text-xs text-neutral-500">{item.address}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <span className="h-8 w-8 rounded-full bg-white/10" />
-                        <span>{item.agent}</span>
-                      </div>
-                      <div>
-                        <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-neutral-400">
-                          {item.time}
-                        </span>
-                      </div>
-                      <div className="flex items-center justify-end gap-3">
-                        <button className="text-red-400 transition hover:text-red-300">
-                          ✕
-                        </button>
-                        <button className="rounded-full bg-neutral-500 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-neutral-400">
-                          Approve
-                        </button>
-                      </div>
+                  {loading && (
+                    <div className="py-6 text-sm text-neutral-400">
+                      Loading approvals...
                     </div>
-                  ))}
+                  )}
+                  {!loading && approvals.length === 0 && (
+                    <div className="py-6 text-sm text-neutral-400">
+                      No pending approvals right now.
+                    </div>
+                  )}
+                  {!loading &&
+                    approvals.map((item) => (
+                      <div
+                        key={item.id}
+                        className="grid grid-cols-[2fr_1.2fr_1fr_0.8fr] gap-4 py-4 text-sm text-neutral-300"
+                      >
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="h-10 w-12 rounded-xl bg-white/5"
+                            style={
+                              item.imageUrl
+                                ? {
+                                    backgroundImage: `url(${item.imageUrl})`,
+                                    backgroundSize: "cover",
+                                    backgroundPosition: "center",
+                                  }
+                                : undefined
+                            }
+                          />
+                          <div>
+                            <p className="text-white">{item.title}</p>
+                            <p className="text-xs text-neutral-500">
+                              {item.location}
+                            </p>
+                          </div>
+                        </div>
+                        <div className="flex items-center gap-2">
+                          <span className="h-8 w-8 rounded-full bg-white/10" />
+                          <span>{item.agent}</span>
+                        </div>
+                        <div>
+                          <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-neutral-400">
+                            {item.time}
+                          </span>
+                        </div>
+                        <div className="flex items-center justify-end gap-3">
+                          <button className="text-red-400 transition hover:text-red-300">
+                            ✕
+                          </button>
+                          <button className="rounded-full bg-neutral-500 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-neutral-400">
+                            Approve
+                          </button>
+                        </div>
+                      </div>
+                    ))}
                 </div>
               </div>
             </div>
