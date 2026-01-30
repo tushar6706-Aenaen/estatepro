@@ -82,6 +82,7 @@ export function HomeHeader() {
   const isAdmin = role === "admin";
   const avatarFallback = userEmail?.[0]?.toUpperCase() ?? "?";
   const accountDestination = isAdmin ? "/admin" : "/onboarding";
+  const profileDestination = isAdmin ? "/admin/profile" : "/onboarding";
 
   const handleSignOut = async () => {
     await supabaseBrowserClient.auth.signOut();
@@ -204,6 +205,9 @@ export function HomeHeader() {
                 <DropdownMenuContent align="end">
                   {userEmail ? (
                     <>
+                      <DropdownMenuItem asChild>
+                        <Link href={profileDestination}>Profile</Link>
+                      </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href={accountDestination}>Account</Link>
                       </DropdownMenuItem>
