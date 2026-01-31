@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/src/components/ui/toast-provider";
 import { ComparisonProvider } from "@/src/components/comparison-provider";
+import { MobileNavigation } from "@/src/components/mobile-navigation";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -32,6 +33,7 @@ export default function RootLayout({
         <ToastProvider>
           <ComparisonProvider>
             {children}
+            <MobileNavigation />
           </ComparisonProvider>
         </ToastProvider>
       </body>

@@ -64,7 +64,7 @@ export function PropertyCardCarousel({ properties }: PropertyCardMobileProps) {
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
                 <div className="absolute bottom-4 left-4 rounded-full bg-white/95 backdrop-blur-sm px-4 py-2 text-lg font-bold text-gray-900 shadow-lg">
-                  ${Number(properties[currentIndex].price).toLocaleString()}
+                  ₹{Number(properties[currentIndex].price).toLocaleString('en-IN')}
                 </div>
               </div>
 

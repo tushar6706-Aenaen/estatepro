@@ -30,16 +30,16 @@ export function MobileFilters() {
   ];
 
   const minPriceOptions = [
-    { label: "$500k", value: "500000" },
-    { label: "$1M", value: "1000000" },
-    { label: "$2M", value: "2000000" },
+    { label: "₹50L", value: "5000000" },
+    { label: "₹1Cr", value: "10000000" },
+    { label: "₹2Cr", value: "20000000" },
   ];
 
   const maxPriceOptions = [
-    { label: "$500k", value: "500000" },
-    { label: "$1M", value: "1000000" },
-    { label: "$2M", value: "2000000" },
-    { label: "$5M+", value: "5000000" },
+    { label: "₹50L", value: "5000000" },
+    { label: "₹1Cr", value: "10000000" },
+    { label: "₹2Cr", value: "20000000" },
+    { label: "₹5Cr+", value: "50000000" },
   ];
 
   const handleApply = () => {

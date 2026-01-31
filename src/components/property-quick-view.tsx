@@ -71,7 +71,7 @@ export function PropertyQuickView({ isOpen, onClose, property }: PropertyQuickVi
                 {/* Price */}
                 <div className="absolute bottom-6 left-6 rounded-xl bg-white/95 backdrop-blur-sm px-5 py-3 shadow-lg">
                   <div className="text-2xl font-bold text-gray-900">
-                    ${Number(property.price).toLocaleString()}
+                    ₹{Number(property.price).toLocaleString('en-IN')}
                   </div>
                 </div>
               </div>

@@ -160,3 +160,15 @@ body {
   will-change: transform;
   transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
 }
+
+/* Safe Area Support for Mobile */
+.safe-area-bottom {
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+@supports (padding-bottom: env(safe-area-inset-bottom)) {
+  .safe-area-bottom {
+    padding-bottom: max(16px, env(safe-area-inset-bottom));
+  }
+}
+

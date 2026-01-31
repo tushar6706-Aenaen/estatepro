@@ -177,7 +177,7 @@ export function ComparisonProvider({ children }: { children: ReactNode }) {
                       <div className="space-y-2 text-sm">
                         <div className="flex justify-between py-2 border-b">
                           <span className="text-gray-600">Price</span>
-                          <span className="font-semibold">${Number(property.price).toLocaleString()}</span>
+                          <span className="font-semibold">₹{Number(property.price).toLocaleString('en-IN')}</span>
                         </div>
                         <div className="flex justify-between py-2 border-b">
                           <span className="text-gray-600">Bedrooms</span>

@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 
 import { supabaseBrowserClient } from "@/src/lib/supabase/client";
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
@@ -13,13 +14,22 @@ import {
   DropdownMenuTrigger,
 } from "@/src/components/ui/dropdown-menu";
 
-const navLinks = ["Buy", "Rent", "Sell", "Agents"];
+const navLinks = [
+  { label: "Buy", value: "sale", href: "/?listingType=sale" },
+  { label: "Rent", value: "rent", href: "/?listingType=rent" },
+  { label: "Sell", value: "sell", href: "/onboarding?redirect=/" },
+  { label: "Agents", value: "agents", href: "/agents" },
+];
 
 type ProfileRow = {
   role: "public" | "agent" | "admin" | null;
 };
 
 export function HomeHeader() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const activeListingType = searchParams.get("listingType") || "sale";
+  
   const supabaseReady = useMemo(() => {
     return Boolean(
       process.env.NEXT_PUBLIC_SUPABASE_URL &&
@@ -182,12 +192,25 @@ export function HomeHeader() {
           />
         </div>
 
-        <nav className="ml-auto hidden items-center gap-6 text-sm text-gray-700 md:flex">
-          {navLinks.map((link) => (
-            <a key={link} className="transition hover:text-gray-900" href="#">
-              {link}
-            </a>
-          ))}
+        <nav className="ml-auto hidden items-center gap-1 text-sm md:flex">
+          {navLinks.map((link) => {
+            const isActive = link.value === activeListingType || 
+                           (link.value === "sale" && !searchParams.get("listingType"));
+            
+            return (
+              <Link
+                key={link.value}
+                href={link.href}
+                className={`px-4 py-2 rounded-full font-medium transition-all ${
+                  isActive && (link.value === "sale" || link.value === "rent")
+                    ? "bg-gray-900 text-white"
+                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                }`}
+              >
+                {link.label}
+              </Link>
+            );
+          })}
         </nav>
 
         <div className="hidden items-center gap-4 md:flex">
