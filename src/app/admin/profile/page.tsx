@@ -373,7 +373,7 @@ export default function AdminProfilePage() {
                     <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-100 text-gray-800">
                       {card.icon}
                     </div>
-                    <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-300">
+                    <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-600">
                       {loading ? "--" : formatDelta(delta)}
                     </span>
                   </div>

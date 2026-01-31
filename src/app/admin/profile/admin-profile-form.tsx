@@ -194,7 +194,7 @@ export function AdminProfileForm() {
             Update your public admin details.
           </p>
         </div>
-        <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300">
+        <span className="rounded-full border border-emerald-400/30 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-600">
           ADMIN
         </span>
       </div>

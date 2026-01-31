@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { RippleButton } from "./ui/ripple-button";
 import { useToast } from "./ui/toast-provider";
@@ -19,6 +20,7 @@ type FloatingActionButtonProps = {
 export function FloatingActionButton({ actions }: FloatingActionButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
   const { showToast } = useToast();
+  const router = useRouter();
 
   const defaultActions: FABAction[] = [
     {
@@ -30,8 +32,12 @@ export function FloatingActionButton({ actions }: FloatingActionButtonProps) {
       ),
       label: "Find Homes",
       onClick: () => {
-        showToast("Searching for homes...", "info");
         window.scrollTo({ top: 0, behavior: "smooth" });
+        // Focus on search input after scroll
+        setTimeout(() => {
+          const searchInput = document.querySelector('input[type="text"]') as HTMLInputElement;
+          if (searchInput) searchInput.focus();
+        }, 500);
       },
     },
     {
@@ -41,7 +47,16 @@ export function FloatingActionButton({ actions }: FloatingActionButtonProps) {
         </svg>
       ),
       label: "Favorites",
-      onClick: () => showToast("Opening favorites...", "info"),
+      onClick: () => {
+        // Store current favorites to localStorage for now
+        const favorites = localStorage.getItem('favorites');
+        if (!favorites || JSON.parse(favorites).length === 0) {
+          showToast("No favorites yet. Add properties to favorites!", "info");
+        } else {
+          showToast(`You have ${JSON.parse(favorites).length} favorites`, "success");
+          // Could navigate to a favorites page: router.push('/favorites');
+        }
+      },
       color: "bg-red-500 hover:bg-red-600",
     },
     {
@@ -51,7 +66,9 @@ export function FloatingActionButton({ actions }: FloatingActionButtonProps) {
         </svg>
       ),
       label: "Contact",
-      onClick: () => showToast("Opening chat...", "info"),
+      onClick: () => {
+        router.push('/chats');
+      },
       color: "bg-blue-500 hover:bg-blue-600",
     },
   ];
