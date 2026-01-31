@@ -494,7 +494,20 @@ export default function AgentProfilePage() {
                 href="/agent"
                 className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-neutral-300 transition hover:text-white"
               >
-                Go to Dashboard ->
+                Go to Dashboard
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                >
+                  <path d="M5 12h14" />
+                  <path d="m13 5 7 7-7 7" />
+                </svg>
               </Link>
             </div>
           </section>

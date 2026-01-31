@@ -4,6 +4,7 @@ import { Cormorant_Garamond, Manrope } from "next/font/google";
 import { createSupabaseServerClient } from "@/src/lib/supabase/server";
 import { HomeHeader } from "@/src/components/layout/home-header";
 import { InquiryForm } from "./inquiry-form";
+import { MessageAgentButton } from "./message-agent-button";
 
 type PropertyDetail = {
   id: string;
@@ -11,6 +12,7 @@ type PropertyDetail = {
   city: string;
   price: number;
   property_type: string;
+  agent_id: string;
   bedrooms?: number;
   bathrooms?: number;
   area_sqft?: number;
@@ -50,7 +52,7 @@ export default async function PropertyDetailPage({
   const { data: property, error } = await supabase
     .from("properties")
     .select(
-      "id,title,city,price,property_type,bedrooms,bathrooms,area_sqft,description,property_images(image_url,is_primary)",
+      "id,title,city,price,property_type,agent_id,bedrooms,bathrooms,area_sqft,description,property_images(image_url,is_primary)",
     )
     .eq("id", id)
     .maybeSingle();
@@ -320,6 +322,10 @@ export default async function PropertyDetailPage({
               </div>
 
               <div className="mt-5">
+                <MessageAgentButton
+                  propertyId={typedProperty.id}
+                  agentId={typedProperty.agent_id}
+                />
                 <InquiryForm
                   propertyId={typedProperty.id}
                   propertyTitle={typedProperty.title}

@@ -23,7 +23,7 @@ type ApprovalRow = {
   city: string | null;
   created_at: string | null;
   property_images?: { image_url: string | null; is_primary: boolean | null }[];
-  profiles?: { full_name: string | null } | null;
+  profiles?: { full_name: string | null }[] | null;
 };
 
 type ApprovalItem = {
@@ -279,7 +279,7 @@ export default function AdminProfilePage() {
           id: item.id,
           title: item.title ?? "Untitled listing",
           location: item.city ?? "Location pending",
-          agent: item.profiles?.full_name ?? "Unknown agent",
+          agent: item.profiles?.[0]?.full_name ?? "Unknown agent",
           time: timeAgo(item.created_at),
           imageUrl: primaryImage?.image_url ?? null,
         };
@@ -490,7 +490,7 @@ export default function AdminProfilePage() {
                   </div>
                 </div>
                 <button className="mt-5 w-full rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-neutral-200 transition hover:border-white/30 hover:text-white">
-                  Go to Admin Dashboard ->
+                  Go to Admin Dashboard 
                 </button>
               </div>
 
@@ -507,7 +507,7 @@ export default function AdminProfilePage() {
                       className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left transition hover:border-white/20"
                     >
                       <span>{action}</span>
-                      <span className="text-neutral-500">-></span>
+                      <span className="text-neutral-500"></span>
                     </button>
                   ))}
                 </div>

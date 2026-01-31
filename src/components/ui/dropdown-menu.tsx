@@ -18,7 +18,7 @@ const DropdownMenuContent = React.forwardRef<
       ref={ref}
       sideOffset={sideOffset}
       className={cn(
-        "z-50 min-w-[180px] rounded-2xl border border-white/10 bg-neutral-950/95 p-2 text-sm text-white shadow-[0_20px_40px_-30px_rgba(0,0,0,0.9)] backdrop-blur",
+        "z-50 min-w-[200px] rounded-2xl border border-white/10 bg-neutral-950/95 p-2 text-sm text-white shadow-[0_24px_60px_-30px_rgba(0,0,0,0.9)] backdrop-blur",
         className,
       )}
       {...props}
@@ -34,7 +34,7 @@ const DropdownMenuItem = React.forwardRef<
   <DropdownMenuPrimitive.Item
     ref={ref}
     className={cn(
-      "flex cursor-pointer items-center justify-between rounded-xl px-3 py-2 text-sm text-white outline-none transition hover:bg-white/10 focus:bg-white/10 data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
+      "flex cursor-pointer items-center gap-3 rounded-xl px-3 py-2 text-sm text-neutral-200 outline-none transition hover:bg-white/10 hover:text-white focus:bg-white/10 focus:text-white data-[highlighted]:bg-white/10 data-[highlighted]:text-white data-[disabled]:pointer-events-none data-[disabled]:opacity-50",
       className,
     )}
     {...props}
@@ -48,7 +48,7 @@ const DropdownMenuSeparator = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <DropdownMenuPrimitive.Separator
     ref={ref}
-    className={cn("my-1 h-px bg-white/10", className)}
+    className={cn("my-2 h-px bg-white/10", className)}
     {...props}
   />
 ));

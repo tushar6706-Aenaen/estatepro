@@ -159,49 +159,108 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
               className="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none sm:w-40"
             />
 
-            <select
-              name="type"
-              defaultValue={searchParams.type ?? ""}
-              className="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-200 outline-none sm:w-44"
-            >
-              <option value="">Property Type</option>
-              <option value="apartment">Apartment</option>
-              <option value="house">House</option>
-              <option value="land">Land</option>
-              <option value="commercial">Commercial</option>
-            </select>
+            <div className="relative w-full sm:w-44">
+              <select
+                name="type"
+                defaultValue={searchParams.type ?? ""}
+                className="w-full appearance-none rounded-full border border-white/10 bg-neutral-950 px-4 py-2 pr-10 text-sm text-neutral-200 outline-none [color-scheme:dark] focus:border-white/30"
+              >
+                <option className="bg-neutral-950 text-white" value="">
+                  Property Type
+                </option>
+                <option className="bg-neutral-950 text-white" value="apartment">
+                  Apartment
+                </option>
+                <option className="bg-neutral-950 text-white" value="house">
+                  House
+                </option>
+                <option className="bg-neutral-950 text-white" value="land">
+                  Land
+                </option>
+                <option className="bg-neutral-950 text-white" value="commercial">
+                  Commercial
+                </option>
+              </select>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
 
-            <select
-              name="priceMin"
-              defaultValue={searchParams.priceMin ?? ""}
-              className="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-200 outline-none sm:w-40"
-            >
-              <option value="">Min Price</option>
-              {priceRanges.map(
-                (r) =>
-                  r.min && (
-                    <option key={r.label} value={r.min}>
-                      {r.label}
-                    </option>
-                  ),
-              )}
-            </select>
+            <div className="relative w-full sm:w-40">
+              <select
+                name="priceMin"
+                defaultValue={searchParams.priceMin ?? ""}
+                className="w-full appearance-none rounded-full border border-white/10 bg-neutral-950 px-4 py-2 pr-10 text-sm text-neutral-200 outline-none [color-scheme:dark] focus:border-white/30"
+              >
+                <option className="bg-neutral-950 text-white" value="">
+                  Min Price
+                </option>
+                {priceRanges.map(
+                  (r) =>
+                    r.min && (
+                      <option className="bg-neutral-950 text-white" key={r.label} value={r.min}>
+                        {r.label}
+                      </option>
+                    ),
+                )}
+              </select>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
 
-            <select
-              name="priceMax"
-              defaultValue={searchParams.priceMax ?? ""}
-              className="w-full rounded-full border border-white/10 bg-white/5 px-4 py-2 text-sm text-neutral-200 outline-none sm:w-40"
-            >
-              <option value="">Max Price</option>
-              {priceRanges.map(
-                (r) =>
-                  r.max && (
-                    <option key={r.label} value={r.max}>
-                      {r.label}
-                    </option>
-                  ),
-              )}
-            </select>
+            <div className="relative w-full sm:w-40">
+              <select
+                name="priceMax"
+                defaultValue={searchParams.priceMax ?? ""}
+                className="w-full appearance-none rounded-full border border-white/10 bg-neutral-950 px-4 py-2 pr-10 text-sm text-neutral-200 outline-none [color-scheme:dark] focus:border-white/30"
+              >
+                <option className="bg-neutral-950 text-white" value="">
+                  Max Price
+                </option>
+                {priceRanges.map(
+                  (r) =>
+                    r.max && (
+                      <option className="bg-neutral-950 text-white" key={r.label} value={r.max}>
+                        {r.label}
+                      </option>
+                    ),
+                )}
+              </select>
+              <svg
+                width="16"
+                height="16"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="pointer-events-none absolute right-4 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400"
+              >
+                <path d="m6 9 6 6 6-6" />
+              </svg>
+            </div>
 
             <button className="flex w-full items-center justify-center gap-2 rounded-full border border-white/10 bg-neutral-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-neutral-400 sm:w-auto">
               Apply Filters
