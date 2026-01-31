@@ -12,9 +12,9 @@ type ToastProps = {
 };
 
 const variantStyles: Record<ToastVariant, string> = {
-  info: "border-white/10 bg-neutral-900/90 text-neutral-200",
-  success: "border-emerald-300/30 bg-emerald-500/15 text-emerald-100",
-  error: "border-rose-300/40 bg-rose-500/15 text-rose-100",
+  info: "border-blue-300 bg-blue-50 text-blue-900",
+  success: "border-emerald-300 bg-emerald-50 text-emerald-900",
+  error: "border-rose-300 bg-rose-50 text-rose-900",
 };
 
 export function Toast({
@@ -43,7 +43,7 @@ export function Toast({
       <button
         type="button"
         onClick={onClose}
-        className="text-xs font-semibold uppercase tracking-[0.2em] text-white/70 hover:text-white"
+        className="text-xs font-semibold uppercase tracking-[0.2em] text-gray-600 hover:text-gray-900"
         aria-label="Dismiss notification"
       >
         Close

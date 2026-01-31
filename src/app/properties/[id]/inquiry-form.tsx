@@ -126,13 +126,13 @@ export function InquiryForm({ propertyId, propertyTitle }: InquiryFormProps) {
       <div className="grid grid-cols-2 gap-3">
         <button
           type="button"
-          className="rounded-full border border-white/20 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:bg-white/20"
+          className="rounded-full border border-gray-300 bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-900 transition hover:bg-gray-200"
         >
           Schedule Tour
         </button>
         <button
           type="button"
-          className="rounded-full border border-white/10 px-4 py-2 text-sm text-neutral-300 transition hover:border-white/30 hover:text-white"
+          className="rounded-full border border-gray-300 px-4 py-2 text-sm text-gray-700 transition hover:border-gray-300 hover:text-gray-900"
         >
           Request Info
         </button>
@@ -143,27 +143,27 @@ export function InquiryForm({ propertyId, propertyTitle }: InquiryFormProps) {
           value={name}
           onChange={(event) => setName(event.target.value)}
           placeholder="Name"
-          className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+          className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 placeholder:text-gray-500 outline-none"
         />
         <input
           value={email}
           onChange={(event) => setEmail(event.target.value)}
           placeholder="Email"
           type="email"
-          className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+          className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 placeholder:text-gray-500 outline-none"
         />
         <input
           value={phone}
           onChange={(event) => setPhone(event.target.value)}
           placeholder="Phone"
-          className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+          className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 placeholder:text-gray-500 outline-none"
         />
         <textarea
           value={message}
           onChange={(event) => setMessage(event.target.value)}
           placeholder={`I am interested in ${propertyTitle}...`}
           rows={4}
-          className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+          className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900 placeholder:text-gray-500 outline-none"
         />
       </div>
 
@@ -182,11 +182,11 @@ export function InquiryForm({ propertyId, propertyTitle }: InquiryFormProps) {
       <button
         type="submit"
         disabled={loading}
-        className="w-full rounded-xl bg-neutral-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-neutral-400 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "Sending..." : "Request a Tour"}
       </button>
-      <p className="text-center text-[11px] text-neutral-400">
+      <p className="text-center text-[11px] text-gray-600">
         By sending a request, you agree to our Terms & Privacy Policy.
       </p>
     </form>

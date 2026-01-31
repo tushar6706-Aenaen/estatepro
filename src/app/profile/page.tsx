@@ -347,13 +347,13 @@ export default function UserProfilePage() {
   const deltaText = loading ? "Loading activity..." : `${deltaLabel} since last month`;
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white">
+    <div className="min-h-screen bg-gray-50 text-gray-900">
       <HomeHeader />
 
       <main className="mx-auto w-full max-w-6xl px-6 pb-16 pt-8">
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm text-neutral-400 transition hover:text-white"
+          className="flex items-center gap-2 text-sm text-gray-600 transition hover:text-gray-900"
         >
           <svg
             width="16"
@@ -371,10 +371,10 @@ export default function UserProfilePage() {
           Dashboard
         </Link>
 
-        <section className="mt-6 rounded-3xl border border-white/10 bg-neutral-900/60 p-6 md:p-8">
+        <section className="mt-6 rounded-3xl border border-gray-300 bg-white p-6 md:p-8">
           <div className="flex flex-wrap items-center gap-6">
             <div
-              className="relative h-20 w-20 overflow-hidden rounded-full border border-white/15 bg-neutral-800 text-lg font-semibold text-white"
+              className="relative h-20 w-20 overflow-hidden rounded-full border border-gray-300 bg-gray-200 text-lg font-semibold text-gray-900"
               style={
                 avatarUrl
                   ? {
@@ -392,7 +392,7 @@ export default function UserProfilePage() {
               )}
               <label
                 htmlFor="user-avatar-upload"
-                className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-4 border-neutral-900 bg-neutral-500 text-xs font-bold"
+                className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-4 border-white bg-gray-900 text-xs font-bold"
               >
                 E
               </label>
@@ -411,17 +411,17 @@ export default function UserProfilePage() {
             </div>
             <div className="flex-1">
               <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl font-semibold text-white">
+                <h1 className="text-2xl font-semibold text-gray-900">
                   {loading ? "Loading..." : displayName}
                 </h1>
-                <span className="rounded-full border border-neutral-500/40 bg-neutral-500/10 px-3 py-1 text-xs font-semibold text-neutral-200">
+                <span className="rounded-full border border-gray-500/40 bg-gray-500/10 px-3 py-1 text-xs font-semibold text-gray-800">
                   {profile?.is_premium ? "Premium User" : "Standard User"}
                 </span>
               </div>
-              <p className="mt-1 text-sm text-neutral-400">
+              <p className="mt-1 text-sm text-gray-600">
                 {email ?? "your.email@example.com"}
               </p>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs text-neutral-300">
+              <div className="mt-3 flex flex-wrap gap-2 text-xs text-gray-700">
                 <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
                   Location: {locationText}
                 </span>
@@ -433,31 +433,31 @@ export default function UserProfilePage() {
           </div>
         </section>
 
-        <section className="mt-8 rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
-          <h2 className="text-xl font-semibold text-white">Edit Profile</h2>
-          <p className="mt-1 text-sm text-neutral-400">
+        <section className="mt-8 rounded-3xl border border-gray-300 bg-white p-6">
+          <h2 className="text-xl font-semibold text-gray-900">Edit Profile</h2>
+          <p className="mt-1 text-sm text-gray-600">
             Update your details for saved searches and inquiries.
           </p>
 
           <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-2">
-            <label className="space-y-2 text-sm text-neutral-300">
+            <label className="space-y-2 text-sm text-gray-700">
               Full Name
-              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2">
+              <div className="flex items-center gap-2 rounded-xl border border-gray-300 bg-gray-100 px-4 py-2">
                 <input
                   value={fullName}
                   onChange={(event) => setFullName(event.target.value)}
                   placeholder="Full name"
-                  className="w-full bg-transparent text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+                  className="w-full bg-transparent text-sm text-gray-800 placeholder:text-gray-500 outline-none"
                 />
               </div>
             </label>
-            <label className="space-y-2 text-sm text-neutral-300">
+            <label className="space-y-2 text-sm text-gray-700">
               Email Address (Read only)
-              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2">
+              <div className="flex items-center gap-2 rounded-xl border border-gray-300 bg-gray-100 px-4 py-2">
                 <input
                   value={email ?? ""}
                   readOnly
-                  className="w-full bg-transparent text-sm text-neutral-400 outline-none"
+                  className="w-full bg-transparent text-sm text-gray-600 outline-none"
                 />
               </div>
             </label>
@@ -498,7 +498,7 @@ export default function UserProfilePage() {
               <button
                 type="submit"
                 disabled={saving || loading || uploading}
-                className="rounded-full bg-neutral-500 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-neutral-400 disabled:cursor-not-allowed disabled:opacity-60"
+                className="rounded-full bg-gray-900 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
               >
                 {saving ? "Saving..." : "Save Changes"}
               </button>
@@ -507,35 +507,35 @@ export default function UserProfilePage() {
         </section>
 
         <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_2fr]">
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
-            <div className="flex items-center justify-between text-xs text-neutral-500">
+          <div className="rounded-3xl border border-gray-300 bg-white p-6">
+            <div className="flex items-center justify-between text-xs text-gray-500">
               <span>THIS MONTH</span>
               <span className="rounded-full bg-white/5 px-2 py-1">
                 {deltaLabel}
               </span>
             </div>
-            <div className="mt-6 text-4xl font-semibold text-white">
+            <div className="mt-6 text-4xl font-semibold text-gray-900">
               {loading ? "--" : totalInquiries}
             </div>
-            <p className="mt-2 text-sm text-neutral-400">Total Inquiries</p>
+            <p className="mt-2 text-sm text-gray-600">Total Inquiries</p>
             <p className="mt-8 text-xs text-emerald-300">{deltaText}</p>
           </div>
 
-          <div className="rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
+          <div className="rounded-3xl border border-gray-300 bg-white p-6">
             <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-white">Recent Activity</h3>
-              <button className="text-sm font-semibold text-neutral-300 transition hover:text-white">
+              <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
+              <button className="text-sm font-semibold text-gray-700 transition hover:text-gray-900">
                 View All
               </button>
             </div>
             <div className="mt-5 space-y-4">
               {loading && (
-                <div className="text-sm text-neutral-400">
+                <div className="text-sm text-gray-600">
                   Loading activity...
                 </div>
               )}
               {!loading && activity.length === 0 && (
-                <div className="text-sm text-neutral-400">
+                <div className="text-sm text-gray-600">
                   No activity yet.
                 </div>
               )}
@@ -543,7 +543,7 @@ export default function UserProfilePage() {
                 activity.map((item) => (
                   <div key={item.id} className="flex items-center gap-4">
                     <div
-                      className="h-12 w-12 rounded-2xl bg-white/5"
+                      className="h-12 w-12 rounded-2xl bg-gray-100"
                       style={
                         item.imageUrl
                           ? {
@@ -555,10 +555,10 @@ export default function UserProfilePage() {
                       }
                     />
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-white">
+                      <p className="text-sm font-semibold text-gray-900">
                         {item.title}
                       </p>
-                      <p className="text-xs text-neutral-500">
+                      <p className="text-xs text-gray-500">
                         Inquired on {item.date}
                       </p>
                     </div>

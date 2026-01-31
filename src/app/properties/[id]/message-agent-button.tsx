@@ -48,14 +48,14 @@ export function MessageAgentButton({
         type="button"
         onClick={handleClick}
         disabled={disabled}
-        className="w-full rounded-full border border-white/10 bg-white/10 px-4 py-2 text-sm font-semibold text-white transition hover:border-white/30 hover:bg-white/15 disabled:cursor-not-allowed disabled:opacity-60"
+        className="w-full rounded-full border border-gray-300 bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-900 transition hover:border-gray-300 hover:bg-gray-200 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {loading ? "Starting chat..." : "Message Agent"}
       </button>
       {error && (
-        <div className="text-xs text-neutral-400">
+        <div className="text-xs text-gray-600">
           {error}{" "}
-          <Link href="/auth?mode=signin" className="text-white underline">
+          <Link href="/auth?mode=signin" className="text-gray-900 underline">
             Sign in
           </Link>
         </div>

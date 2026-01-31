@@ -5,24 +5,24 @@ import { AgentDashboard } from "./agent-dashboard";
 
 export default function AgentPage() {
   return (
-    <div className="min-h-screen bg-neutral-950 text-white">
+    <div className="min-h-screen bg-gray-50 text-gray-900">
       <div className="mx-auto w-full max-w-6xl px-6 py-12 space-y-10">
         <header className="flex flex-wrap items-center justify-between gap-4">
           <div className="space-y-2">
-            <div className="text-xs uppercase tracking-[0.28em] text-neutral-500">
+            <div className="text-xs uppercase tracking-[0.28em] text-gray-500">
               Agent workspace
             </div>
-            <h1 className="text-3xl font-semibold tracking-tight text-white">
+            <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
               Listings and inquiries
             </h1>
-            <p className="max-w-2xl text-sm text-neutral-300">
+            <p className="max-w-2xl text-sm text-gray-700">
               Access requires an agent or admin role. If you just signed up,
               complete onboarding to switch your role and add a contact number.
             </p>
           </div>
           <Link
             href="/"
-            className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-neutral-200 transition hover:border-white/30 hover:text-white"
+            className="rounded-full border border-gray-300 bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-gray-300/30 hover:text-gray-900"
           >
             Back to home
           </Link>

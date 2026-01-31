@@ -24,6 +24,13 @@ type PropertyRow = {
   property_images?: { image_url: string | null; is_primary: boolean | null }[];
 };
 
+type ProfileRow = {
+  id: string;
+  full_name: string | null;
+  avatar_url: string | null;
+  role: string | null;
+};
+
 type MessageRow = {
   id: string;
   chat_id: string;
@@ -55,6 +62,7 @@ export default function ChatThreadPage() {
   const [error, setError] = useState<string | null>(null);
   const [chat, setChat] = useState<ChatRow | null>(null);
   const [property, setProperty] = useState<PropertyRow | null>(null);
+  const [otherProfile, setOtherProfile] = useState<ProfileRow | null>(null);
   const [messages, setMessages] = useState<MessageRow[]>([]);
   const [userId, setUserId] = useState<string | null>(null);
   const [input, setInput] = useState("");
@@ -110,7 +118,13 @@ export default function ChatThreadPage() {
 
       setChat(chatRow);
 
-      const [propertyResponse, messagesResponse] = await Promise.all([
+      const otherParticipantId =
+        chatRow.user_id === authData.user.id
+          ? chatRow.agent_id
+          : chatRow.user_id;
+
+      const [propertyResponse, messagesResponse, profileResponse] =
+        await Promise.all([
         supabaseBrowserClient
           .from("properties")
           .select("id, title, city, price, property_images(image_url, is_primary)")
@@ -122,6 +136,11 @@ export default function ChatThreadPage() {
           .eq("chat_id", chatId)
           .order("created_at", { ascending: true })
           .returns<MessageRow[]>(),
+        supabaseBrowserClient
+          .from("profiles")
+          .select("id, full_name, avatar_url, role")
+          .eq("id", otherParticipantId)
+          .maybeSingle<ProfileRow>(),
       ]);
 
       if (cancelled) return;
@@ -134,7 +153,12 @@ export default function ChatThreadPage() {
         setError(messagesResponse.error.message);
       }
 
+      if (profileResponse.error) {
+        setError(profileResponse.error.message);
+      }
+
       setProperty(propertyResponse.data ?? null);
+      setOtherProfile(profileResponse.data ?? null);
       setMessages(messagesResponse.data ?? []);
       setLoading(false);
     };
@@ -143,6 +167,69 @@ export default function ChatThreadPage() {
 
     return () => {
       cancelled = true;
+    };
+  }, [chatId, supabaseReady]);
+
+  useEffect(() => {
+    if (!chatId || !supabaseReady) return;
+
+    const channel = supabaseBrowserClient
+      .channel(`chat-thread-${chatId}`)
+      .on(
+        "postgres_changes",
+        {
+          event: "INSERT",
+          schema: "public",
+          table: "messages",
+          filter: `chat_id=eq.${chatId}`,
+        },
+        (payload) => {
+          const incoming = payload.new as MessageRow;
+          setMessages((prev) => {
+            if (prev.some((msg) => msg.id === incoming.id)) {
+              return prev;
+            }
+            return [...prev, incoming];
+          });
+        },
+      )
+      .subscribe();
+
+    return () => {
+      supabaseBrowserClient.removeChannel(channel);
+    };
+  }, [chatId, supabaseReady]);
+
+  useEffect(() => {
+    if (!chatId || !supabaseReady) return;
+
+    let cancelled = false;
+
+    const refreshMessages = async () => {
+      const { data, error: refreshError } = await supabaseBrowserClient
+        .from("messages")
+        .select("id, chat_id, sender_id, sender_role, content, created_at")
+        .eq("chat_id", chatId)
+        .order("created_at", { ascending: true })
+        .returns<MessageRow[]>();
+
+      if (cancelled) return;
+
+      if (refreshError) {
+        setError(refreshError.message);
+        return;
+      }
+
+      if (data) {
+        setMessages(data);
+      }
+    };
+
+    const interval = setInterval(refreshMessages, 4000);
+
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
     };
   }, [chatId, supabaseReady]);
 
@@ -176,16 +263,24 @@ export default function ChatThreadPage() {
     : property?.price
       ? `$${property?.price}`
       : "$0";
+  const otherName = otherProfile?.full_name?.trim() || "User";
+  const otherInitials = otherName
+    .split(" ")
+    .filter(Boolean)
+    .map((part) => part[0])
+    .slice(0, 2)
+    .join("")
+    .toUpperCase();
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white">
+    <div className="min-h-screen bg-gray-50 text-gray-900">
       <HomeHeader />
 
       <main className="mx-auto w-full max-w-6xl px-6 pb-16 pt-8">
         <button
           type="button"
           onClick={() => router.push("/chats")}
-          className="mb-6 inline-flex items-center gap-2 text-sm text-neutral-400 transition hover:text-white"
+          className="mb-6 inline-flex items-center gap-2 text-sm text-gray-600 transition hover:text-gray-900"
         >
           <svg
             width="16"
@@ -209,10 +304,10 @@ export default function ChatThreadPage() {
           </div>
         )}
 
-        <section className="rounded-3xl border border-white/10 bg-neutral-900/60 p-5">
+        <section className="rounded-3xl border border-gray-300 bg-white p-5">
           <div className="flex flex-wrap items-center gap-4">
             <div
-              className="h-16 w-24 overflow-hidden rounded-2xl bg-neutral-800"
+              className="h-16 w-24 overflow-hidden rounded-2xl bg-gray-200"
               style={
                 primaryImage?.image_url
                   ? {
@@ -223,18 +318,40 @@ export default function ChatThreadPage() {
                   : undefined
               }
             />
-            <div className="flex-1">
-              <p className="text-sm text-neutral-400">
-                {property?.city ?? "Location pending"}
-              </p>
-              <h1 className="text-xl font-semibold text-white">
-                {property?.title ?? "Property conversation"}
-              </h1>
-              <p className="text-sm text-neutral-300">{price}</p>
+            <div className="flex flex-1 items-center gap-4">
+              <div
+                className="relative h-12 w-12 overflow-hidden rounded-full border border-gray-300 bg-gray-200 text-sm font-semibold text-gray-900"
+                style={
+                  otherProfile?.avatar_url
+                    ? {
+                        backgroundImage: `url(${otherProfile.avatar_url})`,
+                        backgroundSize: "cover",
+                        backgroundPosition: "center",
+                      }
+                    : undefined
+                }
+              >
+                {!otherProfile?.avatar_url && (
+                  <div className="flex h-full w-full items-center justify-center">
+                    {otherInitials || "U"}
+                  </div>
+                )}
+              </div>
+              <div className="flex-1">
+                <p className="text-sm text-gray-500">
+                  Chat with {otherName}
+                </p>
+                <h1 className="text-xl font-semibold text-gray-900">
+                  {property?.title ?? "Property conversation"}
+                </h1>
+                <p className="text-sm text-gray-800">
+                  {property?.city ?? "Location pending"} - {price}
+                </p>
+              </div>
             </div>
             <Link
               href={property ? `/properties/${property.id}` : "/"}
-              className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-xs font-semibold text-neutral-200 transition hover:border-white/30 hover:text-white"
+              className="rounded-full border-2 border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 transition hover:border-gray-900 hover:bg-gray-50"
             >
               View listing
             </Link>
@@ -242,19 +359,24 @@ export default function ChatThreadPage() {
         </section>
 
         <section className="mt-6 grid gap-4 lg:grid-cols-[1fr_320px]">
-          <div className="flex h-[520px] flex-col rounded-3xl border border-white/10 bg-neutral-900/40">
-            <div className="flex-1 space-y-3 overflow-y-auto px-5 py-5">
+          <div className="flex h-[520px] flex-col rounded-3xl border border-gray-300 bg-white">
+            <div className="hide-scrollbar flex-1 space-y-3 overflow-y-auto px-5 py-5">
               {loading && (
-                <div className="text-sm text-neutral-400">Loading chat...</div>
+                <div className="text-sm text-gray-700">Loading chat...</div>
               )}
               {!loading && messages.length === 0 && (
-                <div className="text-sm text-neutral-400">
+                <div className="text-sm text-gray-700">
                   No messages yet. Say hello to get started.
                 </div>
               )}
               {!loading &&
                 messages.map((message) => {
                   const isSelf = message.sender_id === userId;
+                  const senderLabel = isSelf
+                    ? "You"
+                    : message.sender_id === chat?.agent_id
+                      ? "Agent"
+                      : "Buyer";
                   return (
                     <div
                       key={message.id}
@@ -263,12 +385,19 @@ export default function ChatThreadPage() {
                       <div
                         className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm ${
                           isSelf
-                            ? "bg-neutral-500 text-white"
-                            : "bg-white/10 text-neutral-200"
+                            ? "bg-gray-900 text-white"
+                            : "bg-gray-100 text-gray-900"
                         }`}
                       >
+                        <div className={`mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${
+                          isSelf ? "text-gray-400" : "text-gray-500"
+                        }`}>
+                          {senderLabel}
+                        </div>
                         <p>{message.content}</p>
-                        <span className="mt-2 block text-[10px] text-white/60">
+                        <span className={`mt-2 block text-[10px] ${
+                          isSelf ? "text-gray-400" : "text-gray-500"
+                        }`}>
                           {formatTimestamp(message.created_at)}
                         </span>
                       </div>
@@ -276,19 +405,19 @@ export default function ChatThreadPage() {
                   );
                 })}
             </div>
-            <div className="border-t border-white/10 px-5 py-4">
+            <div className="border-t border-gray-300 px-5 py-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
                 <textarea
                   value={input}
                   onChange={(event) => setInput(event.target.value)}
                   placeholder="Write a message..."
-                  className="min-h-[80px] flex-1 resize-none rounded-2xl border border-white/10 bg-neutral-950 px-4 py-3 text-sm text-neutral-200 outline-none focus:border-white/30"
+                  className="min-h-[80px] flex-1 resize-none rounded-2xl border-2 border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10"
                 />
                 <button
                   type="button"
                   onClick={handleSend}
                   disabled={sending || !input.trim()}
-                  className="rounded-full bg-neutral-500 px-5 py-2 text-sm font-semibold text-white transition hover:bg-neutral-400 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {sending ? "Sending..." : "Send"}
                 </button>
@@ -297,9 +426,9 @@ export default function ChatThreadPage() {
           </div>
 
           <aside className="space-y-4">
-            <div className="rounded-3xl border border-white/10 bg-neutral-900/60 p-5">
-              <h2 className="text-sm font-semibold text-white">Chat details</h2>
-              <div className="mt-4 space-y-3 text-xs text-neutral-400">
+            <div className="rounded-3xl border-2 border-gray-200 bg-white p-5">
+              <h2 className="text-sm font-semibold text-gray-900">Chat details</h2>
+              <div className="mt-4 space-y-3 text-xs text-gray-700">
                 <div className="flex items-center justify-between">
                   <span>Started</span>
                   <span>{chat ? formatTimestamp(chat.created_at) : "--"}</span>
@@ -314,7 +443,7 @@ export default function ChatThreadPage() {
                 </div>
               </div>
             </div>
-            <div className="rounded-3xl border border-white/10 bg-neutral-900/60 p-5 text-xs text-neutral-400">
+            <div className="rounded-3xl border-2 border-gray-200 bg-white p-5 text-xs text-gray-700">
               Keep conversations respectful. Listings are updated regularly.
             </div>
           </aside>

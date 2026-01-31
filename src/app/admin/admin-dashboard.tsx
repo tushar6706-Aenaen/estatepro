@@ -244,7 +244,7 @@ export function AdminDashboard() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-neutral-300">
+      <div className="rounded-2xl border border-gray-300 bg-gray-100 p-6 text-sm text-gray-700">
         Loading admin dashboard...
       </div>
     );
@@ -269,16 +269,16 @@ export function AdminDashboard() {
           />
         </div>
       )}
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_25px_60px_-50px_rgba(0,0,0,0.7)]">
+      <section className="rounded-3xl border border-gray-300 bg-gray-100 p-6 shadow-[0_25px_60px_-50px_rgba(0,0,0,0.7)]">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className="text-xs uppercase tracking-[0.28em] text-neutral-400">
+            <div className="text-xs uppercase tracking-[0.28em] text-gray-600">
               Pending listings
             </div>
-            <h2 className="mt-2 text-2xl font-semibold text-white">
+            <h2 className="mt-2 text-2xl font-semibold text-gray-900">
               Review queue
             </h2>
-            <p className="mt-2 text-sm text-neutral-300">
+            <p className="mt-2 text-sm text-gray-700">
               Approve listings to publish them. Reject listings with feedback that
               helps agents revise.
             </p>
@@ -287,18 +287,18 @@ export function AdminDashboard() {
             type="button"
             onClick={() => loadData("refresh")}
             disabled={refreshing}
-            className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold text-neutral-200 transition hover:border-white/30 hover:text-white disabled:cursor-not-allowed disabled:opacity-70"
+            className="rounded-full border border-gray-300 bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-800 transition hover:border-gray-300/30 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {refreshing ? "Refreshing..." : "Refresh"}
           </button>
         </div>
 
-        <div className="mt-4 text-xs text-neutral-400">
+        <div className="mt-4 text-xs text-gray-600">
           {pendingListings.length} listings awaiting review
         </div>
 
         {pendingListings.length === 0 && (
-          <div className="mt-4 rounded-2xl border border-white/10 bg-neutral-950/40 px-4 py-4 text-sm text-neutral-300">
+          <div className="mt-4 rounded-2xl border border-gray-300 bg-gray-50 px-4 py-4 text-sm text-gray-700">
             Nothing pending right now. Check back soon.
           </div>
         )}
@@ -313,10 +313,10 @@ export function AdminDashboard() {
             return (
               <div
                 key={listing.id}
-                className="overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/60"
+                className="overflow-hidden rounded-3xl border border-gray-300 bg-white"
               >
                 <div
-                  className="h-36 bg-neutral-800"
+                  className="h-36 bg-gray-200"
                   style={
                     primaryImage?.image_url
                       ? {
@@ -330,10 +330,10 @@ export function AdminDashboard() {
                 <div className="space-y-4 p-5">
                   <div className="flex items-start justify-between gap-3">
                     <div>
-                      <div className="text-lg font-semibold text-white">
+                      <div className="text-lg font-semibold text-gray-900">
                         {listing.title ?? "Untitled"}
                       </div>
-                      <div className="text-sm text-neutral-300">
+                      <div className="text-sm text-gray-700">
                         {listing.city ?? ""} · {formatPrice(listing.price)}
                       </div>
                     </div>
@@ -342,7 +342,7 @@ export function AdminDashboard() {
                     </span>
                   </div>
 
-                  <div className="flex flex-wrap gap-3 text-xs text-neutral-400">
+                  <div className="flex flex-wrap gap-3 text-xs text-gray-600">
                     <span>{listing.property_type ?? "type"}</span>
                     <span>{listing.bedrooms ?? "--"} bd</span>
                     <span>{listing.bathrooms ?? "--"} ba</span>
@@ -353,19 +353,19 @@ export function AdminDashboard() {
                   </div>
 
                   {listing.description && (
-                    <p className="text-xs text-neutral-300">
+                    <p className="text-xs text-gray-700">
                       {listing.description}
                     </p>
                   )}
 
                   {listing.agent_phone && (
-                    <div className="text-xs text-neutral-400">
+                    <div className="text-xs text-gray-600">
                       Agent phone: {listing.agent_phone}
                     </div>
                   )}
 
-                  <div className="rounded-2xl border border-white/10 bg-neutral-950/40 px-4 py-3">
-                    <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-neutral-400">
+                  <div className="rounded-2xl border border-gray-300 bg-gray-50 px-4 py-3">
+                    <div className="text-[10px] font-semibold uppercase tracking-[0.24em] text-gray-600">
                       Feedback for agent
                     </div>
                     <textarea
@@ -373,7 +373,7 @@ export function AdminDashboard() {
                       value={feedback}
                       onChange={(event) => updateFeedback(listing.id, event.target.value)}
                       placeholder="Share what needs improvement or confirm approval notes."
-                      className="mt-2 w-full rounded-xl border border-white/10 bg-neutral-950/70 px-3 py-2 text-xs text-white placeholder:text-neutral-500"
+                      className="mt-2 w-full rounded-xl border border-gray-300 bg-white px-3 py-2 text-xs text-gray-900 placeholder:text-gray-500"
                     />
                   </div>
 
@@ -408,24 +408,24 @@ export function AdminDashboard() {
         </div>
       </section>
 
-      <section className="rounded-3xl border border-white/10 bg-white/5 p-6">
+      <section className="rounded-3xl border border-gray-300 bg-gray-100 p-6">
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className="text-xs uppercase tracking-[0.28em] text-neutral-400">
+            <div className="text-xs uppercase tracking-[0.28em] text-gray-600">
               Inquiries
             </div>
-            <h2 className="mt-2 text-2xl font-semibold text-white">
+            <h2 className="mt-2 text-2xl font-semibold text-gray-900">
               All marketplace inquiries
             </h2>
-            <p className="mt-2 text-sm text-neutral-300">
+            <p className="mt-2 text-sm text-gray-700">
               Read-only stream of buyer requests across approved listings.
             </p>
           </div>
-          <div className="text-xs text-neutral-400">{inquiries.length} total</div>
+          <div className="text-xs text-gray-600">{inquiries.length} total</div>
         </div>
 
         {inquiries.length === 0 && (
-          <div className="mt-4 rounded-2xl border border-white/10 bg-neutral-950/40 px-4 py-4 text-sm text-neutral-300">
+          <div className="mt-4 rounded-2xl border border-gray-300 bg-gray-50 px-4 py-4 text-sm text-gray-700">
             No inquiries yet. Once buyers request tours, they will appear here.
           </div>
         )}
@@ -434,33 +434,33 @@ export function AdminDashboard() {
           {inquiries.map((inquiry) => (
             <div
               key={inquiry.id}
-              className="rounded-2xl border border-white/10 bg-neutral-900/60 px-4 py-4"
+              className="rounded-2xl border border-gray-300 bg-white px-4 py-4"
             >
               <div className="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                  <div className="text-sm font-semibold text-white">
+                  <div className="text-sm font-semibold text-gray-900">
                     {inquiry.name ?? "Anonymous"}
                   </div>
-                  <div className="text-xs text-neutral-400">
+                  <div className="text-xs text-gray-600">
                     {inquiry.email ?? "No email"}
                   </div>
                 </div>
-                <div className="text-xs text-neutral-500">
+                <div className="text-xs text-gray-500">
                   {formatDate(inquiry.created_at)}
                 </div>
               </div>
 
-              <div className="mt-3 text-xs text-neutral-400">
+              <div className="mt-3 text-xs text-gray-600">
                 Property: {inquiry.property?.title ?? "Unknown listing"}
                 {inquiry.property?.city ? ` · ${inquiry.property.city}` : ""}
               </div>
 
               {inquiry.message && (
-                <p className="mt-3 text-sm text-neutral-300">{inquiry.message}</p>
+                <p className="mt-3 text-sm text-gray-700">{inquiry.message}</p>
               )}
 
               {inquiry.property_id && (
-                <div className="mt-3 text-[10px] uppercase tracking-[0.2em] text-neutral-500">
+                <div className="mt-3 text-[10px] uppercase tracking-[0.2em] text-gray-500">
                   Property ID: {inquiry.property_id}
                 </div>
               )}

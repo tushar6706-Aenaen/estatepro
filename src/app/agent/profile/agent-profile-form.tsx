@@ -189,12 +189,12 @@ export function AgentProfileForm() {
   return (
     <form
       onSubmit={handleSubmit}
-      className="rounded-3xl border border-white/10 bg-neutral-900/60 p-6"
+      className="rounded-3xl border border-gray-300 bg-white p-6"
     >
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="text-lg font-semibold text-white">Edit Profile</h3>
-          <p className="text-xs text-neutral-400">
+          <h3 className="text-lg font-semibold text-gray-900">Edit Profile</h3>
+          <p className="text-xs text-gray-600">
             Keep your contact details up to date.
           </p>
         </div>
@@ -205,15 +205,15 @@ export function AgentProfileForm() {
 
       {loading ? (
         <div className="mt-5 space-y-3">
-          <div className="h-10 w-full rounded-xl bg-white/5" />
-          <div className="h-10 w-full rounded-xl bg-white/5" />
-          <div className="h-10 w-full rounded-xl bg-white/5" />
+          <div className="h-10 w-full rounded-xl bg-gray-100" />
+          <div className="h-10 w-full rounded-xl bg-gray-100" />
+          <div className="h-10 w-full rounded-xl bg-gray-100" />
         </div>
       ) : (
         <div className="mt-5 space-y-4">
           <div className="flex items-center gap-4">
             <div
-              className="relative h-16 w-16 overflow-hidden rounded-full border border-white/10 bg-neutral-800"
+              className="relative h-16 w-16 overflow-hidden rounded-full border border-gray-300 bg-gray-200"
               style={
                 avatarUrl
                   ? {
@@ -225,7 +225,7 @@ export function AgentProfileForm() {
               }
             >
               {!avatarUrl && (
-                <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-white">
+                <div className="flex h-full w-full items-center justify-center text-sm font-semibold text-gray-900">
                   {fullName
                     .split(" ")
                     .filter(Boolean)
@@ -237,7 +237,7 @@ export function AgentProfileForm() {
               )}
               <label
                 htmlFor="agent-avatar-upload"
-                className="absolute bottom-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-2 border-neutral-900 bg-neutral-500 text-[10px] font-semibold text-white"
+                className="absolute bottom-0 right-0 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-gray-900 text-[10px] font-semibold text-white"
               >
                 E
               </label>
@@ -255,85 +255,85 @@ export function AgentProfileForm() {
               />
             </div>
             <div>
-              <p className="text-sm font-semibold text-white">Avatar</p>
-              <p className="text-xs text-neutral-500">
+              <p className="text-sm font-semibold text-gray-900">Avatar</p>
+              <p className="text-xs text-gray-500">
                 {uploading ? "Uploading..." : "PNG, JPG up to 5MB"}
               </p>
             </div>
           </div>
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+            <label className="text-xs uppercase tracking-[0.2em] text-gray-500">
               Full Name
             </label>
             <input
               value={fullName}
               onChange={(event) => setFullName(event.target.value)}
               placeholder="Enter your name"
-              className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-800 placeholder:text-gray-500 outline-none"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+            <label className="text-xs uppercase tracking-[0.2em] text-gray-500">
               Email
             </label>
             <input
               value={email ?? ""}
               readOnly
-              className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-400"
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+            <label className="text-xs uppercase tracking-[0.2em] text-gray-500">
               Phone
             </label>
             <input
               value={phone}
               onChange={(event) => setPhone(event.target.value)}
               placeholder="Add a phone number"
-              className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-800 placeholder:text-gray-500 outline-none"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+            <label className="text-xs uppercase tracking-[0.2em] text-gray-500">
               Title
             </label>
             <input
               value={agentTitle}
               onChange={(event) => setAgentTitle(event.target.value)}
               placeholder="Senior Real Estate Agent"
-              className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-800 placeholder:text-gray-500 outline-none"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+            <label className="text-xs uppercase tracking-[0.2em] text-gray-500">
               City
             </label>
             <input
               value={city}
               onChange={(event) => setCity(event.target.value)}
               placeholder="San Francisco"
-              className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-800 placeholder:text-gray-500 outline-none"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+            <label className="text-xs uppercase tracking-[0.2em] text-gray-500">
               State
             </label>
             <input
               value={regionState}
               onChange={(event) => setRegionState(event.target.value)}
               placeholder="CA"
-              className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-800 placeholder:text-gray-500 outline-none"
             />
           </div>
           <div className="space-y-2">
-            <label className="text-xs uppercase tracking-[0.2em] text-neutral-500">
+            <label className="text-xs uppercase tracking-[0.2em] text-gray-500">
               Role
             </label>
             <input
               value={role ?? "agent"}
               readOnly
-              className="w-full rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-neutral-400"
+              className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-600"
             />
           </div>
         </div>
@@ -354,7 +354,7 @@ export function AgentProfileForm() {
       <button
         type="submit"
         disabled={saving || loading || uploading}
-        className="mt-5 w-full rounded-full bg-neutral-500 px-4 py-3 text-sm font-semibold text-white transition hover:bg-neutral-400 disabled:cursor-not-allowed disabled:opacity-60"
+        className="mt-5 w-full rounded-full bg-gray-900 px-4 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {saving ? "Saving..." : "Save Changes"}
       </button>

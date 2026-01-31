@@ -297,30 +297,30 @@ export default function AdminProfilePage() {
   }, [supabaseReady]);
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white">
+    <div className="min-h-screen bg-gray-50 text-gray-900">
       <HomeHeader />
 
       <main className="mx-auto w-full max-w-6xl px-6 pb-16 pt-8">
         <RoleGuard allowedRoles={["admin"]}>
-          <div className="flex flex-wrap items-center gap-3 text-xs text-neutral-400">
-            <Link className="transition hover:text-white" href="/">
+          <div className="flex flex-wrap items-center gap-3 text-xs text-gray-600">
+            <Link className="transition hover:text-gray-900" href="/">
               Home
             </Link>
             <span>/</span>
-            <span className="text-neutral-200">Admin Profile</span>
+            <span className="text-gray-800">Admin Profile</span>
           </div>
 
           <div className="mt-4 flex flex-wrap items-center justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.25em] text-neutral-500">
+              <p className="text-xs uppercase tracking-[0.25em] text-gray-500">
                 Admin Profile
               </p>
-              <h1 className="mt-2 text-3xl font-semibold tracking-tight text-white">
+              <h1 className="mt-2 text-3xl font-semibold tracking-tight text-gray-900">
                 Overview
               </h1>
             </div>
             <div className="flex flex-wrap gap-3">
-              <button className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-neutral-200 transition hover:border-white/30 hover:text-white">
+              <button className="flex items-center gap-2 rounded-full border border-gray-300 bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-gray-300/30 hover:text-gray-900">
                 <svg
                   width="16"
                   height="16"
@@ -336,7 +336,7 @@ export default function AdminProfilePage() {
                 </svg>
                 Settings
               </button>
-              <button className="flex items-center gap-2 rounded-full bg-neutral-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-neutral-400">
+              <button className="flex items-center gap-2 rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800">
                 <span className="text-lg leading-none">+</span>
                 New Listing
               </button>
@@ -367,18 +367,18 @@ export default function AdminProfilePage() {
               return (
                 <div
                   key={card.label}
-                  className="rounded-3xl border border-white/10 bg-neutral-900/60 p-5 shadow-[0_20px_40px_-32px_rgba(0,0,0,0.85)]"
+                  className="rounded-3xl border border-gray-300 bg-white p-5 shadow-[0_20px_40px_-32px_rgba(0,0,0,0.85)]"
                 >
                   <div className="flex items-center justify-between">
-                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-neutral-200">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-100 text-gray-800">
                       {card.icon}
                     </div>
                     <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-300">
                       {loading ? "--" : formatDelta(delta)}
                     </span>
                   </div>
-                  <p className="mt-4 text-sm text-neutral-400">{card.label}</p>
-                  <p className="mt-1 text-2xl font-semibold text-white">
+                  <p className="mt-4 text-sm text-gray-600">{card.label}</p>
+                  <p className="mt-1 text-2xl font-semibold text-gray-900">
                     {loading ? "--" : value.toLocaleString()}
                   </p>
                 </div>
@@ -387,28 +387,28 @@ export default function AdminProfilePage() {
           </section>
 
           <section className="mt-8 grid gap-6 lg:grid-cols-[1.6fr_1fr]">
-            <div className="rounded-3xl border border-white/10 bg-neutral-900/60">
-              <div className="flex items-center justify-between border-b border-white/10 px-6 py-4">
-                <h2 className="text-lg font-semibold text-white">Pending Approvals</h2>
-                <button className="text-sm font-semibold text-neutral-300 transition hover:text-white">
+            <div className="rounded-3xl border border-gray-300 bg-white">
+              <div className="flex items-center justify-between border-b border-gray-300 px-6 py-4">
+                <h2 className="text-lg font-semibold text-gray-900">Pending Approvals</h2>
+                <button className="text-sm font-semibold text-gray-700 transition hover:text-gray-900">
                   View All
                 </button>
               </div>
               <div className="px-6 pb-6">
-                <div className="grid grid-cols-[2fr_1.2fr_1fr_0.8fr] gap-4 border-b border-white/10 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-neutral-500">
+                <div className="grid grid-cols-[2fr_1.2fr_1fr_0.8fr] gap-4 border-b border-gray-300 py-3 text-xs font-semibold uppercase tracking-[0.2em] text-gray-500">
                   <span>Property</span>
                   <span>Agent</span>
                   <span>Date</span>
                   <span className="text-right">Actions</span>
                 </div>
-                <div className="divide-y divide-white/5">
+                <div className="divide-y divide-gray-100">
                   {loading && (
-                    <div className="py-6 text-sm text-neutral-400">
+                    <div className="py-6 text-sm text-gray-600">
                       Loading approvals...
                     </div>
                   )}
                   {!loading && approvals.length === 0 && (
-                    <div className="py-6 text-sm text-neutral-400">
+                    <div className="py-6 text-sm text-gray-600">
                       No pending approvals right now.
                     </div>
                   )}
@@ -416,11 +416,11 @@ export default function AdminProfilePage() {
                     approvals.map((item) => (
                       <div
                         key={item.id}
-                        className="grid grid-cols-[2fr_1.2fr_1fr_0.8fr] gap-4 py-4 text-sm text-neutral-300"
+                        className="grid grid-cols-[2fr_1.2fr_1fr_0.8fr] gap-4 py-4 text-sm text-gray-700"
                       >
                         <div className="flex items-center gap-3">
                           <div
-                            className="h-10 w-12 rounded-xl bg-white/5"
+                            className="h-10 w-12 rounded-xl bg-gray-100"
                             style={
                               item.imageUrl
                                 ? {
@@ -432,18 +432,18 @@ export default function AdminProfilePage() {
                             }
                           />
                           <div>
-                            <p className="text-white">{item.title}</p>
-                            <p className="text-xs text-neutral-500">
+                            <p className="text-gray-900">{item.title}</p>
+                            <p className="text-xs text-gray-500">
                               {item.location}
                             </p>
                           </div>
                         </div>
                         <div className="flex items-center gap-2">
-                          <span className="h-8 w-8 rounded-full bg-white/10" />
+                          <span className="h-8 w-8 rounded-full bg-gray-100" />
                           <span>{item.agent}</span>
                         </div>
                         <div>
-                          <span className="rounded-full bg-white/5 px-3 py-1 text-xs text-neutral-400">
+                          <span className="rounded-full bg-gray-100 px-3 py-1 text-xs text-gray-600">
                             {item.time}
                           </span>
                         </div>
@@ -451,7 +451,7 @@ export default function AdminProfilePage() {
                           <button className="text-red-400 transition hover:text-red-300">
                             x
                           </button>
-                          <button className="rounded-full bg-neutral-500 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-neutral-400">
+                          <button className="rounded-full bg-gray-900 px-4 py-1.5 text-xs font-semibold text-white transition hover:bg-gray-800">
                             Approve
                           </button>
                         </div>
@@ -464,9 +464,9 @@ export default function AdminProfilePage() {
             <div className="space-y-6">
               <AdminProfileForm />
 
-              <div className="rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
+              <div className="rounded-3xl border border-gray-300 bg-white p-6">
                 <div className="flex items-center gap-3">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-neutral-500/20 text-neutral-200">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-500/20 text-gray-800">
                     <svg
                       width="18"
                       height="18"
@@ -482,21 +482,21 @@ export default function AdminProfilePage() {
                     </svg>
                   </div>
                   <div>
-                    <h3 className="text-lg font-semibold text-white">Deep Analytics</h3>
-                    <p className="text-sm text-neutral-400">
+                    <h3 className="text-lg font-semibold text-gray-900">Deep Analytics</h3>
+                    <p className="text-sm text-gray-600">
                       Access comprehensive reports, user behavior analysis, and
                       revenue trends inside the admin dashboard.
                     </p>
                   </div>
                 </div>
-                <button className="mt-5 w-full rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-neutral-200 transition hover:border-white/30 hover:text-white">
+                <button className="mt-5 w-full rounded-full border border-gray-300 bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-gray-300/30 hover:text-gray-900">
                   Go to Admin Dashboard 
                 </button>
               </div>
 
-              <div className="rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
-                <h3 className="text-lg font-semibold text-white">Quick Actions</h3>
-                <div className="mt-4 space-y-3 text-sm text-neutral-300">
+              <div className="rounded-3xl border border-gray-300 bg-white p-6">
+                <h3 className="text-lg font-semibold text-gray-900">Quick Actions</h3>
+                <div className="mt-4 space-y-3 text-sm text-gray-700">
                   {[
                     "Invite Agent",
                     "Review Reports",
@@ -504,7 +504,7 @@ export default function AdminProfilePage() {
                   ].map((action) => (
                     <button
                       key={action}
-                      className="flex w-full items-center justify-between rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-left transition hover:border-white/20"
+                      className="flex w-full items-center justify-between rounded-2xl border border-gray-300 bg-gray-100 px-4 py-3 text-left transition hover:border-gray-300/20"
                     >
                       <span>{action}</span>
                       <span className="text-neutral-500"></span>

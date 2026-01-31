@@ -160,16 +160,16 @@ export default function OnboardingPage() {
   };
 
   return (
-    <div className="min-h-screen bg-neutral-950 px-4 py-12 text-white">
+    <div className="min-h-screen bg-gray-50 px-4 py-12 text-gray-900">
       <div className="mx-auto flex w-full max-w-3xl flex-col gap-10">
         <header className="space-y-3">
-          <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-neutral-300">
+          <div className="inline-flex items-center gap-2 rounded-full border border-gray-300 bg-gray-100 px-4 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-gray-700">
             Profile setup
           </div>
-          <h1 className="text-3xl font-semibold tracking-tight text-white md:text-4xl">
+          <h1 className="text-3xl font-semibold tracking-tight text-gray-900 md:text-4xl">
             Tell us how you want to use the platform.
           </h1>
-          <p className="max-w-2xl text-base text-neutral-300">
+          <p className="max-w-2xl text-base text-gray-700">
             This helps us tailor your experience. You can change this later in
             settings if your goals change.
           </p>
@@ -177,13 +177,13 @@ export default function OnboardingPage() {
 
         <form
           onSubmit={handleSubmit}
-          className="rounded-3xl border border-white/10 bg-neutral-900/70 p-8 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.65)] backdrop-blur"
+          className="rounded-3xl border border-gray-300 bg-white p-8 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.65)] backdrop-blur"
         >
           {loading ? (
             <div className="animate-pulse space-y-3">
-              <div className="h-4 w-32 rounded bg-neutral-800" />
-              <div className="h-10 rounded bg-neutral-800" />
-              <div className="h-10 rounded bg-neutral-800" />
+              <div className="h-4 w-32 rounded bg-gray-200" />
+              <div className="h-10 rounded bg-gray-200" />
+              <div className="h-10 rounded bg-gray-200" />
             </div>
           ) : (
             <div className="space-y-6">
@@ -193,8 +193,8 @@ export default function OnboardingPage() {
                   onClick={() => setRoleChoice("buyer")}
                   className={`flex h-full flex-col gap-3 rounded-2xl border p-5 text-left transition ${
                     roleChoice === "buyer"
-                      ? "border-neutral-400/60 bg-neutral-900 text-white shadow-lg"
-                      : "border-white/10 bg-neutral-900/40 text-neutral-200 hover:border-white/20"
+                      ? "border-gray-600/60 bg-white text-gray-900 shadow-lg"
+                      : "border-gray-300 bg-white/40 text-gray-800 hover:border-gray-300/20"
                   }`}
                 >
                   <span className="text-sm font-semibold uppercase tracking-[0.18em]">
@@ -205,7 +205,7 @@ export default function OnboardingPage() {
                   </span>
                   <span
                     className={`text-sm ${
-                      roleChoice === "buyer" ? "text-white/80" : "text-neutral-400"
+                      roleChoice === "buyer" ? "text-gray-900/80" : "text-gray-600"
                     }`}
                   >
                     See approved listings only.
@@ -217,8 +217,8 @@ export default function OnboardingPage() {
                   onClick={() => setRoleChoice("agent")}
                   className={`flex h-full flex-col gap-3 rounded-2xl border p-5 text-left transition ${
                     roleChoice === "agent"
-                      ? "border-neutral-400/60 bg-neutral-900 text-white shadow-lg"
-                      : "border-white/10 bg-neutral-900/40 text-neutral-200 hover:border-white/20"
+                      ? "border-gray-600/60 bg-white text-gray-900 shadow-lg"
+                      : "border-gray-300 bg-white/40 text-gray-800 hover:border-gray-300/20"
                   }`}
                 >
                   <span className="text-sm font-semibold uppercase tracking-[0.18em]">
@@ -229,7 +229,7 @@ export default function OnboardingPage() {
                   </span>
                   <span
                     className={`text-sm ${
-                      roleChoice === "agent" ? "text-white/80" : "text-neutral-400"
+                      roleChoice === "agent" ? "text-gray-900/80" : "text-gray-600"
                     }`}
                   >
                     We&apos;ll ask for a contact number.
@@ -239,11 +239,11 @@ export default function OnboardingPage() {
 
               {roleChoice === "agent" && (
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-neutral-200">
+                  <label className="text-sm font-semibold text-gray-800">
                     Phone number
                   </label>
-                  <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-neutral-900/60 px-4 py-3">
-                    <span className="text-sm font-semibold text-neutral-300">
+                  <div className="flex items-center gap-2 rounded-xl border border-gray-300 bg-white px-4 py-3">
+                    <span className="text-sm font-semibold text-gray-700">
                       +1
                     </span>
                     <input
@@ -252,10 +252,10 @@ export default function OnboardingPage() {
                       placeholder="98765 43210"
                       value={phone}
                       onChange={(event) => setPhone(event.target.value)}
-                      className="w-full bg-transparent text-sm text-neutral-100 outline-none placeholder:text-neutral-500"
+                      className="w-full bg-transparent text-sm text-gray-700 outline-none placeholder:text-gray-500"
                     />
                   </div>
-                  <p className="text-xs text-neutral-400">
+                  <p className="text-xs text-gray-600">
                     This will appear on your listings for buyers to contact you.
                   </p>
                 </div>
@@ -277,14 +277,14 @@ export default function OnboardingPage() {
                 <button
                   type="submit"
                   disabled={saving}
-                  className="inline-flex items-center justify-center rounded-full bg-neutral-500 px-6 py-3 text-sm font-semibold text-white transition hover:bg-neutral-400 disabled:cursor-not-allowed disabled:opacity-70"
+                  className="inline-flex items-center justify-center rounded-full bg-gray-900 px-6 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
                 >
                   {saving ? "Saving..." : "Continue"}
                 </button>
                 <button
                   type="button"
                   onClick={() => router.push("/")}
-                  className="text-sm font-semibold text-neutral-400 hover:text-white"
+                  className="text-sm font-semibold text-gray-600 hover:text-gray-900"
                 >
                   Skip for now
                 </button>
@@ -294,7 +294,7 @@ export default function OnboardingPage() {
         </form>
 
         {!loading && !hasUser && (
-          <div className="rounded-2xl border border-neutral-300/30 bg-neutral-500/10 px-4 py-3 text-sm text-neutral-200">
+          <div className="rounded-2xl border border-gray-700/30 bg-gray-500/10 px-4 py-3 text-sm text-gray-800">
             You need to sign in to save your profile.{" "}
             <Link
               href="/auth?redirect=/onboarding"
@@ -307,7 +307,7 @@ export default function OnboardingPage() {
         )}
 
         {!isSupabaseConfigured && (
-          <div className="rounded-2xl border border-amber-300/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-100">
+          <div className="rounded-2xl border border-amber-300/30 bg-amber-500/10 px-4 py-3 text-sm text-amber-900">
             Add `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` to
             your `.env.local` to enable profile updates.
           </div>

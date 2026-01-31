@@ -295,7 +295,7 @@ export default function AgentProfilePage() {
         : "Location not set";
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white">
+    <div className="min-h-screen bg-gray-50 text-gray-900">
       <HomeHeader />
 
       <main className="mx-auto w-full max-w-6xl px-6 pb-16 pt-8">
@@ -306,10 +306,10 @@ export default function AgentProfilePage() {
             </div>
           )}
 
-          <section className="rounded-3xl border border-white/10 bg-neutral-900/60 p-6 md:p-8">
+          <section className="rounded-3xl border border-gray-300 bg-white p-6 md:p-8">
             <div className="flex flex-wrap items-center gap-6">
               <div
-                className="relative h-24 w-24 overflow-hidden rounded-full border border-white/15 bg-neutral-800"
+                className="relative h-24 w-24 overflow-hidden rounded-full border border-gray-300 bg-gray-200"
                 style={
                   profile?.avatar_url
                     ? {
@@ -321,7 +321,7 @@ export default function AgentProfilePage() {
                 }
               >
                 {!profile?.avatar_url && (
-                  <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-white">
+                  <div className="flex h-full w-full items-center justify-center text-lg font-semibold text-gray-900">
                     {profileName
                       .split(" ")
                       .filter(Boolean)
@@ -335,22 +335,22 @@ export default function AgentProfilePage() {
               </div>
               <div className="flex-1">
                 <div className="flex flex-wrap items-center gap-3">
-                  <h1 className="text-2xl font-semibold text-white">
+                  <h1 className="text-2xl font-semibold text-gray-900">
                     {loading ? "Loading..." : profileName}
                   </h1>
                   <span className="rounded-full border border-emerald-400/40 bg-emerald-500/10 px-3 py-1 text-xs font-semibold text-emerald-300">
                     Agent
                   </span>
                 </div>
-                <p className="mt-2 text-sm text-neutral-300">
+                <p className="mt-2 text-sm text-gray-700">
                   {loading ? "" : `${profileTitle} - ${profileRating}`}
                 </p>
-                <p className="mt-1 text-sm text-neutral-500">{profileLocation}</p>
+                <p className="mt-1 text-sm text-gray-500">{profileLocation}</p>
               </div>
               <div className="flex flex-wrap gap-3">
                 <Link
                   href="#edit-profile"
-                  className="flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2 text-sm font-semibold text-neutral-200 transition hover:border-white/30 hover:text-white"
+                  className="flex items-center gap-2 rounded-full border border-gray-300 bg-gray-100 px-4 py-2 text-sm font-semibold text-gray-800 transition hover:border-gray-300/30 hover:text-gray-900"
                 >
                   <svg
                     width="16"
@@ -369,7 +369,7 @@ export default function AgentProfilePage() {
                 </Link>
                 <Link
                   href="/agent"
-                  className="flex items-center gap-2 rounded-full bg-neutral-500 px-4 py-2 text-sm font-semibold text-white transition hover:bg-neutral-400"
+                  className="flex items-center gap-2 rounded-full bg-gray-900 px-4 py-2 text-sm font-semibold text-white transition hover:bg-gray-800"
                 >
                   <span className="text-lg leading-none">+</span>
                   Add New Property
@@ -448,25 +448,25 @@ export default function AgentProfilePage() {
             ].map((card) => (
               <div
                 key={card.label}
-                className="rounded-3xl border border-white/10 bg-neutral-900/60 p-5 shadow-[0_20px_40px_-32px_rgba(0,0,0,0.85)]"
+                className="rounded-3xl border border-gray-300 bg-white p-5 shadow-[0_20px_40px_-32px_rgba(0,0,0,0.85)]"
               >
                 <div className="flex items-center justify-between">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-neutral-200">
+                  <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-100 text-gray-800">
                     {card.icon}
                   </div>
                   <span className="rounded-full bg-emerald-500/20 px-2.5 py-1 text-xs font-semibold text-emerald-300">
                     {loading ? "--" : formatDelta(card.delta)}
                   </span>
                 </div>
-                <p className="mt-4 text-sm text-neutral-400">{card.label}</p>
-                <p className="mt-1 text-2xl font-semibold text-white">
+                <p className="mt-4 text-sm text-gray-600">{card.label}</p>
+                <p className="mt-1 text-2xl font-semibold text-gray-900">
                   {loading ? "--" : card.value.toLocaleString()}
                 </p>
               </div>
             ))}
-            <div className="rounded-3xl border border-white/10 bg-neutral-900/60 p-5">
+            <div className="rounded-3xl border border-gray-300 bg-white p-5">
               <div className="flex items-center gap-3">
-                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-white/10 text-neutral-200">
+                <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-gray-100 text-gray-800">
                   <svg
                     width="18"
                     height="18"
@@ -482,17 +482,17 @@ export default function AgentProfilePage() {
                   </svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white">
+                  <h3 className="text-lg font-semibold text-gray-900">
                     Agent Dashboard
                   </h3>
-                  <p className="text-sm text-neutral-400">
+                  <p className="text-sm text-gray-600">
                     View analytics and manage your leads.
                   </p>
                 </div>
               </div>
               <Link
                 href="/agent"
-                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-neutral-300 transition hover:text-white"
+                className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-gray-700 transition hover:text-gray-900"
               >
                 Go to Dashboard
                 <svg
@@ -514,20 +514,20 @@ export default function AgentProfilePage() {
 
           <section className="mt-10">
             <div className="flex items-center justify-between">
-              <h2 className="text-xl font-semibold text-white">My Listings</h2>
-              <button className="text-sm font-semibold text-neutral-300 transition hover:text-white">
+              <h2 className="text-xl font-semibold text-gray-900">My Listings</h2>
+              <button className="text-sm font-semibold text-gray-700 transition hover:text-gray-900">
                 View All
               </button>
             </div>
 
             <div className="mt-5 grid gap-5 md:grid-cols-2 lg:grid-cols-4">
               {loading && (
-                <div className="col-span-full text-sm text-neutral-400">
+                <div className="col-span-full text-sm text-gray-600">
                   Loading listings...
                 </div>
               )}
               {!loading && listings.length === 0 && (
-                <div className="col-span-full text-sm text-neutral-400">
+                <div className="col-span-full text-sm text-gray-600">
                   You do not have any listings yet.
                 </div>
               )}
@@ -535,10 +535,10 @@ export default function AgentProfilePage() {
                 listings.map((item) => (
                   <div
                     key={item.id}
-                    className="overflow-hidden rounded-3xl border border-white/10 bg-neutral-900/60"
+                    className="overflow-hidden rounded-3xl border border-gray-300 bg-white"
                   >
                     <div
-                      className="relative h-36 bg-neutral-800"
+                      className="relative h-36 bg-gray-200"
                       style={
                         item.image
                           ? {
@@ -559,20 +559,20 @@ export default function AgentProfilePage() {
                       </button>
                     </div>
                     <div className="space-y-2 px-4 py-4">
-                      <p className="text-lg font-semibold text-white">
+                      <p className="text-lg font-semibold text-gray-900">
                         {item.price}
                       </p>
-                      <p className="text-sm text-neutral-200">{item.title}</p>
-                      <p className="text-xs text-neutral-500">{item.address}</p>
+                      <p className="text-sm text-gray-800">{item.title}</p>
+                      <p className="text-xs text-gray-500">{item.address}</p>
                     </div>
                   </div>
                 ))}
 
               <Link
                 href="/agent"
-                className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-white/15 bg-neutral-900/40 px-6 py-12 text-center text-sm text-neutral-300 transition hover:border-white/30 hover:text-white"
+                className="flex flex-col items-center justify-center gap-3 rounded-3xl border border-dashed border-gray-300 bg-white/40 px-6 py-12 text-center text-sm text-gray-700 transition hover:border-gray-300/30 hover:text-gray-900"
               >
-                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-white/10 text-xl">
+                <span className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 text-xl">
                   +
                 </span>
                 List New Property

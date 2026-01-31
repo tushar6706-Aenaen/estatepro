@@ -402,7 +402,7 @@ export function AgentDashboard() {
 
   if (loading) {
     return (
-      <div className="rounded-2xl border border-white/10 bg-white/5 p-6 text-sm text-neutral-300">
+      <div className="rounded-2xl border border-gray-300 bg-gray-100 p-6 text-sm text-gray-700">
         Loading your listings...
       </div>
     );
@@ -433,15 +433,15 @@ export function AgentDashboard() {
       <section className="grid gap-6 lg:grid-cols-[1.3fr,1fr]">
         <form
           onSubmit={handleCreateListing}
-          className="rounded-3xl border border-white/10 bg-white/5 p-6 shadow-[0_25px_60px_-50px_rgba(0,0,0,0.8)]"
+          className="rounded-3xl border border-gray-300 bg-gray-100 p-6 shadow-[0_25px_60px_-50px_rgba(0,0,0,0.8)]"
         >
-          <div className="text-xs uppercase tracking-[0.28em] text-neutral-400">
+          <div className="text-xs uppercase tracking-[0.28em] text-gray-600">
             Create listing
           </div>
-          <h2 className="mt-2 text-2xl font-semibold text-white">
+          <h2 className="mt-2 text-2xl font-semibold text-gray-900">
             Add a new property
           </h2>
-          <p className="mt-2 text-sm text-neutral-300">
+          <p className="mt-2 text-sm text-gray-700">
             Listings start as pending until an admin approves them. Add images
             from the bucket named &quot;{storageBucket}&quot; in Supabase Storage.
           </p>
@@ -451,13 +451,13 @@ export function AgentDashboard() {
               value={formState.title}
               onChange={(event) => updateForm("title", event.target.value)}
               placeholder="Listing title"
-              className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-3 text-sm text-white placeholder:text-neutral-500"
+              className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
             />
             <input
               value={formState.city}
               onChange={(event) => updateForm("city", event.target.value)}
               placeholder="City"
-              className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-3 text-sm text-white placeholder:text-neutral-500"
+              className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
             />
             <div className="grid gap-3 md:grid-cols-2">
               <input
@@ -466,12 +466,12 @@ export function AgentDashboard() {
                 placeholder="Price"
                 type="number"
                 min="0"
-                className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-3 text-sm text-white placeholder:text-neutral-500"
+                className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
               />
               <select
                 value={formState.propertyType}
                 onChange={(event) => updateForm("propertyType", event.target.value)}
-                className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-3 text-sm text-white"
+                className="w-full appearance-none rounded-xl border-2 border-gray-200 bg-white px-4 py-3 pr-10 text-sm font-medium text-gray-900 shadow-sm outline-none transition focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 hover:border-gray-300"
               >
                 <option value="">Property type</option>
                 {propertyTypes.map((type) => (
@@ -488,7 +488,7 @@ export function AgentDashboard() {
                 placeholder="Beds"
                 type="number"
                 min="0"
-                className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-3 text-sm text-white placeholder:text-neutral-500"
+                className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
               />
               <input
                 value={formState.bathrooms}
@@ -497,7 +497,7 @@ export function AgentDashboard() {
                 type="number"
                 min="0"
                 step="0.5"
-                className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-3 text-sm text-white placeholder:text-neutral-500"
+                className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
               />
               <input
                 value={formState.areaSqft}
@@ -505,7 +505,7 @@ export function AgentDashboard() {
                 placeholder="Sqft"
                 type="number"
                 min="0"
-                className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-3 text-sm text-white placeholder:text-neutral-500"
+                className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
               />
             </div>
             <textarea
@@ -513,10 +513,10 @@ export function AgentDashboard() {
               onChange={(event) => updateForm("description", event.target.value)}
               placeholder="Description"
               rows={4}
-              className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-3 text-sm text-white placeholder:text-neutral-500"
+              className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
             />
-            <div className="rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-3 text-sm text-neutral-300">
-              <div className="text-xs uppercase tracking-[0.24em] text-neutral-400">
+            <div className="rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
+              <div className="text-xs uppercase tracking-[0.24em] text-gray-600">
                 Photos
               </div>
               <input
@@ -524,10 +524,10 @@ export function AgentDashboard() {
                 accept="image/*"
                 multiple
                 onChange={handleFiles}
-                className="mt-3 w-full text-sm text-neutral-200"
+                className="mt-3 w-full text-sm text-gray-800"
               />
               {imageFiles.length > 0 && (
-                <div className="mt-2 text-xs text-neutral-400">
+                <div className="mt-2 text-xs text-gray-600">
                   {imageFiles.length} image(s) selected. The first image becomes
                   the primary photo.
                 </div>
@@ -549,25 +549,25 @@ export function AgentDashboard() {
           <button
             type="submit"
             disabled={saving}
-            className="mt-5 inline-flex items-center justify-center rounded-full bg-neutral-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-neutral-400 disabled:cursor-not-allowed disabled:opacity-70"
+            className="mt-5 inline-flex items-center justify-center rounded-full bg-gray-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
           >
             {saving ? "Saving..." : "Create listing"}
           </button>
         </form>
 
-        <div className="rounded-3xl border border-white/10 bg-white/5 p-6">
-          <div className="text-xs uppercase tracking-[0.28em] text-neutral-400">
+        <div className="rounded-3xl border border-gray-300 bg-gray-100 p-6">
+          <div className="text-xs uppercase tracking-[0.28em] text-gray-600">
             Profile
           </div>
-          <h3 className="mt-2 text-xl font-semibold text-white">
+          <h3 className="mt-2 text-xl font-semibold text-gray-900">
             Contact details
           </h3>
-          <p className="mt-2 text-sm text-neutral-300">
+          <p className="mt-2 text-sm text-gray-700">
             Phone shown on listings: {profile?.phone ?? "--"}
           </p>
           <Link
             href="/onboarding"
-            className="mt-4 inline-flex text-sm font-semibold text-neutral-300 hover:text-neutral-200"
+            className="mt-4 inline-flex text-sm font-semibold text-gray-700 hover:text-gray-800"
           >
             Update onboarding info
           </Link>
@@ -577,20 +577,20 @@ export function AgentDashboard() {
       <section>
         <div className="flex flex-wrap items-center justify-between gap-4">
           <div>
-            <div className="text-xs uppercase tracking-[0.28em] text-neutral-400">
+            <div className="text-xs uppercase tracking-[0.28em] text-gray-600">
               My listings
             </div>
-            <h2 className="mt-2 text-2xl font-semibold text-white">
+            <h2 className="mt-2 text-2xl font-semibold text-gray-900">
               Properties you manage
             </h2>
           </div>
-          <div className="text-xs text-neutral-400">
+          <div className="text-xs text-gray-600">
             {listings.length} total
           </div>
         </div>
 
         {listings.length === 0 && (
-          <div className="mt-4 rounded-2xl border border-white/10 bg-white/5 px-4 py-4 text-sm text-neutral-300">
+          <div className="mt-4 rounded-2xl border border-gray-300 bg-gray-100 px-4 py-4 text-sm text-gray-700">
             No listings yet. Create your first listing using the form above.
           </div>
         )}
@@ -604,9 +604,9 @@ export function AgentDashboard() {
             return (
               <div
                 key={listing.id}
-                className="rounded-3xl border border-white/10 bg-neutral-900/60 p-5 shadow-[0_25px_60px_-50px_rgba(0,0,0,0.8)]"
+                className="rounded-3xl border border-gray-300 bg-white p-5 shadow-[0_25px_60px_-50px_rgba(0,0,0,0.8)]"
               >
-                <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-neutral-400">
+                <div className="flex items-center justify-between text-xs uppercase tracking-[0.2em] text-gray-600">
                   <span
                     className={`rounded-full px-3 py-1 text-[10px] font-semibold ${statusBadge(
                       listing.status,
@@ -622,20 +622,20 @@ export function AgentDashboard() {
                     <input
                       value={editState.title}
                       onChange={(event) => updateEditForm("title", event.target.value)}
-                      className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-white"
+                      className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900"
                       placeholder="Title"
                     />
                     <input
                       value={editState.city}
                       onChange={(event) => updateEditForm("city", event.target.value)}
-                      className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-white"
+                      className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900"
                       placeholder="City"
                     />
                     <div className="grid gap-2 md:grid-cols-2">
                       <input
                         value={editState.price}
                         onChange={(event) => updateEditForm("price", event.target.value)}
-                        className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-white"
+                        className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900"
                         placeholder="Price"
                         type="number"
                       />
@@ -644,7 +644,7 @@ export function AgentDashboard() {
                         onChange={(event) =>
                           updateEditForm("propertyType", event.target.value)
                         }
-                        className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-white"
+                        className="w-full appearance-none rounded-xl border-2 border-gray-200 bg-white px-4 py-3 pr-10 text-sm font-medium text-gray-900 shadow-sm outline-none transition focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 hover:border-gray-300"
                       >
                         <option value="">Property type</option>
                         {propertyTypes.map((type) => (
@@ -660,7 +660,7 @@ export function AgentDashboard() {
                         onChange={(event) =>
                           updateEditForm("bedrooms", event.target.value)
                         }
-                        className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-white"
+                        className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900"
                         placeholder="Beds"
                         type="number"
                       />
@@ -669,7 +669,7 @@ export function AgentDashboard() {
                         onChange={(event) =>
                           updateEditForm("bathrooms", event.target.value)
                         }
-                        className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-white"
+                        className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900"
                         placeholder="Baths"
                         type="number"
                         step="0.5"
@@ -679,7 +679,7 @@ export function AgentDashboard() {
                         onChange={(event) =>
                           updateEditForm("areaSqft", event.target.value)
                         }
-                        className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-white"
+                        className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900"
                         placeholder="Sqft"
                         type="number"
                       />
@@ -690,7 +690,7 @@ export function AgentDashboard() {
                         updateEditForm("description", event.target.value)
                       }
                       rows={3}
-                      className="w-full rounded-2xl border border-white/10 bg-neutral-950/60 px-4 py-2 text-sm text-white"
+                      className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900"
                       placeholder="Description"
                     />
                     {editError && (
@@ -703,14 +703,14 @@ export function AgentDashboard() {
                         type="button"
                         onClick={handleEditSave}
                         disabled={editSaving}
-                        className="rounded-full bg-neutral-500 px-4 py-2 text-xs font-semibold text-white transition hover:bg-neutral-400 disabled:opacity-70"
+                        className="rounded-full bg-gray-900 px-4 py-2 text-xs font-semibold text-white transition hover:bg-gray-800 disabled:opacity-70"
                       >
                         {editSaving ? "Saving..." : "Save changes"}
                       </button>
                       <button
                         type="button"
                         onClick={cancelEdit}
-                        className="rounded-full border border-white/15 bg-white/5 px-4 py-2 text-xs font-semibold text-neutral-200"
+                        className="rounded-full border border-gray-300 bg-gray-100 px-4 py-2 text-xs font-semibold text-gray-800"
                       >
                         Cancel
                       </button>
@@ -718,20 +718,20 @@ export function AgentDashboard() {
                   </div>
                 ) : (
                   <div className="mt-4 space-y-2">
-                    <div className="text-lg font-semibold text-white">
+                    <div className="text-lg font-semibold text-gray-900">
                       {listing.title ?? "Untitled"}
                     </div>
-                    <div className="text-sm text-neutral-300">
+                    <div className="text-sm text-gray-700">
                       {listing.city ?? "--"} - {formatPrice(listing.price)}
                     </div>
-                    <div className="text-xs text-neutral-400">
+                    <div className="text-xs text-gray-600">
                       {listing.property_type ?? "type"} -{" "}
                       {listing.bedrooms ?? "--"} bd -{" "}
                       {listing.bathrooms ?? "--"} ba -{" "}
                       {listing.area_sqft ?? "--"} sqft
                     </div>
                     {listing.description && (
-                      <p className="text-xs text-neutral-400">
+                      <p className="text-xs text-gray-600">
                         {listing.description}
                       </p>
                     )}
@@ -750,7 +750,7 @@ export function AgentDashboard() {
                         <button
                           type="button"
                           onClick={() => startEdit(listing)}
-                          className="rounded-full border border-white/15 bg-white/5 px-4 py-2 font-semibold text-neutral-200"
+                          className="rounded-full border border-gray-300 bg-gray-100 px-4 py-2 font-semibold text-gray-800"
                         >
                           Edit
                         </button>
@@ -764,7 +764,7 @@ export function AgentDashboard() {
                       </>
                     )}
                     {!editable && (
-                      <span className="rounded-full border border-white/10 bg-white/5 px-4 py-2 text-neutral-400">
+                      <span className="rounded-full border border-gray-300 bg-gray-100 px-4 py-2 text-gray-600">
                         Editing disabled after approval.
                       </span>
                     )}

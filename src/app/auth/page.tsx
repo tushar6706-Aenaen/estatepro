@@ -192,15 +192,15 @@ export default function AuthPage() {
   };
 
   return (
-    <div className="relative max-h-screen overflow-hidden bg-neutral-950 text-white">
+    <div className="relative max-h-screen overflow-hidden bg-gray-50 text-gray-900">
       <div className="pointer-events-none absolute inset-0 opacity-70">
-        <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-neutral-900/40 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-neutral-800/30 blur-3xl" />
+        <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-white/40 blur-3xl" />
+        <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-gray-200/30 blur-3xl" />
       </div>
 
       <main className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-6 py-16">
-        <div className="mb-10 flex items-center gap-3 text-sm text-neutral-300">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-white/5 text-neutral-200">
+        <div className="mb-10 flex items-center gap-3 text-sm text-gray-700">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-100 text-gray-800">
             <svg
               width="18"
               height="18"
@@ -218,10 +218,10 @@ export default function AuthPage() {
             </svg>
           </span>
           <div>
-            <div className="text-xs uppercase tracking-[0.28em] text-neutral-500">
+            <div className="text-xs uppercase tracking-[0.28em] text-gray-500">
               Phase 2
             </div>
-            <div className="font-semibold text-white">Authentication & Roles</div>
+            <div className="font-semibold text-gray-900">Authentication & Roles</div>
           </div>
         </div>
 
@@ -229,10 +229,10 @@ export default function AuthPage() {
           
           <form
             onSubmit={handleAuth}
-            className="relative space-y-6 rounded-3xl border border-white/10 bg-neutral-900/70 p-8 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.9)]"
+            className="relative space-y-6 rounded-3xl border border-gray-300 bg-white p-8 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.9)]"
           >
             <div className="flex items-center justify-between gap-3">
-              <div className="flex gap-2 rounded-full bg-white/5 p-1 text-xs font-semibold text-white">
+              <div className="flex gap-2 rounded-full bg-gray-100 p-1 text-xs font-semibold text-gray-900">
                 <button
                   type="button"
                   onClick={() => {
@@ -243,8 +243,8 @@ export default function AuthPage() {
                   }}
                   className={`rounded-full px-4 py-2 transition ${
                     mode === "signin"
-                      ? "bg-white text-neutral-900"
-                      : "text-neutral-200/80 hover:text-white"
+                      ? "bg-blue-600 text-white"
+                      : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
                   Sign in
@@ -259,8 +259,8 @@ export default function AuthPage() {
                   }}
                   className={`rounded-full px-4 py-2 transition ${
                     mode === "signup"
-                      ? "bg-white text-neutral-900"
-                      : "text-neutral-200/80 hover:text-white"
+                      ? "bg-blue-600 text-white"
+                      : "text-gray-600 hover:text-gray-900"
                   }`}
                 >
                   Create account
@@ -268,7 +268,7 @@ export default function AuthPage() {
               </div>
               <Link
                 href="/"
-                className="text-xs font-semibold text-neutral-400 transition hover:text-white"
+                className="text-xs font-semibold text-gray-600 transition hover:text-gray-900"
               >
                 Back home
               </Link>
@@ -276,7 +276,7 @@ export default function AuthPage() {
 
             <div className="space-y-4">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-neutral-200">
+                <label className="text-sm font-semibold text-gray-800">
                   Email
                 </label>
                 <input
@@ -291,9 +291,9 @@ export default function AuthPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="flex items-center justify-between text-sm font-semibold text-neutral-200">
+                <label className="flex items-center justify-between text-sm font-semibold text-gray-800">
                   <span>Password</span>
-                  <span className="text-xs font-normal text-neutral-400">
+                  <span className="text-xs font-normal text-gray-600">
                     Minimum 6 characters
                   </span>
                 </label>
@@ -310,7 +310,7 @@ export default function AuthPage() {
 
               {mode === "signup" && (
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-neutral-200">
+                  <label className="text-sm font-semibold text-gray-800">
                     Confirm password
                   </label>
                   <input
@@ -319,7 +319,7 @@ export default function AuthPage() {
                     required
                     value={confirmPassword}
                     onChange={(event) => setConfirmPassword(event.target.value)}
-                    className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none focus:border-neutral-300/50 focus:ring-2 focus:ring-neutral-400/40"
+                    className="w-full rounded-2xl border border-gray-300 bg-gray-100 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 outline-none focus:border-gray-300/50 focus:ring-2 focus:ring-gray-400/40"
                     placeholder="Repeat password"
                   />
                 </div>
@@ -338,8 +338,8 @@ export default function AuthPage() {
             )}
 
             {pendingEmail && (
-              <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-xs text-neutral-300">
-                <div className="font-semibold text-white">
+              <div className="rounded-2xl border border-gray-300 bg-gray-100 px-4 py-3 text-xs text-gray-700">
+                <div className="font-semibold text-gray-900">
                   Waiting for confirmation
                 </div>
                 <div className="mt-1">
@@ -350,7 +350,7 @@ export default function AuthPage() {
                   type="button"
                   onClick={handleResend}
                   disabled={resendBusy}
-                  className="mt-3 inline-flex items-center rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-semibold text-neutral-100 hover:text-white disabled:cursor-not-allowed disabled:opacity-60"
+                  className="mt-3 inline-flex items-center rounded-full border border-gray-300 bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-60"
                 >
                   {resendBusy ? "Sending..." : "Resend confirmation email"}
                 </button>
@@ -360,7 +360,7 @@ export default function AuthPage() {
             <button
               type="submit"
               disabled={busy}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-neutral-400 px-4 py-3 text-sm font-semibold text-neutral-950 shadow-[0_20px_50px_-35px_rgba(0,0,0,0.8)] transition hover:bg-neutral-300 disabled:cursor-not-allowed disabled:opacity-70"
+              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white shadow-[0_20px_50px_-35px_rgba(0,0,0,0.8)] transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
             >
               {busy ? "Working..." : mode === "signup" ? "Create account" : "Sign in"}
             </button>

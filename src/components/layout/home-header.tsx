@@ -97,7 +97,7 @@ export function HomeHeader() {
       return (
         <Link
           href="/auth?mode=signup&redirect=/onboarding"
-          className="rounded-full bg-neutral-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_-20px_rgba(0,0,0,0.8)] transition hover:bg-neutral-400"
+          className="rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-gray-800"
         >
           List Property
         </Link>
@@ -108,7 +108,7 @@ export function HomeHeader() {
       return (
         <Link
           href="/admin"
-          className="rounded-full bg-emerald-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_-20px_rgba(16,185,129,0.8)] transition hover:bg-emerald-400"
+          className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-700"
         >
           Admin Dashboard
         </Link>
@@ -119,7 +119,7 @@ export function HomeHeader() {
       return (
         <Link
           href="/agent"
-          className="rounded-full bg-neutral-500 px-5 py-2 text-sm font-semibold text-white shadow-[0_10px_30px_-20px_rgba(0,0,0,0.8)] transition hover:bg-neutral-400"
+          className="rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-gray-800"
         >
           Agent Dashboard
         </Link>
@@ -129,7 +129,7 @@ export function HomeHeader() {
     return (
       <Link
         href="/onboarding?redirect=/"
-        className="rounded-full border border-white/15 bg-white/5 px-5 py-2 text-sm font-semibold text-neutral-200 transition hover:border-white/30 hover:text-white"
+        className="rounded-full border border-gray-900 bg-white px-5 py-2 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
       >
         Become an Agent
       </Link>
@@ -137,10 +137,10 @@ export function HomeHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-white/10 bg-neutral-950/80 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b border-gray-300 bg-white/95 backdrop-blur">
       <div className="mx-auto flex w-full max-w-6xl items-center gap-6 px-6 py-4">
         <div className="flex items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-500/15 text-neutral-300">
+          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
             <svg
               width="18"
               height="18"
@@ -157,10 +157,10 @@ export function HomeHeader() {
               <path d="m19.1 4.9-14.2 14.2" />
             </svg>
           </span>
-          <span className="text-lg font-semibold tracking-tight">LuxEstate</span>
+          <span className="text-lg font-semibold tracking-tight text-gray-900">LuxEstate</span>
         </div>
 
-        <div className="hidden flex-1 items-center gap-3 rounded-full border border-white/10 bg-neutral-900/60 px-4 py-2 text-sm text-neutral-300 md:flex">
+        <div className="hidden flex-1 items-center gap-3 rounded-full border border-gray-300 bg-gray-50 px-4 py-2 text-sm text-gray-700 md:flex">
           <svg
             width="16"
             height="16"
@@ -170,7 +170,7 @@ export function HomeHeader() {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-neutral-400"
+            className="text-gray-500"
           >
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
@@ -178,13 +178,13 @@ export function HomeHeader() {
           <input
             type="text"
             placeholder="Search for city, neighborhood, or zip"
-            className="w-full bg-transparent text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
+            className="w-full bg-transparent text-sm text-gray-900 placeholder:text-gray-400 outline-none"
           />
         </div>
 
-        <nav className="ml-auto hidden items-center gap-6 text-sm text-neutral-300 md:flex">
+        <nav className="ml-auto hidden items-center gap-6 text-sm text-gray-700 md:flex">
           {navLinks.map((link) => (
-            <a key={link} className="transition hover:text-white" href="#">
+            <a key={link} className="transition hover:text-gray-900" href="#">
               {link}
             </a>
           ))}
@@ -192,12 +192,12 @@ export function HomeHeader() {
 
         <div className="hidden items-center gap-4 md:flex">
           {loading ? (
-            <div className="h-10 w-40 rounded-full bg-white/5" />
+            <div className="h-10 w-40 rounded-full bg-gray-200" />
           ) : (
             <>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-2 text-sm font-semibold text-neutral-200 transition hover:text-white">
+                  <button className="flex items-center gap-2 text-sm font-semibold text-gray-700 transition hover:text-gray-900">
                     <Avatar className="h-9 w-9">
                       <AvatarFallback>{avatarFallback}</AvatarFallback>
                     </Avatar>
@@ -209,6 +209,9 @@ export function HomeHeader() {
                 <DropdownMenuContent align="end">
                   {userEmail ? (
                     <>
+                      <DropdownMenuItem asChild>
+                        <Link href="/chats">Messages</Link>
+                      </DropdownMenuItem>
                       <DropdownMenuItem asChild>
                         <Link href={profileDestination}>Profile</Link>
                       </DropdownMenuItem>

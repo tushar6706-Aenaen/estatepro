@@ -60,16 +60,16 @@ export default async function PropertyDetailPage({
   if (error) {
     return (
       <div
-        className="min-h-screen bg-neutral-950 text-white"
+        className="min-h-screen bg-gray-50 text-gray-900"
       >
         <HomeHeader />
 
         <div className={`${bodyFont.variable} ${displayFont.variable} font-[var(--font-body)]`}>
           <main className="mx-auto w-full max-w-6xl px-6 py-12">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center">
+            <div className="rounded-3xl border border-gray-300 bg-gray-100 p-10 text-center">
               <h1 className="text-2xl font-semibold">Unable to load property</h1>
-              <p className="mt-3 text-sm text-neutral-300">{error.message}</p>
-              <p className="mt-2 text-xs text-neutral-400">
+              <p className="mt-3 text-sm text-gray-700">{error.message}</p>
+              <p className="mt-2 text-xs text-gray-600">
                 Check RLS policies and ensure the property exists in Supabase.
               </p>
               <Link
@@ -88,15 +88,15 @@ export default async function PropertyDetailPage({
   if (!property) {
     return (
       <div
-        className="min-h-screen bg-neutral-950 text-white"
+        className="min-h-screen bg-gray-50 text-gray-900"
       >
         <HomeHeader />
 
         <div className={`${bodyFont.variable} ${displayFont.variable} font-[var(--font-body)]`}>
           <main className="mx-auto w-full max-w-6xl px-6 py-12">
-            <div className="rounded-3xl border border-white/10 bg-white/5 p-10 text-center">
+            <div className="rounded-3xl border border-gray-300 bg-gray-100 p-10 text-center">
               <h1 className="text-2xl font-semibold">Property not found</h1>
-              <p className="mt-3 text-sm text-neutral-300">
+              <p className="mt-3 text-sm text-gray-700">
                 We couldn&#39;t find a listing for this property.
               </p>
               <Link
@@ -127,25 +127,25 @@ export default async function PropertyDetailPage({
   });
 
   return (
-    <div className="min-h-screen bg-neutral-950 text-white">
+    <div className="min-h-screen bg-gray-50 text-gray-900">
       <HomeHeader />
 
       <main
         className={`relative mx-auto w-full max-w-6xl px-6 pb-16 pt-6 ${bodyFont.variable} ${displayFont.variable} font-[var(--font-body)]`}
       >
-        <div className="text-xs text-neutral-400">
-          Home / Buy / <span className="text-white/90">{typedProperty.city}</span>
+        <div className="text-xs text-gray-600">
+          Home / Buy / <span className="text-gray-900">{typedProperty.city}</span>
         </div>
 
         <section className="mt-6 grid gap-4 lg:grid-cols-[2.2fr_1fr]">
-          <div className="relative overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+          <div className="relative overflow-hidden rounded-3xl border border-gray-300 bg-gray-100">
             {gallerySlots[0] ? (
               <div
                 className="h-72 w-full bg-cover bg-center md:h-[420px]"
                 style={{ backgroundImage: `url(${gallerySlots[0]})` }}
               />
             ) : (
-              <div className="h-72 w-full bg-white/5 md:h-[420px]" />
+              <div className="h-72 w-full bg-gray-100 md:h-[420px]" />
             )}
             <span className="absolute bottom-4 left-4 rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
               Featured
@@ -156,7 +156,7 @@ export default async function PropertyDetailPage({
             {gallerySlots.slice(1).map((imageUrl, index) => (
               <div
                 key={`${typedProperty.id}-gallery-${index}`}
-                className="overflow-hidden rounded-2xl border border-white/10 bg-white/5"
+                className="overflow-hidden rounded-2xl border border-gray-300 bg-gray-100"
               >
                 {imageUrl ? (
                   <div
@@ -164,7 +164,7 @@ export default async function PropertyDetailPage({
                     style={{ backgroundImage: `url(${imageUrl})` }}
                   />
                 ) : (
-                  <div className="h-36 w-full bg-white/5 md:h-[200px]" />
+                  <div className="h-36 w-full bg-gray-100 md:h-[200px]" />
                 )}
               </div>
             ))}
@@ -174,14 +174,14 @@ export default async function PropertyDetailPage({
         <section className="mt-10 grid gap-8 lg:grid-cols-[1.6fr_1fr]">
           <div className="space-y-8">
             <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-tight text-white md:text-5xl font-[var(--font-display)]">
+              <h1 className="text-4xl font-semibold tracking-tight text-gray-900 md:text-5xl font-[var(--font-display)]">
                 ${formattedPrice}
               </h1>
-              <p className="text-sm text-neutral-300">{typedProperty.title}</p>
-              <p className="text-sm text-neutral-400">{typedProperty.city}</p>
+              <p className="text-sm text-gray-700">{typedProperty.title}</p>
+              <p className="text-sm text-gray-600">{typedProperty.city}</p>
             </div>
 
-            <div className="grid gap-4 rounded-3xl border border-white/10 bg-white/5 px-6 py-5 text-sm text-neutral-400 md:grid-cols-4">
+            <div className="grid gap-4 rounded-3xl border border-gray-300 bg-gray-100 px-6 py-5 text-sm text-gray-600 md:grid-cols-4">
               <div className="flex items-center gap-2">
                 <svg
                   width="16"
@@ -192,7 +192,7 @@ export default async function PropertyDetailPage({
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-neutral-400"
+                  className="text-gray-600"
                 >
                   <path d="M3 10h18" />
                   <path d="M7 10V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3" />
@@ -210,7 +210,7 @@ export default async function PropertyDetailPage({
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-neutral-400"
+                  className="text-gray-600"
                 >
                   <path d="M9 6h6" />
                   <path d="M7 6h10l1 6H6l1-6z" />
@@ -228,7 +228,7 @@ export default async function PropertyDetailPage({
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-neutral-400"
+                  className="text-gray-600"
                 >
                   <rect x="4" y="4" width="16" height="16" rx="2" />
                   <path d="M4 12h16" />
@@ -248,7 +248,7 @@ export default async function PropertyDetailPage({
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-neutral-400"
+                  className="text-gray-600"
                 >
                   <path d="M3 11l9-7 9 7" />
                   <path d="M9 22V12h6v10" />
@@ -261,24 +261,24 @@ export default async function PropertyDetailPage({
               <h2 className="text-lg font-semibold font-[var(--font-display)]">
                 About this home
               </h2>
-              <p className="text-sm leading-relaxed text-neutral-400">
+              <p className="text-sm leading-relaxed text-gray-600">
                 {typedProperty.description ??
                   "Experience refined living with thoughtful finishes, expansive entertaining spaces, and a seamless indoor-outdoor flow designed for modern comfort."}
               </p>
-              <button className="text-xs font-semibold text-neutral-300 transition hover:text-white">
+              <button className="text-xs font-semibold text-gray-700 transition hover:text-gray-900">
                 Read more
               </button>
             </div>
 
             <div className="space-y-4">
               <h3 className="text-lg font-semibold font-[var(--font-display)]">Highlights</h3>
-              <div className="grid gap-3 text-sm text-neutral-400 sm:grid-cols-3">
+              <div className="grid gap-3 text-sm text-gray-600 sm:grid-cols-3">
                 {highlights.map((item) => (
                   <div
                     key={item}
-                    className="flex items-center gap-3 rounded-2xl border border-white/10 bg-white/5 px-4 py-3"
+                    className="flex items-center gap-3 rounded-2xl border border-gray-300 bg-gray-100 px-4 py-3"
                   >
-                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-neutral-500/20 text-neutral-200">
+                    <span className="flex h-8 w-8 items-center justify-center rounded-full bg-gray-200 text-gray-800">
                       <svg
                         width="14"
                         height="14"
@@ -301,23 +301,23 @@ export default async function PropertyDetailPage({
 
             <div className="space-y-4">
               <h3 className="text-lg font-semibold font-[var(--font-display)]">Location</h3>
-              <div className="relative h-56 overflow-hidden rounded-3xl border border-white/10 bg-white/5">
+              <div className="relative h-56 overflow-hidden rounded-3xl border border-gray-300 bg-gray-100">
                 <div className="absolute bottom-4 right-4 rounded-full bg-black/60 px-3 py-1 text-xs text-white">
                   {typedProperty.city}
                 </div>
-                <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-neutral-500 shadow-[0_0_16px_rgba(163,163,163,0.6)]" />
+                <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-900 shadow-[0_0_16px_rgba(31,41,55,0.6)]" />
               </div>
             </div>
           </div>
 
           <aside className="space-y-6">
-            <div className="rounded-3xl border border-white/10 bg-neutral-900/60 p-6">
+            <div className="rounded-3xl border border-gray-300 bg-white p-6">
               <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-white/10" />
+                <div className="h-12 w-12 rounded-full bg-gray-200" />
                 <div>
-                  <p className="text-xs text-neutral-400">Listed by</p>
+                  <p className="text-xs text-gray-600">Listed by</p>
                   <p className="text-sm font-semibold">Luxe Estates</p>
-                  <p className="text-xs text-neutral-400">DRE-01234567</p>
+                  <p className="text-xs text-gray-600">DRE-01234567</p>
                 </div>
               </div>
 
