@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 
 type SearchWithAutocompleteProps = {
@@ -65,29 +65,22 @@ const POPULAR_CITIES = [
 
 export function SearchWithAutocomplete({ value, onChange, placeholder }: SearchWithAutocompleteProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const [suggestions, setSuggestions] = useState<string[]>([]);
-  const [recentSearches, setRecentSearches] = useState<string[]>([]);
+  const [recentSearches, setRecentSearches] = useState<string[]>(() => {
+    if (typeof window === "undefined") return [];
+    const stored = localStorage.getItem("recentCitySearches");
+    try {
+      return stored ? JSON.parse(stored) : [];
+    } catch {
+      return [];
+    }
+  });
   const inputRef = useRef<HTMLInputElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
-
-  // Load recent searches from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem("recentCitySearches");
-    if (stored) {
-      setRecentSearches(JSON.parse(stored));
-    }
-  }, []);
-
-  // Update suggestions based on input
-  useEffect(() => {
-    if (value.trim()) {
-      const filtered = POPULAR_CITIES.filter((city) =>
-        city.toLowerCase().includes(value.toLowerCase())
-      ).slice(0, 5);
-      setSuggestions(filtered);
-    } else {
-      setSuggestions([]);
-    }
+  const suggestions = useMemo(() => {
+    if (!value.trim()) return [];
+    return POPULAR_CITIES.filter((city) =>
+      city.toLowerCase().includes(value.toLowerCase()),
+    ).slice(0, 5);
   }, [value]);
 
   // Close dropdown when clicking outside

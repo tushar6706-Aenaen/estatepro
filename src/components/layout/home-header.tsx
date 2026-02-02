@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 
 import { supabaseBrowserClient } from "@/src/lib/supabase/client";
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
@@ -26,7 +26,6 @@ type ProfileRow = {
 };
 
 export function HomeHeader() {
-  const router = useRouter();
   const searchParams = useSearchParams();
   const activeListingType = searchParams.get("listingType") || "sale";
   

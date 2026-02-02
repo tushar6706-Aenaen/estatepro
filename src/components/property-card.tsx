@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import { useComparison } from "./comparison-provider";
@@ -22,6 +22,14 @@ type PropertyCardProps = {
   isNew?: boolean;
   priceChange?: "up" | "down" | null;
   priceChangePercent?: number;
+};
+
+type FavoriteItem = {
+  id: string;
+  title: string;
+  city: string;
+  price: number | string;
+  imageUrl?: string | null;
 };
 
 export function PropertyCard({
@@ -47,29 +55,41 @@ export function PropertyCard({
   const { showToast } = useToast();
 
   // Check if property is in favorites on mount
-  useState(() => {
-    const favorites = localStorage.getItem('favorites');
-    if (favorites) {
-      const favArray = JSON.parse(favorites);
-      setIsFavorite(favArray.some((fav: any) => fav.id === id));
+  useEffect(() => {
+    const favorites = localStorage.getItem("favorites");
+    if (!favorites) return;
+    try {
+      const favArray: FavoriteItem[] = JSON.parse(favorites);
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setIsFavorite(favArray.some((fav) => fav.id === id));
+    } catch {
+      // Ignore malformed localStorage data
     }
-  });
+  }, [id]);
 
   const handleToggleFavorite = (e: React.MouseEvent) => {
     e.preventDefault();
-    const favorites = localStorage.getItem('favorites');
-    let favArray = favorites ? JSON.parse(favorites) : [];
+    const favorites = localStorage.getItem("favorites");
+    let favArray: FavoriteItem[] = [];
+
+    if (favorites) {
+      try {
+        favArray = JSON.parse(favorites);
+      } catch {
+        favArray = [];
+      }
+    }
     
     if (isFavorite) {
       // Remove from favorites
-      favArray = favArray.filter((fav: any) => fav.id !== id);
-      localStorage.setItem('favorites', JSON.stringify(favArray));
+      favArray = favArray.filter((fav) => fav.id !== id);
+      localStorage.setItem("favorites", JSON.stringify(favArray));
       setIsFavorite(false);
       showToast("Removed from favorites", "info");
     } else {
       // Add to favorites
       favArray.push({ id, title, city, price, imageUrl });
-      localStorage.setItem('favorites', JSON.stringify(favArray));
+      localStorage.setItem("favorites", JSON.stringify(favArray));
       setIsFavorite(true);
       showToast("Added to favorites", "success");
     }

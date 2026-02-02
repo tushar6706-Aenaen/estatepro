@@ -57,7 +57,6 @@ function AnimatedStatistic({ end, label, suffix = "", delay = 0 }: StatisticProp
 }
 
 export function AnimatedHero() {
-  const [scrollY, setScrollY] = useState(0);
   const scrollYProgress = useMotionValue(0);
   const y = useTransform(scrollYProgress, [0, 1], [0, 300]);
   const ySmooth = useSpring(y, { stiffness: 100, damping: 30 });
@@ -65,7 +64,6 @@ export function AnimatedHero() {
   useEffect(() => {
     const handleScroll = () => {
       const scroll = window.scrollY;
-      setScrollY(scroll);
       scrollYProgress.set(scroll / 1000);
     };
 

@@ -1,7 +1,6 @@
 "use client";
 
 import { motion, AnimatePresence } from "framer-motion";
-import { useState } from "react";
 import Link from "next/link";
 
 type PropertyQuickViewProps = {
@@ -22,8 +21,6 @@ type PropertyQuickViewProps = {
 };
 
 export function PropertyQuickView({ isOpen, onClose, property }: PropertyQuickViewProps) {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
-
   return (
     <AnimatePresence>
       {isOpen && (

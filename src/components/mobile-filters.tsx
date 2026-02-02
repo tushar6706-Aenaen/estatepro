@@ -5,12 +5,6 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { BottomSheet } from "./ui/bottom-sheet";
 import { RippleButton } from "./ui/ripple-button";
 import { SearchWithAutocomplete } from "./search-autocomplete";
-import { motion } from "framer-motion";
-
-type Option = {
-  label: string;
-  value: string;
-};
 
 export function MobileFilters() {
   const router = useRouter();

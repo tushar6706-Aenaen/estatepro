@@ -1,7 +1,5 @@
 import { supabaseBrowserClient } from "@/src/lib/supabase/client";
 
-type SupabaseError = { message: string } | null;
-
 export type ChatRow = {
   id: string;
   property_id: string;

@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
-import { motion, useMotionValue, useTransform, AnimatePresence } from "framer-motion";
+import { useState } from "react";
+import { motion, AnimatePresence, type PanInfo } from "framer-motion";
 
 type PropertyCardMobileProps = {
   properties: Array<{
@@ -15,11 +15,11 @@ type PropertyCardMobileProps = {
 
 export function PropertyCardCarousel({ properties }: PropertyCardMobileProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-  const constraintsRef = useRef<HTMLDivElement>(null);
 
-  const handleDragEnd = (event: any, info: any) => {
-    setIsDragging(false);
+  const handleDragEnd = (
+    _event: MouseEvent | TouchEvent | PointerEvent,
+    info: PanInfo,
+  ) => {
     const offset = info.offset.x;
     const velocity = info.velocity.x;
 

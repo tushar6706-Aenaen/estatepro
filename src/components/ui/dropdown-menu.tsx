@@ -14,10 +14,16 @@ const DropdownMenu: React.FC<DropdownMenuProps> = ({ children }) => {
     <div className="relative">
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
-          return React.cloneElement(child as React.ReactElement<any>, {
-            isOpen,
-            setIsOpen,
-          });
+          return React.cloneElement(
+            child as React.ReactElement<{
+              isOpen?: boolean;
+              setIsOpen?: (open: boolean) => void;
+            }>,
+            {
+              isOpen,
+              setIsOpen,
+            },
+          );
         }
         return child;
       })}
@@ -38,8 +44,14 @@ const DropdownMenuTrigger = React.forwardRef<HTMLButtonElement, DropdownMenuTrig
     };
 
     if (asChild && React.isValidElement(children)) {
-      return React.cloneElement(children as React.ReactElement<any>, {
-        onClick: handleClick,
+      const childElement = children as React.ReactElement<
+        React.ButtonHTMLAttributes<HTMLButtonElement>
+      >;
+      return React.cloneElement(childElement, {
+        onClick: (event: React.MouseEvent<HTMLButtonElement>) => {
+          childElement.props.onClick?.(event);
+          handleClick();
+        },
       });
     }
 
@@ -67,6 +79,7 @@ interface DropdownMenuContentProps extends React.HTMLAttributes<HTMLDivElement> 
 const DropdownMenuContent = React.forwardRef<HTMLDivElement, DropdownMenuContentProps>(
   ({ className, children, align = "end", isOpen, setIsOpen, ...props }, ref) => {
     const contentRef = React.useRef<HTMLDivElement>(null);
+    void ref;
 
     React.useEffect(() => {
       const handleClickOutside = (event: MouseEvent) => {
@@ -114,7 +127,8 @@ interface DropdownMenuItemProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const DropdownMenuItem = React.forwardRef<HTMLDivElement, DropdownMenuItemProps>(
-  ({ className, children, asChild, ...props } , ref) => {
+  ({ className, children, asChild, ...props }, _ref) => {
+    void _ref;
     if (asChild && React.isValidElement(children)) {
       const childElement = children as React.ReactElement<{ className?: string }>;
       return React.cloneElement(childElement, {

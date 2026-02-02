@@ -301,12 +301,6 @@ export default function ChatsPage() {
               const primaryImage =
                 property?.property_images?.find((img) => img.is_primary) ??
                 property?.property_images?.[0];
-              const priceNumber = Number(property?.price);
-              const price = Number.isFinite(priceNumber)
-                ? `$${priceNumber.toLocaleString()}`
-                : property?.price
-                  ? `$${property?.price}`
-                  : "$0";
               const roleLabel =
                 userId && chat.agent_id === userId ? "Buyer" : "Agent";
               const participantName =

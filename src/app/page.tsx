@@ -154,7 +154,14 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
               
               // Simulate price changes
               const priceChange = index % 5 === 0 ? "down" : index % 3 === 0 ? "up" : null;
-              const priceChangePercent = priceChange ? Math.floor(Math.random() * 10) + 1 : 0;
+              // Deterministic pseudo-random percentage to avoid impure Math.random in render
+              const hashSource = `${listing.id}-${listing.title}-${index}`;
+              let hash = 0;
+              for (let i = 0; i < hashSource.length; i += 1) {
+                hash = (hash << 5) - hash + hashSource.charCodeAt(i);
+                hash |= 0;
+              }
+              const priceChangePercent = priceChange ? (Math.abs(hash) % 10) + 1 : 0;
 
               return (
                 <PropertyCard
