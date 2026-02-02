@@ -354,9 +354,19 @@ export function AgentDashboard() {
   const handleDelete = async (listing: PropertyRow) => {
     if (!listing.id) return;
     const confirmed = window.confirm(
-      "Delete this listing? This cannot be undone.",
+      "Remove this listing? Use this after it is sold or rented. This cannot be undone.",
     );
     if (!confirmed) return;
+
+    const { error: imagesError } = await supabaseBrowserClient
+      .from("property_images")
+      .delete()
+      .eq("property_id", listing.id);
+
+    if (imagesError) {
+      setLoadError(imagesError.message);
+      return;
+    }
 
     const { error } = await supabaseBrowserClient
       .from("properties")
@@ -369,7 +379,7 @@ export function AgentDashboard() {
     }
 
     setListings((prev) => prev.filter((item) => item.id !== listing.id));
-    showToast("Listing deleted.", "info");
+    showToast("Listing removed.", "info");
   };
 
   const formatPrice = (price: PropertyRow["price"]) => {
@@ -597,7 +607,7 @@ export function AgentDashboard() {
 
         <div className="mt-6 grid gap-6 lg:grid-cols-2">
           {listings.map((listing) => {
-            const editable =
+            const canEdit =
               listing.status === "pending" || listing.status === "rejected";
             const isEditing = editId === listing.id;
 
@@ -745,27 +755,26 @@ export function AgentDashboard() {
 
                 {!isEditing && (
                   <div className="mt-5 flex flex-wrap gap-3 text-xs">
-                    {editable && (
-                      <>
-                        <button
-                          type="button"
-                          onClick={() => startEdit(listing)}
-                          className="rounded-full border border-gray-300 bg-gray-100 px-4 py-2 font-semibold text-gray-800"
-                        >
-                          Edit
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => handleDelete(listing)}
-                          className="rounded-full border border-rose-300/30 bg-rose-500/10 px-4 py-2 font-semibold text-rose-200"
-                        >
-                          Delete
-                        </button>
-                      </>
+                    {canEdit && (
+                      <button
+                        type="button"
+                        onClick={() => startEdit(listing)}
+                        className="rounded-full border border-gray-300 bg-gray-100 px-4 py-2 font-semibold text-gray-800"
+                      >
+                        Edit
+                      </button>
                     )}
-                    {!editable && (
+                    <button
+                      type="button"
+                      onClick={() => handleDelete(listing)}
+                      className="rounded-full border border-rose-300/30 bg-rose-500/10 px-4 py-2 font-semibold text-rose-200"
+                    >
+                      Remove
+                    </button>
+                    {!canEdit && (
                       <span className="rounded-full border border-gray-300 bg-gray-100 px-4 py-2 text-gray-600">
-                        Editing disabled after approval.
+                        Editing disabled after approval. Remove listings once
+                        sold or rented.
                       </span>
                     )}
                   </div>
