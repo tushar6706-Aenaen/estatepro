@@ -2,6 +2,7 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import Image from "next/image";
 
 type PropertyQuickViewProps = {
   isOpen: boolean;
@@ -56,7 +57,14 @@ export function PropertyQuickView({ isOpen, onClose, property }: PropertyQuickVi
               {/* Image Section */}
               <div className="relative h-96 bg-gray-200">
                 {property.imageUrl && (
-                  <img src={property.imageUrl} alt={property.title} className="w-full h-full object-cover" />
+                  <Image
+                    src={property.imageUrl}
+                    alt={property.title}
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 960px"
+                    priority
+                  />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
                 

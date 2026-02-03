@@ -1,6 +1,7 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
+import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Property = {
@@ -112,7 +113,13 @@ export function ComparisonProvider({ children }: { children: ReactNode }) {
                 <div key={property.id} className="relative group">
                   <div className="w-16 h-16 rounded-lg bg-gray-800 overflow-hidden">
                     {property.imageUrl && (
-                      <img src={property.imageUrl} alt={property.title} className="w-full h-full object-cover" />
+                      <Image
+                        src={property.imageUrl}
+                        alt={property.title}
+                        fill
+                        className="object-cover"
+                        sizes="64px"
+                      />
                     )}
                   </div>
                   <button
@@ -167,7 +174,13 @@ export function ComparisonProvider({ children }: { children: ReactNode }) {
                     <div key={property.id} className="space-y-4">
                       <div className="aspect-video rounded-xl bg-gray-200 overflow-hidden">
                         {property.imageUrl && (
-                          <img src={property.imageUrl} alt={property.title} className="w-full h-full object-cover" />
+                          <Image
+                            src={property.imageUrl}
+                            alt={property.title}
+                            fill
+                            className="object-cover"
+                            sizes="320px"
+                          />
                         )}
                       </div>
                       <div>

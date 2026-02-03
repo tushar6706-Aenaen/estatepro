@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import Image from "next/image";
 import { useComparison } from "./comparison-provider";
 import { useToast } from "./ui/toast-provider";
 import { PropertyQuickView } from "./property-quick-view";
@@ -145,12 +146,15 @@ export function PropertyCard({
                     transition={{ duration: 0.6, ease: "easeOut" }}
                     className="absolute inset-0"
                   >
-                    <img
+                    <Image
                       src={imageUrl}
                       alt={title}
-                      className="h-full w-full object-cover"
+                      fill
+                      className="object-cover"
+                      sizes="(max-width: 768px) 100vw, 33vw"
                       onLoad={() => setImageLoaded(true)}
                       style={{ opacity: imageLoaded ? 1 : 0 }}
+                      priority={index < 3}
                     />
                     {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/20" />

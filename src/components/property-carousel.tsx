@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
+import Image from "next/image";
 
 type PropertyCardMobileProps = {
   properties: Array<{
@@ -56,10 +57,13 @@ export function PropertyCardCarousel({ properties }: PropertyCardMobileProps) {
               {/* Image */}
               <div className="relative h-64 bg-gray-200">
                 {properties[currentIndex].imageUrl && (
-                  <img
+                  <Image
                     src={properties[currentIndex].imageUrl}
                     alt={properties[currentIndex].title}
-                    className="w-full h-full object-cover"
+                    fill
+                    className="object-cover"
+                    sizes="(max-width: 768px) 100vw, 80vw"
+                    priority
                   />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
