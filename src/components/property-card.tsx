@@ -124,17 +124,17 @@ export function PropertyCard({
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: index * 0.1 }}
-        className="h-full"
+        className="h-full w-full max-w-sm mx-auto md:max-w-none"
       >
         <div className="relative h-full">
           <Link href={`/properties/${id}`}>
             <motion.div
               whileHover={{ y: -8 }}
               transition={{ duration: 0.3, ease: "easeOut" }}
-              className="group h-full flex flex-col overflow-hidden rounded-2xl bg-white shadow-lg hover:shadow-2xl border-2 border-transparent hover:border-gray-900 transition-all"
+              className="group h-full flex flex-col overflow-hidden rounded-xl md:rounded-2xl bg-white shadow-lg hover:shadow-2xl border-2 border-transparent hover:border-gray-900 transition-all"
             >
               {/* Image Container with Skeleton */}
-              <div className="relative h-56 bg-gray-200 overflow-hidden">
+              <div className="relative h-48 md:h-56 bg-gray-200 overflow-hidden">
                 {/* Skeleton Loader */}
                 {!imageLoaded && <div className="absolute inset-0 skeleton" />}
 
