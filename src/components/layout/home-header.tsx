@@ -39,6 +39,7 @@ export function HomeHeader() {
   const [loading, setLoading] = useState(supabaseReady);
   const [userEmail, setUserEmail] = useState<string | null>(null);
   const [role, setRole] = useState<ProfileRow["role"] | null>(null);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     if (!supabaseReady) {
@@ -275,24 +276,180 @@ export function HomeHeader() {
           )}
         </div>
 
-        <button className="md:hidden ml-auto">
+        <button 
+          className="md:hidden ml-auto"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle menu"
+        >
           <span className="sr-only">Open menu</span>
-          <svg
-            width="24"
-            height="24"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-          >
-            <path d="M3 12h18" />
-            <path d="M3 6h18" />
-            <path d="M3 18h18" />
-          </svg>
+          {mobileMenuOpen ? (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M18 6L6 18" />
+              <path d="M6 6l12 12" />
+            </svg>
+          ) : (
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
+              <path d="M3 12h18" />
+              <path d="M3 6h18" />
+              <path d="M3 18h18" />
+            </svg>
+          )}
         </button>
       </div>
+
+      {/* Mobile Menu */}
+      {mobileMenuOpen && (
+        <div className="md:hidden border-t border-gray-300 bg-white">
+          <div className="px-4 py-4 space-y-3">
+            {/* User Info Section */}
+            {loading ? (
+              <div className="h-12 w-full rounded-lg bg-gray-200 animate-pulse" />
+            ) : userEmail ? (
+              <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
+                <Avatar className="h-10 w-10">
+                  <AvatarFallback>{avatarFallback}</AvatarFallback>
+                </Avatar>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-gray-900 truncate">{userEmail}</p>
+                  <p className="text-xs text-gray-600">
+                    {isAdmin ? "Administrator" : isAgent ? "Agent" : "Member"}
+                  </p>
+                </div>
+              </div>
+            ) : (
+              <div className="pb-3 border-b border-gray-200">
+                <Link
+                  href="/auth?mode=signin"
+                  className="block w-full text-center rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Sign In
+                </Link>
+              </div>
+            )}
+
+            {/* Navigation Links */}
+            <nav className="space-y-1">
+              {navLinks.map((link) => {
+                const isActive = link.value === activeListingType || 
+                               (link.value === "sale" && !searchParams.get("listingType"));
+                
+                return (
+                  <Link
+                    key={link.value}
+                    href={link.href}
+                    className={`block px-4 py-2.5 rounded-lg font-medium transition-all ${
+                      isActive && (link.value === "sale" || link.value === "rent")
+                        ? "bg-gray-900 text-white"
+                        : "text-gray-700 hover:bg-gray-100"
+                    }`}
+                    onClick={() => setMobileMenuOpen(false)}
+                  >
+                    {link.label}
+                  </Link>
+                );
+              })}
+            </nav>
+
+            {/* User Menu Items */}
+            {userEmail && (
+              <div className="pt-3 border-t border-gray-200 space-y-1">
+                <Link
+                  href="/chats"
+                  className="block px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Messages
+                </Link>
+                <Link
+                  href={profileDestination}
+                  className="block px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Profile
+                </Link>
+                <Link
+                  href={accountDestination}
+                  className="block px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {isAdmin ? "Admin Dashboard" : isAgent ? "Agent Dashboard" : "Account"}
+                </Link>
+              </div>
+            )}
+
+            {/* Action Button */}
+            <div className="pt-3 border-t border-gray-200">
+              {!userEmail ? (
+                <Link
+                  href="/auth?mode=signup&redirect=/onboarding"
+                  className="block w-full text-center rounded-lg border-2 border-gray-900 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  List Property
+                </Link>
+              ) : (
+                <>
+                  {isAdmin && (
+                    <Link
+                      href="/admin"
+                      className="block w-full text-center rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Admin Dashboard
+                    </Link>
+                  )}
+                  {isAgent && !isAdmin && (
+                    <Link
+                      href="/agent"
+                      className="block w-full text-center rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Agent Dashboard
+                    </Link>
+                  )}
+                  {!isAgent && !isAdmin && (
+                    <Link
+                      href="/onboarding?redirect=/"
+                      className="block w-full text-center rounded-lg border-2 border-gray-900 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
+                      onClick={() => setMobileMenuOpen(false)}
+                    >
+                      Become an Agent
+                    </Link>
+                  )}
+                  <button
+                    onClick={() => {
+                      handleSignOut();
+                      setMobileMenuOpen(false);
+                    }}
+                    className="mt-2 block w-full text-center rounded-lg border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                  >
+                    Sign Out
+                  </button>
+                </>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </header>
   );
 }
