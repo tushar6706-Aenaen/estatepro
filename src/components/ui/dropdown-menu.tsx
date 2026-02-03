@@ -127,8 +127,7 @@ interface DropdownMenuItemProps extends React.HTMLAttributes<HTMLDivElement> {
 }
 
 const DropdownMenuItem = React.forwardRef<HTMLDivElement, DropdownMenuItemProps>(
-  ({ className, children, asChild, ...props }, _ref) => {
-    void _ref;
+  ({ className, children, asChild, ...props }, ref) => {
     if (asChild && React.isValidElement(children)) {
       const childElement = children as React.ReactElement<{ className?: string }>;
       return React.cloneElement(childElement, {

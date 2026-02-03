@@ -131,68 +131,68 @@ export default async function PropertyDetailPage({
       <HomeHeader />
 
       <main
-        className={`relative mx-auto w-full max-w-6xl px-6 pb-16 pt-6 ${bodyFont.variable} ${displayFont.variable} font-[var(--font-body)]`}
+        className={`relative mx-auto w-full max-w-6xl px-4 md:px-6 pb-16 pt-4 md:pt-6 ${bodyFont.variable} ${displayFont.variable} font-[var(--font-body)]`}
       >
-        <div className="text-xs text-gray-600">
+        <div className="text-[10px] md:text-xs text-gray-600">
           Home / Buy / <span className="text-gray-900">{typedProperty.city}</span>
         </div>
 
-        <section className="mt-6 grid gap-4 lg:grid-cols-[2.2fr_1fr]">
-          <div className="relative overflow-hidden rounded-3xl border border-gray-300 bg-gray-100">
+        <section className="mt-4 md:mt-6 grid gap-3 md:gap-4 lg:grid-cols-[2.2fr_1fr]">
+          <div className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-gray-300 bg-gray-100">
             {gallerySlots[0] ? (
               <div
-                className="h-72 w-full bg-cover bg-center md:h-[420px]"
+                className="h-56 sm:h-72 w-full bg-cover bg-center md:h-[420px]"
                 style={{ backgroundImage: `url(${gallerySlots[0]})` }}
               />
             ) : (
-              <div className="h-72 w-full bg-gray-100 md:h-[420px]" />
+              <div className="h-56 sm:h-72 w-full bg-gray-100 md:h-[420px]" />
             )}
-            <span className="absolute bottom-4 left-4 rounded-full bg-black/60 px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.2em] text-white">
+            <span className="absolute bottom-3 md:bottom-4 left-3 md:left-4 rounded-full bg-black/60 px-2 md:px-3 py-1 text-[10px] font-semibold uppercase tracking-[0.15em] md:tracking-[0.2em] text-white">
               Featured
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-4">
+          <div className="grid grid-cols-2 gap-2 md:gap-4">
             {gallerySlots.slice(1).map((imageUrl, index) => (
               <div
                 key={`${typedProperty.id}-gallery-${index}`}
-                className="overflow-hidden rounded-2xl border border-gray-300 bg-gray-100"
+                className="overflow-hidden rounded-xl md:rounded-2xl border border-gray-300 bg-gray-100"
               >
                 {imageUrl ? (
                   <div
-                    className="h-36 w-full bg-cover bg-center md:h-[200px]"
+                    className="h-28 sm:h-36 w-full bg-cover bg-center md:h-[200px]"
                     style={{ backgroundImage: `url(${imageUrl})` }}
                   />
                 ) : (
-                  <div className="h-36 w-full bg-gray-100 md:h-[200px]" />
+                  <div className="h-28 sm:h-36 w-full bg-gray-100 md:h-[200px]" />
                 )}
               </div>
             ))}
           </div>
         </section>
 
-        <section className="mt-10 grid gap-8 lg:grid-cols-[1.6fr_1fr]">
-          <div className="space-y-8">
-            <div className="space-y-3">
-              <h1 className="text-4xl font-semibold tracking-tight text-gray-900 md:text-5xl font-[var(--font-display)]">
+        <section className="mt-6 md:mt-10 grid gap-6 md:gap-8 lg:grid-cols-[1.6fr_1fr]">
+          <div className="space-y-6 md:space-y-8">
+            <div className="space-y-2 md:space-y-3">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight text-gray-900 font-[var(--font-display)]">
                 ${formattedPrice}
               </h1>
               <p className="text-sm text-gray-700">{typedProperty.title}</p>
               <p className="text-sm text-gray-600">{typedProperty.city}</p>
             </div>
 
-            <div className="grid gap-4 rounded-3xl border border-gray-300 bg-gray-100 px-6 py-5 text-sm text-gray-600 md:grid-cols-4">
-              <div className="flex items-center gap-2">
+            <div className="grid gap-3 md:gap-4 rounded-2xl md:rounded-3xl border border-gray-300 bg-gray-100 px-4 md:px-6 py-4 md:py-5 text-xs md:text-sm text-gray-600 grid-cols-2 sm:grid-cols-4">
+              <div className="flex items-center gap-1.5 md:gap-2">
                 <svg
-                  width="16"
-                  height="16"
+                  width="14"
+                  height="14"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-gray-600"
+                  className="text-gray-600 md:w-4 md:h-4"
                 >
                   <path d="M3 10h18" />
                   <path d="M7 10V7a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v3" />
@@ -200,17 +200,17 @@ export default async function PropertyDetailPage({
                 </svg>
                 {typedProperty.bedrooms ?? "-"} Beds
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 md:gap-2">
                 <svg
-                  width="16"
-                  height="16"
+                  width="14"
+                  height="14"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-gray-600"
+                  className="text-gray-600 md:w-4 md:h-4"
                 >
                   <path d="M9 6h6" />
                   <path d="M7 6h10l1 6H6l1-6z" />
@@ -218,17 +218,17 @@ export default async function PropertyDetailPage({
                 </svg>
                 {typedProperty.bathrooms ?? "-"} Baths
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 md:gap-2">
                 <svg
-                  width="16"
-                  height="16"
+                  width="14"
+                  height="14"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-gray-600"
+                  className="text-gray-600 md:w-4 md:h-4"
                 >
                   <rect x="4" y="4" width="16" height="16" rx="2" />
                   <path d="M4 12h16" />
@@ -238,17 +238,17 @@ export default async function PropertyDetailPage({
                   ? `${typedProperty.area_sqft.toLocaleString()} Sqft`
                   : "- Sqft"}
               </div>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1.5 md:gap-2">
                 <svg
-                  width="16"
-                  height="16"
+                  width="14"
+                  height="14"
                   viewBox="0 0 24 24"
                   fill="none"
                   stroke="currentColor"
                   strokeWidth="2"
                   strokeLinecap="round"
                   strokeLinejoin="round"
-                  className="text-gray-600"
+                  className="text-gray-600 md:w-4 md:h-4"
                 >
                   <path d="M3 11l9-7 9 7" />
                   <path d="M9 22V12h6v10" />
@@ -257,8 +257,8 @@ export default async function PropertyDetailPage({
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold font-[var(--font-display)]">
+            <div className="space-y-3 md:space-y-4">
+              <h2 className="text-base md:text-lg font-semibold font-[var(--font-display)]">
                 About this home
               </h2>
               <p className="text-sm leading-relaxed text-gray-600">
@@ -270,9 +270,9 @@ export default async function PropertyDetailPage({
               </button>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold font-[var(--font-display)]">Highlights</h3>
-              <div className="grid gap-3 text-sm text-gray-600 sm:grid-cols-3">
+            <div className="space-y-3 md:space-y-4">
+              <h3 className="text-base md:text-lg font-semibold font-[var(--font-display)]">Highlights</h3>
+              <div className="grid gap-2 md:gap-3 text-xs md:text-sm text-gray-600 grid-cols-1 sm:grid-cols-2 lg:grid-cols-3">
                 {highlights.map((item) => (
                   <div
                     key={item}
@@ -299,10 +299,10 @@ export default async function PropertyDetailPage({
               </div>
             </div>
 
-            <div className="space-y-4">
-              <h3 className="text-lg font-semibold font-[var(--font-display)]">Location</h3>
-              <div className="relative h-56 overflow-hidden rounded-3xl border border-gray-300 bg-gray-100">
-                <div className="absolute bottom-4 right-4 rounded-full bg-black/60 px-3 py-1 text-xs text-white">
+            <div className="space-y-3 md:space-y-4">
+              <h3 className="text-base md:text-lg font-semibold font-[var(--font-display)]">Location</h3>
+              <div className="relative h-48 md:h-56 overflow-hidden rounded-2xl md:rounded-3xl border border-gray-300 bg-gray-100">
+                <div className="absolute bottom-3 md:bottom-4 right-3 md:right-4 rounded-full bg-black/60 px-2 md:px-3 py-1 text-[10px] md:text-xs text-white">
                   {typedProperty.city}
                 </div>
                 <div className="absolute left-1/2 top-1/2 h-3 w-3 -translate-x-1/2 -translate-y-1/2 rounded-full bg-gray-900 shadow-[0_0_16px_rgba(31,41,55,0.6)]" />
@@ -310,18 +310,18 @@ export default async function PropertyDetailPage({
             </div>
           </div>
 
-          <aside className="space-y-6">
-            <div className="rounded-3xl border border-gray-300 bg-white p-6">
-              <div className="flex items-center gap-4">
-                <div className="h-12 w-12 rounded-full bg-gray-200" />
+          <aside className="space-y-4 md:space-y-6">
+            <div className="rounded-2xl md:rounded-3xl border border-gray-300 bg-white p-4 md:p-6">
+              <div className="flex items-center gap-3 md:gap-4">
+                <div className="h-10 w-10 md:h-12 md:w-12 rounded-full bg-gray-200" />
                 <div>
-                  <p className="text-xs text-gray-600">Listed by</p>
+                  <p className="text-[10px] md:text-xs text-gray-600">Listed by</p>
                   <p className="text-sm font-semibold">Luxe Estates</p>
-                  <p className="text-xs text-gray-600">DRE-01234567</p>
+                  <p className="text-[10px] md:text-xs text-gray-600">DRE-01234567</p>
                 </div>
               </div>
 
-              <div className="mt-5">
+              <div className="mt-4 md:mt-5">
                 <MessageAgentButton
                   propertyId={typedProperty.id}
                   agentId={typedProperty.agent_id}

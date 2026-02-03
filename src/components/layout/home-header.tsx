@@ -147,18 +147,19 @@ export function HomeHeader() {
 
   return (
     <header className="sticky top-0 z-50 border-b border-gray-300 bg-white/95 backdrop-blur">
-      <div className="mx-auto flex w-full max-w-6xl items-center gap-6 px-6 py-4">
-        <div className="flex items-center gap-3">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+      <div className="mx-auto flex w-full max-w-6xl items-center gap-3 md:gap-6 px-4 md:px-6 py-3 md:py-4">
+        <div className="flex items-center gap-2 md:gap-3">
+          <span className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
             <svg
-              width="18"
-              height="18"
+              width="16"
+              height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
               strokeWidth="2"
               strokeLinecap="round"
               strokeLinejoin="round"
+              className="md:w-[18px] md:h-[18px]"
             >
               <path d="M12 2v20" />
               <path d="M2 12h20" />
@@ -166,7 +167,7 @@ export function HomeHeader() {
               <path d="m19.1 4.9-14.2 14.2" />
             </svg>
           </span>
-          <span className="text-lg font-semibold tracking-tight text-gray-900">LuxEstate</span>
+          <span className="text-base md:text-lg font-semibold tracking-tight text-gray-900">LuxEstate</span>
         </div>
 
         <div className="hidden flex-1 items-center gap-3 rounded-full border border-gray-300 bg-gray-50 px-4 py-2 text-sm text-gray-700 md:flex">
@@ -191,7 +192,7 @@ export function HomeHeader() {
           />
         </div>
 
-        <nav className="ml-auto hidden items-center gap-1 text-sm md:flex">
+        <nav className="ml-auto hidden items-center gap-1 text-sm lg:flex">
           {navLinks.map((link) => {
             const isActive = link.value === activeListingType || 
                            (link.value === "sale" && !searchParams.get("listingType"));
@@ -200,7 +201,7 @@ export function HomeHeader() {
               <Link
                 key={link.value}
                 href={link.href}
-                className={`px-4 py-2 rounded-full font-medium transition-all ${
+                className={`px-3 lg:px-4 py-2 rounded-full font-medium transition-all ${
                   isActive && (link.value === "sale" || link.value === "rent")
                     ? "bg-gray-900 text-white"
                     : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
@@ -212,15 +213,15 @@ export function HomeHeader() {
           })}
         </nav>
 
-        <div className="hidden items-center gap-4 md:flex">
+        <div className="hidden items-center gap-3 md:gap-4 md:flex">
           {loading ? (
-            <div className="h-10 w-40 rounded-full bg-gray-200" />
+            <div className="h-10 w-32 md:w-40 rounded-full bg-gray-200" />
           ) : (
             <>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <button className="flex items-center gap-2 text-sm font-semibold text-gray-700 transition hover:text-gray-900">
-                    <Avatar className="h-9 w-9">
+                    <Avatar className="h-8 w-8 md:h-9 md:w-9">
                       <AvatarFallback>{avatarFallback}</AvatarFallback>
                     </Avatar>
                     <span className="hidden lg:inline">
@@ -274,7 +275,7 @@ export function HomeHeader() {
           )}
         </div>
 
-        <button className="md:hidden">
+        <button className="md:hidden ml-auto">
           <span className="sr-only">Open menu</span>
           <svg
             width="24"

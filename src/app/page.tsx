@@ -98,16 +98,16 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
         <MobileFilters />
 
         {/* Section Divider */}
-        <div className="section-divider my-16" />
+        <div className="section-divider my-12 md:my-16" />
 
         {/* Listing Section */}
-        <section className="mx-auto w-full max-w-6xl px-6 py-20">
-          <div className="flex flex-wrap items-end justify-between gap-6 mb-12">
+        <section className="mx-auto w-full max-w-6xl px-4 md:px-6 py-12 md:py-20">
+          <div className="flex flex-wrap items-end justify-between gap-4 md:gap-6 mb-8 md:mb-12">
             <div>
-              <h2 className="text-3xl font-semibold text-gray-900">
+              <h2 className="text-2xl md:text-3xl font-semibold text-gray-900">
                 Newly Listed Properties
               </h2>
-              <p className="mt-3 text-base text-gray-600">
+              <p className="mt-2 md:mt-3 text-sm md:text-base text-gray-600">
                 Fresh on the market in your favorite areas.
               </p>
             </div>
@@ -185,29 +185,29 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
             })}
           </div>
 
-          <div className="mt-16 flex justify-center">
-            <button className="rounded-full border-2 border-gray-300 bg-white px-10 py-4 md:px-8 md:py-4 text-base md:text-sm font-semibold text-gray-700 transition hover:bg-gray-50 hover:border-gray-400 active:scale-95">
+          <div className="mt-12 md:mt-16 flex justify-center">
+            <button className="rounded-full border-2 border-gray-300 bg-white px-8 py-3 md:px-8 md:py-4 text-sm font-semibold text-gray-700 transition hover:bg-gray-50 hover:border-gray-400 active:scale-95">
               Load More Properties
             </button>
           </div>
         </section>
 
         {/* Section Divider */}
-        <div className="section-divider my-20" />
+        <div className="section-divider my-12 md:my-20" />
 
         {/* Floating Action Button */}
         <FloatingActionButton />
       </main>
 
-      <footer className="border-t border-gray-300 bg-white mt-8">
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-6 py-8 text-sm text-gray-600 md:flex-row md:items-center md:justify-between">
+      <footer className="border-t border-gray-300 bg-white mt-6 md:mt-8">
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 md:gap-6 px-4 md:px-6 py-6 md:py-8 text-xs md:text-sm text-gray-600 md:flex-row md:items-center md:justify-between">
           <div className="flex items-center gap-2">
-            <span className="inline-flex h-8 w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-700">
+            <span className="inline-flex h-6 w-6 md:h-8 md:w-8 items-center justify-center rounded-lg bg-gray-100 text-gray-700 text-sm">
               *
             </span>
             <span>(c) 2023 LuxEstate Inc.</span>
           </div>
-          <div className="flex flex-wrap items-center gap-6 text-gray-600">
+          <div className="flex flex-wrap items-center gap-4 md:gap-6 text-gray-600">
             <a className="transition hover:text-gray-900" href="#">About Us</a>
             <a className="transition hover:text-gray-900" href="#">For Agents</a>
             <a className="transition hover:text-gray-900" href="#">Support</a>

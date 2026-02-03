@@ -440,48 +440,48 @@ export function AgentDashboard() {
           />
         </div>
       )}
-      <section className="grid gap-6 lg:grid-cols-[1.3fr,1fr]">
+      <section className="grid gap-4 md:gap-6 lg:grid-cols-[1.3fr,1fr]">
         <form
           onSubmit={handleCreateListing}
-          className="rounded-3xl border border-gray-300 bg-gray-100 p-6 shadow-[0_25px_60px_-50px_rgba(0,0,0,0.8)]"
+          className="rounded-2xl md:rounded-3xl border border-gray-300 bg-gray-100 p-4 md:p-6 shadow-[0_25px_60px_-50px_rgba(0,0,0,0.8)]"
         >
-          <div className="text-xs uppercase tracking-[0.28em] text-gray-600">
+          <div className="text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.28em] text-gray-600">
             Create listing
           </div>
-          <h2 className="mt-2 text-2xl font-semibold text-gray-900">
+          <h2 className="mt-1 md:mt-2 text-xl md:text-2xl font-semibold text-gray-900">
             Add a new property
           </h2>
-          <p className="mt-2 text-sm text-gray-700">
+          <p className="mt-1 md:mt-2 text-xs md:text-sm text-gray-700">
             Listings start as pending until an admin approves them. Add images
             from the bucket named &quot;{storageBucket}&quot; in Supabase Storage.
           </p>
 
-          <div className="mt-6 grid gap-4">
+          <div className="mt-4 md:mt-6 grid gap-3 md:gap-4">
             <input
               value={formState.title}
               onChange={(event) => updateForm("title", event.target.value)}
               placeholder="Listing title"
-              className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
+              className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
             />
             <input
               value={formState.city}
               onChange={(event) => updateForm("city", event.target.value)}
               placeholder="City"
-              className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
+              className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
             />
-            <div className="grid gap-3 md:grid-cols-2">
+            <div className="grid gap-2 md:gap-3 grid-cols-1 sm:grid-cols-2">
               <input
                 value={formState.price}
                 onChange={(event) => updateForm("price", event.target.value)}
                 placeholder="Price"
                 type="number"
                 min="0"
-                className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
+                className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
               />
               <select
                 value={formState.propertyType}
                 onChange={(event) => updateForm("propertyType", event.target.value)}
-                className="w-full appearance-none rounded-xl border-2 border-gray-200 bg-white px-4 py-3 pr-10 text-sm font-medium text-gray-900 shadow-sm outline-none transition focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 hover:border-gray-300"
+                className="w-full appearance-none rounded-lg md:rounded-xl border-2 border-gray-200 bg-white px-3 md:px-4 py-2.5 md:py-3 pr-8 md:pr-10 text-xs md:text-sm font-medium text-gray-900 shadow-sm outline-none transition focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 hover:border-gray-300"
               >
                 <option value="">Property type</option>
                 {propertyTypes.map((type) => (
@@ -491,14 +491,14 @@ export function AgentDashboard() {
                 ))}
               </select>
             </div>
-            <div className="grid gap-3 md:grid-cols-3">
+            <div className="grid gap-2 md:gap-3 grid-cols-3">
               <input
                 value={formState.bedrooms}
                 onChange={(event) => updateForm("bedrooms", event.target.value)}
                 placeholder="Beds"
                 type="number"
                 min="0"
-                className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
+                className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-2 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
               />
               <input
                 value={formState.bathrooms}
@@ -507,7 +507,7 @@ export function AgentDashboard() {
                 type="number"
                 min="0"
                 step="0.5"
-                className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
+                className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-2 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
               />
               <input
                 value={formState.areaSqft}
@@ -515,7 +515,7 @@ export function AgentDashboard() {
                 placeholder="Sqft"
                 type="number"
                 min="0"
-                className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
+                className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-2 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
               />
             </div>
             <textarea
@@ -523,10 +523,10 @@ export function AgentDashboard() {
               onChange={(event) => updateForm("description", event.target.value)}
               placeholder="Description"
               rows={4}
-              className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500"
+              className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
             />
-            <div className="rounded-2xl border border-gray-300 bg-white px-4 py-3 text-sm text-gray-700">
-              <div className="text-xs uppercase tracking-[0.24em] text-gray-600">
+            <div className="rounded-xl md:rounded-2xl border border-gray-300 bg-white px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-700">
+              <div className="text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.24em] text-gray-600">
                 Photos
               </div>
               <input

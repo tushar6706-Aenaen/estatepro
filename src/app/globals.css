@@ -172,3 +172,43 @@ body {
   }
 }
 
+/* Mobile Touch Improvements */
+@media (max-width: 768px) {
+  /* Increase tap target sizes for better mobile usability */
+  button, a, input[type="button"], input[type="submit"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+
+  /* Smooth scrolling on mobile */
+  html {
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  /* Prevent text size adjustment on orientation change */
+  html {
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Reduce hover effects on mobile */
+  .property-card:hover {
+    transform: none;
+  }
+
+  /* Make cards more touch-friendly */
+  .property-card {
+    touch-action: manipulation;
+  }
+}
+
+/* Touch-specific optimizations */
+@media (hover: none) and (pointer: coarse) {
+  /* Remove hover effects on touch devices */
+  *:hover {
+    transition: none;
+  }
+}
+
+

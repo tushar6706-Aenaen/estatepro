@@ -47,11 +47,11 @@ function AnimatedStatistic({ end, label, suffix = "", delay = 0 }: StatisticProp
       transition={{ duration: 0.6, delay: delay / 1000 }}
       className="text-center"
     >
-      <div className="text-4xl font-bold text-white">
+      <div className="text-2xl md:text-4xl font-bold text-white">
         {count.toLocaleString()}
         {suffix}
       </div>
-      <div className="mt-2 text-sm text-white/80">{label}</div>
+      <div className="mt-1 md:mt-2 text-xs md:text-sm text-white/80">{label}</div>
     </motion.div>
   );
 }
@@ -97,13 +97,13 @@ export function AnimatedHero() {
         style={{ y: ySmooth }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
-      <div className="relative mx-auto grid min-h-[600px] w-full max-w-6xl items-center px-6 py-20">
-        <div className="space-y-8">
+      <div className="relative mx-auto grid min-h-[500px] md:min-h-[600px] w-full max-w-6xl items-center px-4 md:px-6 py-12 md:py-20">
+        <div className="space-y-6 md:space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white"
+            className="inline-flex items-center gap-2 rounded-full border border-white/20 bg-white/10 backdrop-blur-sm px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-semibold uppercase tracking-[0.2em] md:tracking-[0.3em] text-white"
           >
             Premium listings
           </motion.div>
@@ -112,7 +112,7 @@ export function AnimatedHero() {
             variants={containerVariants}
             initial="hidden"
             animate="visible"
-            className="text-5xl font-bold tracking-tight text-white drop-shadow-lg md:text-6xl"
+            className="text-3xl md:text-5xl lg:text-6xl font-bold tracking-tight text-white drop-shadow-lg"
           >
             {text.split("").map((char, index) => (
               <motion.span key={index} variants={charVariants}>
@@ -125,14 +125,14 @@ export function AnimatedHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 1.5 }}
-            className="max-w-2xl text-lg text-white/90 drop-shadow-md"
+            className="max-w-2xl text-base md:text-lg text-white/90 drop-shadow-md"
           >
             Discover luxury properties in exclusive locations tailored to your
             lifestyle.
           </motion.p>
 
           {/* Statistics Section */}
-          <div className="grid grid-cols-3 gap-8 pt-8">
+          <div className="grid grid-cols-3 gap-4 md:gap-8 pt-4 md:pt-8">
             <AnimatedStatistic end={1000} label="Properties Listed" suffix="+" delay={200} />
             <AnimatedStatistic end={500} label="Happy Clients" suffix="+" delay={400} />
             <AnimatedStatistic end={50} label="Expert Agents" suffix="+" delay={600} />
@@ -143,9 +143,9 @@ export function AnimatedHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, delay: 2 }}
-            className="flex flex-col gap-3 rounded-2xl border-2 border-white/20 bg-white/95 backdrop-blur-md p-4 shadow-2xl md:flex-row md:items-center"
+            className="flex flex-col gap-3 rounded-2xl border-2 border-white/20 bg-white/95 backdrop-blur-md p-3 md:p-4 shadow-2xl md:flex-row md:items-center"
           >
-            <div className="flex flex-1 items-center gap-3 rounded-xl bg-gray-50 px-4 py-3 text-sm text-gray-700">
+            <div className="flex flex-1 items-center gap-2 md:gap-3 rounded-xl bg-gray-50 px-3 md:px-4 py-3 text-sm text-gray-700">
               <svg
                 width="18"
                 height="18"
@@ -155,7 +155,7 @@ export function AnimatedHero() {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-gray-500"
+                className="text-gray-500 flex-shrink-0"
               >
                 <path d="M12 21s-6-4.4-6-10a6 6 0 1 1 12 0c0 5.6-6 10-6 10z" />
                 <circle cx="12" cy="11" r="2" />
@@ -167,18 +167,17 @@ export function AnimatedHero() {
               />
             </div>
             <RippleButton
-              className="flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-8 py-4 md:px-6 md:py-3 text-base md:text-sm font-semibold text-white shadow-md transition hover:bg-gray-800 min-h-[56px] md:min-h-0"
+              className="flex items-center justify-center gap-2 rounded-xl bg-gray-900 px-6 py-3.5 md:px-6 md:py-3 text-sm font-semibold text-white shadow-md transition hover:bg-gray-800"
             >
               <svg
-                width="20"
-                height="20"
+                width="18"
+                height="18"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="md:w-4 md:h-4"
               >
                 <circle cx="11" cy="11" r="8" />
                 <path d="m21 21-4.3-4.3" />
