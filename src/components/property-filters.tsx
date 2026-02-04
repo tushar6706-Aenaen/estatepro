@@ -44,11 +44,11 @@ function CustomDropdown({ label, options, value, onChange }: DropdownProps) {
         onClick={() => setIsOpen(!isOpen)}
         className={`flex w-full items-center justify-between gap-2 rounded-xl border-2 px-4 py-3 text-sm font-medium transition-all ${
           isOpen
-            ? "border-gray-900 ring-2 ring-gray-900/10"
-            : "border-gray-200 bg-white text-gray-700 hover:border-gray-300"
+            ? "border-gray-900 ring-4 ring-gray-900/10 bg-gradient-to-br from-gray-50 to-white shadow-lg"
+            : "border-gray-200 bg-white text-gray-700 hover:border-gray-400 hover:shadow-md"
         }`}
       >
-        <span className={value ? "text-gray-900" : "text-gray-500"}>
+        <span className={value ? "text-gray-900 font-semibold" : "text-gray-500"}>
           {selectedLabel || label}
         </span>
         <svg
@@ -70,16 +70,24 @@ function CustomDropdown({ label, options, value, onChange }: DropdownProps) {
 
       {/* Dropdown Menu */}
       {isOpen && (
-        <div className="absolute left-0 top-[calc(100%+8px)] z-50 w-full min-w-[200px] overflow-hidden rounded-xl border border-gray-100 bg-white shadow-xl ring-1 ring-black/5 animate-in fade-in zoom-in-95 duration-100">
-          <div className="max-h-60 overflow-y-auto py-1">
+        <motion.div
+          initial={{ opacity: 0, y: -10, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          exit={{ opacity: 0, y: -10, scale: 0.95 }}
+          transition={{ duration: 0.15 }}
+          className="absolute left-0 top-[calc(100%+8px)] z-50 w-full min-w-[200px] overflow-hidden rounded-xl border-2 border-gray-200 bg-white shadow-2xl"
+        >
+          <div className="max-h-60 overflow-y-auto py-1 scrollbar-hide">
             <button
               type="button"
               onClick={() => {
                 onChange("");
                 setIsOpen(false);
               }}
-              className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
-                value === "" ? "bg-gray-50 font-semibold text-gray-900" : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+              className={`w-full px-4 py-2.5 text-left text-sm transition-all ${
+                value === "" 
+                  ? "bg-gradient-to-r from-gray-900 to-gray-800 font-bold text-white" 
+                  : "text-gray-600 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 hover:text-gray-900 hover:font-medium"
               }`}
             >
               Any {label}
@@ -92,17 +100,17 @@ function CustomDropdown({ label, options, value, onChange }: DropdownProps) {
                   onChange(opt.value);
                   setIsOpen(false);
                 }}
-                className={`w-full px-4 py-2.5 text-left text-sm transition-colors ${
+                className={`w-full px-4 py-2.5 text-left text-sm transition-all ${
                   value === opt.value
-                    ? "bg-gray-50 font-semibold text-gray-900"
-                    : "text-gray-600 hover:bg-gray-50 hover:text-gray-900"
+                    ? "bg-gradient-to-r from-gray-900 to-gray-800 font-bold text-white"
+                    : "text-gray-600 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 hover:text-gray-900 hover:font-medium"
                 }`}
               >
                 {opt.label}
               </button>
             ))}
           </div>
-        </div>
+        </motion.div>
       )}
     </div>
   );

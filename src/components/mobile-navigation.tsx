@@ -42,7 +42,7 @@ export function MobileNavigation() {
   };
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white border-t border-gray-300 md:hidden safe-area-bottom">
+    <div className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-lg border-t-2 border-gray-200 md:hidden safe-area-bottom shadow-2xl">
       <div className="grid grid-cols-3 gap-0">
         {navItems.map((item) => {
           const isActive = item.value === activeListingType;
@@ -51,25 +51,31 @@ export function MobileNavigation() {
             <Link
               key={item.value}
               href={item.href}
-              className="relative flex flex-col items-center justify-center py-3 px-2"
+              className="relative flex flex-col items-center justify-center py-4 px-2 transition-all active:scale-95"
             >
               {isActive && (
                 <motion.div
                   layoutId="activeTab"
-                  className="absolute inset-x-2 top-0 h-1 bg-gray-900 rounded-full"
+                  className="absolute inset-x-2 top-0 h-1 bg-gradient-to-r from-gray-900 to-gray-800 rounded-full shadow-lg"
                   transition={{ type: "spring", stiffness: 500, damping: 30 }}
                 />
               )}
-              <div
-                className={`transition-colors ${
-                  isActive ? "text-gray-900" : "text-gray-500"
+              <motion.div
+                whileHover={{ scale: 1.1 }}
+                whileTap={{ scale: 0.95 }}
+                className={`transition-all duration-200 ${
+                  isActive 
+                    ? "text-gray-900 scale-110" 
+                    : "text-gray-400"
                 }`}
               >
                 {getIcon(item.icon)}
-              </div>
+              </motion.div>
               <span
-                className={`text-xs font-medium mt-1 transition-colors ${
-                  isActive ? "text-gray-900" : "text-gray-500"
+                className={`text-xs font-bold mt-1.5 transition-all duration-200 ${
+                  isActive 
+                    ? "text-gray-900 scale-105" 
+                    : "text-gray-500"
                 }`}
               >
                 {item.label}

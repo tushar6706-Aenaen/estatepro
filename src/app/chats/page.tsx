@@ -256,7 +256,7 @@ export default function ChatsPage() {
   }, [supabaseReady, userId]);
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50 text-gray-900">
       <HomeHeader />
 
       <main className="mx-auto w-full max-w-6xl px-6 pb-16 pt-10">

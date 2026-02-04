@@ -90,17 +90,21 @@ export function FloatingActionButton({ actions }: FloatingActionButtonProps) {
                 transition={{ delay: index * 0.05 }}
                 className="flex items-center gap-3"
               >
-                <span className="bg-gray-900 text-white px-3 py-2 rounded-lg text-sm font-medium whitespace-nowrap shadow-lg">
+                <motion.span
+                  initial={{ x: 20, opacity: 0 }}
+                  animate={{ x: 0, opacity: 1 }}
+                  className="bg-gradient-to-r from-gray-900 to-gray-800 text-white px-4 py-2.5 rounded-xl text-sm font-bold whitespace-nowrap shadow-2xl border border-gray-700"
+                >
                   {action.label}
-                </span>
+                </motion.span>
                 <RippleButton
                   onClick={() => {
                     action.onClick();
                     setIsOpen(false);
                   }}
                   className={`${
-                    action.color || "bg-gray-900 hover:bg-gray-800"
-                  } text-white w-14 h-14 rounded-full shadow-xl flex items-center justify-center transition`}
+                    action.color || "bg-gradient-to-r from-gray-900 to-gray-800"
+                  } text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition hover:scale-110 active:scale-95`}
                 >
                   {action.icon}
                 </RippleButton>
@@ -113,13 +117,13 @@ export function FloatingActionButton({ actions }: FloatingActionButtonProps) {
       {/* Main FAB */}
       <RippleButton
         onClick={() => setIsOpen(!isOpen)}
-        className="bg-gray-900 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:bg-gray-800 transition"
+        className="bg-gradient-to-r from-gray-900 to-gray-800 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition active:scale-95 border-2 border-gray-700"
       >
         <motion.div
           animate={{ rotate: isOpen ? 45 : 0 }}
           transition={{ duration: 0.2 }}
         >
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
             <line x1="12" y1="5" x2="12" y2="19" />
             <line x1="5" y1="12" x2="19" y2="12" />
           </svg>

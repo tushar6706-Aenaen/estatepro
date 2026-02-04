@@ -107,7 +107,7 @@ export function HomeHeader() {
       return (
         <Link
           href="/auth?mode=signup&redirect=/onboarding"
-          className="rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-gray-800"
+          className="rounded-full bg-gradient-to-r from-gray-900 to-gray-800 px-5 py-2.5 text-sm font-bold text-white shadow-lg transition hover:shadow-xl hover:scale-105 active:scale-95"
         >
           List Property
         </Link>
@@ -118,7 +118,7 @@ export function HomeHeader() {
       return (
         <Link
           href="/admin"
-          className="rounded-full bg-emerald-600 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-emerald-700"
+          className="rounded-full bg-gradient-to-r from-emerald-600 to-emerald-700 px-5 py-2.5 text-sm font-bold text-white shadow-lg transition hover:shadow-xl hover:scale-105 active:scale-95"
         >
           Admin Dashboard
         </Link>
@@ -129,7 +129,7 @@ export function HomeHeader() {
       return (
         <Link
           href="/agent"
-          className="rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white shadow-md transition hover:bg-gray-800"
+          className="rounded-full bg-gradient-to-r from-gray-900 to-gray-800 px-5 py-2.5 text-sm font-bold text-white shadow-lg transition hover:shadow-xl hover:scale-105 active:scale-95"
         >
           Agent Dashboard
         </Link>
@@ -139,7 +139,7 @@ export function HomeHeader() {
     return (
       <Link
         href="/onboarding?redirect=/"
-        className="rounded-full border border-gray-900 bg-white px-5 py-2 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
+        className="rounded-full border-2 border-gray-900 bg-white px-5 py-2.5 text-sm font-bold text-gray-900 transition hover:bg-gradient-to-r hover:from-gray-50 hover:to-white hover:shadow-lg hover:scale-105 active:scale-95"
       >
         Become an Agent
       </Link>
@@ -147,17 +147,17 @@ export function HomeHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b border-gray-300 bg-white/95 backdrop-blur">
+    <header className="sticky top-0 z-50 border-b-2 border-gray-200 bg-white/98 backdrop-blur-xl shadow-sm">
       <div className="mx-auto flex w-full max-w-6xl items-center gap-3 md:gap-6 px-4 md:px-6 py-3 md:py-4">
         <div className="flex items-center gap-2 md:gap-3">
-          <span className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl bg-blue-100 text-blue-600">
+          <span className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md">
             <svg
               width="16"
               height="16"
               viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="2"
+              strokeWidth="2.5"
               strokeLinecap="round"
               strokeLinejoin="round"
               className="md:w-[18px] md:h-[18px]"
@@ -168,10 +168,10 @@ export function HomeHeader() {
               <path d="m19.1 4.9-14.2 14.2" />
             </svg>
           </span>
-          <span className="text-base md:text-lg font-semibold tracking-tight text-gray-900">LuxEstate</span>
+          <span className="text-base md:text-lg font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">LuxEstate</span>
         </div>
 
-        <div className="hidden flex-1 items-center gap-3 rounded-full border border-gray-300 bg-gray-50 px-4 py-2 text-sm text-gray-700 md:flex">
+        <div className="hidden flex-1 items-center gap-3 rounded-full border-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white px-4 py-2.5 text-sm text-gray-700 md:flex hover:border-gray-300 transition-all shadow-sm">
           <svg
             width="16"
             height="16"
@@ -181,7 +181,7 @@ export function HomeHeader() {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-gray-500"
+            className="text-gray-400"
           >
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
@@ -189,12 +189,11 @@ export function HomeHeader() {
           <input
             type="text"
             placeholder="Search for city, neighborhood, or zip"
-            className="w-full bg-transparent text-sm text-gray-900 placeholder:text-gray-400 outline-none"
+            className="w-full bg-transparent text-sm text-gray-900 placeholder:text-gray-500 outline-none"
           />
         </div>
 
-        <nav className="ml-auto hidden items-center gap-1 text-sm lg:flex">
-          {navLinks.map((link) => {
+        <nav className="ml-auto hidden items-center gap-1 text-sm lg:flex">{navLinks.map((link) => {
             const isActive = link.value === activeListingType || 
                            (link.value === "sale" && !searchParams.get("listingType"));
             
@@ -202,10 +201,10 @@ export function HomeHeader() {
               <Link
                 key={link.value}
                 href={link.href}
-                className={`px-3 lg:px-4 py-2 rounded-full font-medium transition-all ${
+                className={`px-3 lg:px-4 py-2 rounded-full font-bold transition-all ${
                   isActive && (link.value === "sale" || link.value === "rent")
-                    ? "bg-gray-900 text-white"
-                    : "text-gray-700 hover:text-gray-900 hover:bg-gray-100"
+                    ? "bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg scale-105"
+                    : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 hover:scale-105"
                 }`}
               >
                 {link.label}

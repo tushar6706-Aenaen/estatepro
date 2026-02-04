@@ -25,15 +25,49 @@ body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
 }
 
-.hide-scrollbar {
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 10px;
+  height: 10px;
+}
+
+::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, #888, #666);
+  border-radius: 10px;
+  transition: background 0.3s;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, #666, #444);
+}
+
+/* Firefox Scrollbar */
+* {
+  scrollbar-width: thin;
+  scrollbar-color: #888 #f1f1f1;
+}
+
+.hide-scrollbar,
+.scrollbar-hide {
   scrollbar-width: none;
   -ms-overflow-style: none;
 }
 
-.hide-scrollbar::-webkit-scrollbar {
+.hide-scrollbar::-webkit-scrollbar,
+.scrollbar-hide::-webkit-scrollbar {
   display: none;
   width: 0;
   height: 0;
+}
+
+/* Smooth Scroll */
+html {
+  scroll-behavior: smooth;
 }
 
 /* Typewriter Animation */

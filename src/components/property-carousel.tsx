@@ -16,6 +16,7 @@ type PropertyCardMobileProps = {
 
 export function PropertyCardCarousel({ properties }: PropertyCardMobileProps) {
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
 
   const handleDragEnd = (
     _event: MouseEvent | TouchEvent | PointerEvent,
@@ -35,9 +36,9 @@ export function PropertyCardCarousel({ properties }: PropertyCardMobileProps) {
   };
 
   return (
-    <div className="md:hidden relative overflow-hidden">
+    <div className="md:hidden relative overflow-hidden py-4 bg-gradient-to-b from-transparent to-gray-50/50">
       {/* Carousel Container */}
-      <div className="relative h-[380px] touch-pan-y">
+      <div className="relative h-96 touch-pan-y">
         <AnimatePresence initial={false} custom={currentIndex}>
           <motion.div
             key={currentIndex}
@@ -53,9 +54,9 @@ export function PropertyCardCarousel({ properties }: PropertyCardMobileProps) {
             onDragEnd={handleDragEnd}
             className="absolute inset-0 px-4"
           >
-            <div className="h-full rounded-2xl border border-gray-200 bg-white shadow-xl overflow-hidden">
+            <div className="h-full rounded-3xl border-2 border-gray-200 bg-white shadow-2xl overflow-hidden backdrop-blur-sm">
               {/* Image */}
-              <div className="relative h-52 bg-gray-200">
+              <div className="relative h-56 bg-gradient-to-br from-gray-200 to-gray-300">
                 {properties[currentIndex].imageUrl && (
                   <Image
                     src={properties[currentIndex].imageUrl}
@@ -66,34 +67,36 @@ export function PropertyCardCarousel({ properties }: PropertyCardMobileProps) {
                     priority
                   />
                 )}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />
-                <div className="absolute bottom-3 left-3 rounded-full bg-white/95 backdrop-blur-sm px-3 py-1.5 text-base font-bold text-gray-900 shadow-lg">
+                <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
+                <div className="absolute bottom-4 left-4 rounded-2xl bg-white/95 backdrop-blur-md px-4 py-2 text-lg font-bold text-gray-900 shadow-2xl border border-white/40">
                   ₹{Number(properties[currentIndex].price).toLocaleString('en-IN')}
                 </div>
               </div>
 
               {/* Content */}
-              <div className="p-4 space-y-3">
+              <div className="p-5 space-y-4 bg-gradient-to-b from-white to-gray-50">
                 <div>
-                  <h3 className="text-xl font-bold text-gray-900 mb-1.5 line-clamp-2">
+                  <h3 className="text-xl font-bold text-gray-900 mb-2 line-clamp-2 leading-tight">
                     {properties[currentIndex].title}
                   </h3>
-                  <div className="flex items-center gap-1.5 text-gray-600 text-sm">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-                      <path d="M12 21s-6-4.4-6-10a6 6 0 1 1 12 0c0 5.6-6 10-6 10z" />
-                      <circle cx="12" cy="11" r="2" />
-                    </svg>
-                    <span>{properties[currentIndex].city}</span>
+                  <div className="flex items-center gap-2 text-gray-600 text-sm">
+                    <div className="p-1.5 bg-gray-100 rounded-lg">
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                        <path d="M12 21s-6-4.4-6-10a6 6 0 1 1 12 0c0 5.6-6 10-6 10z" />
+                        <circle cx="12" cy="11" r="2" />
+                      </svg>
+                    </div>
+                    <span className="font-medium">{properties[currentIndex].city}</span>
                   </div>
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex gap-2">
-                  <button className="flex-1 bg-gray-900 text-white py-3 rounded-xl font-semibold text-sm hover:bg-gray-800 transition active:scale-95">
+                <div className="flex gap-3">
+                  <button className="flex-1 bg-gray-900 text-white py-3.5 rounded-2xl font-semibold text-sm hover:bg-gray-800 transition-all active:scale-95 shadow-lg hover:shadow-xl">
                     View Details
                   </button>
-                  <button className="p-3 border-2 border-gray-300 rounded-xl hover:border-gray-400 transition active:scale-95">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                  <button className="p-3.5 border-2 border-gray-300 rounded-2xl hover:border-gray-900 hover:bg-gray-900 hover:text-white transition-all active:scale-95 group">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="group-hover:fill-current">
                       <path d="M20.8 8.6a5 5 0 0 0-8-4 5 5 0 0 0-8 4c0 6 8 10.4 8 10.4s8-4.4 8-10.4z" />
                     </svg>
                   </button>
@@ -105,33 +108,53 @@ export function PropertyCardCarousel({ properties }: PropertyCardMobileProps) {
       </div>
 
       {/* Pagination Dots */}
-      <div className="flex justify-center gap-2 mt-4">
+      <div className="flex justify-center gap-2.5 mt-6">
         {properties.map((_, index) => (
           <button
             key={index}
             onClick={() => setCurrentIndex(index)}
-            className={`h-2 rounded-full transition-all ${
-              index === currentIndex ? "w-8 bg-gray-900" : "w-2 bg-gray-300"
+            className={`h-2.5 rounded-full transition-all duration-300 ${
+              index === currentIndex ? "w-10 bg-gray-900" : "w-2.5 bg-gray-300 hover:bg-gray-400"
             }`}
+            aria-label={`Go to property ${index + 1}`}
           />
         ))}
       </div>
 
       {/* Swipe Indicator */}
-      {currentIndex === 0 && (
+      {currentIndex === 0 && properties.length > 1 && (
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0 }}
-          className="absolute bottom-24 left-1/2 -translate-x-1/2 text-sm text-gray-500 flex items-center gap-2 pointer-events-none"
+          transition={{ delay: 0.5 }}
+          className="absolute bottom-28 left-1/2 -translate-x-1/2 text-sm text-gray-500 flex items-center gap-2 pointer-events-none bg-white/90 backdrop-blur-sm px-4 py-2 rounded-full shadow-lg"
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <motion.svg
+            animate={{ x: [-3, 0, -3] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <polyline points="15 18 9 12 15 6" />
-          </svg>
+          </motion.svg>
           Swipe to explore
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+          <motion.svg
+            animate={{ x: [3, 0, 3] }}
+            transition={{ repeat: Infinity, duration: 1.5 }}
+            width="16"
+            height="16"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
             <polyline points="9 18 15 12 9 6" />
-          </svg>
+          </motion.svg>
         </motion.div>
       )}
     </div>
