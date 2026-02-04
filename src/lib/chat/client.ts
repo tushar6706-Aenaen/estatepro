@@ -1,4 +1,5 @@
 import { supabaseBrowserClient } from "@/src/lib/supabase/client";
+import { sanitizeString } from "@/src/lib/validation";
 
 export type ChatRow = {
   id: string;
@@ -128,6 +129,15 @@ export const sendMessage = async (params: {
     return { data: null, error: asError("Message cannot be empty.") };
   }
 
+  if (trimmed.length > 2000) {
+    return {
+      data: null,
+      error: asError("Message is too long (max 2000 characters)."),
+    };
+  }
+
+  const sanitized = sanitizeString(trimmed);
+
   const { userId, error: authError } = await getAuthedUserId();
   if (!userId || authError) {
     return { data: null, error: authError };
@@ -145,7 +155,7 @@ export const sendMessage = async (params: {
       chat_id: params.chatId,
       sender_id: userId,
       sender_role: senderRole ?? "public",
-      content: trimmed,
+      content: sanitized,
     })
     .select("id, chat_id, sender_id, sender_role, content, created_at")
     .single<MessageRow>();

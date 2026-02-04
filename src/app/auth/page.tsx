@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 import { supabaseBrowserClient } from "@/src/lib/supabase/client";
+import { validateEmail, validatePassword } from "@/src/lib/validation";
 
 type Mode = "signin" | "signup";
 
@@ -85,9 +86,24 @@ export default function AuthPage() {
       return;
     }
 
-    if (mode === "signup" && password !== confirmPassword) {
-      setError("Passwords do not match.");
+    // Validate email format
+    if (!validateEmail(email)) {
+      setError("Please enter a valid email address.");
       return;
+    }
+
+    // Validate password strength for signup
+    if (mode === "signup") {
+      const passwordValidation = validatePassword(password);
+      if (!passwordValidation.valid) {
+        setError(passwordValidation.message || "Invalid password.");
+        return;
+      }
+
+      if (password !== confirmPassword) {
+        setError("Passwords do not match.");
+        return;
+      }
     }
 
     setBusy(true);
@@ -285,7 +301,7 @@ export default function AuthPage() {
                   required
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none focus:border-neutral-300/50 focus:ring-2 focus:ring-neutral-400/40"
+                  className="w-full rounded-2xl border border-gray-300 bg-gray-100 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-300/40"
                   placeholder="you@example.com"
                 />
               </div>
@@ -293,9 +309,11 @@ export default function AuthPage() {
               <div className="space-y-2">
                 <label className="flex items-center justify-between text-sm font-semibold text-gray-800">
                   <span>Password</span>
-                  <span className="text-xs font-normal text-gray-600">
-                    Minimum 6 characters
-                  </span>
+                  {mode === "signup" && (
+                    <span className="text-xs font-normal text-gray-600">
+                      8+ chars, uppercase, lowercase, number
+                    </span>
+                  )}
                 </label>
                 <input
                   type="password"
@@ -303,7 +321,7 @@ export default function AuthPage() {
                   required
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="w-full rounded-2xl border border-white/10 bg-white/5 px-4 py-3 text-sm text-white placeholder:text-neutral-500 outline-none focus:border-neutral-300/50 focus:ring-2 focus:ring-neutral-400/40"
+                  className="w-full rounded-2xl border border-gray-300 bg-gray-100 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-300/40"
                   placeholder="********"
                 />
               </div>
@@ -319,7 +337,7 @@ export default function AuthPage() {
                     required
                     value={confirmPassword}
                     onChange={(event) => setConfirmPassword(event.target.value)}
-                    className="w-full rounded-2xl border border-gray-300 bg-gray-100 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 outline-none focus:border-gray-300/50 focus:ring-2 focus:ring-gray-400/40"
+                    className="w-full rounded-2xl border border-gray-300 bg-gray-100 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-300/40"
                     placeholder="Repeat password"
                   />
                 </div>
@@ -327,12 +345,12 @@ export default function AuthPage() {
             </div>
 
             {error && (
-              <div className="rounded-2xl border border-red-300/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              <div className="rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
                 {error}
               </div>
             )}
             {notice && (
-              <div className="rounded-2xl border border-emerald-300/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+              <div className="rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                 {notice}
               </div>
             )}

@@ -235,6 +235,12 @@ export default function ChatThreadPage() {
 
   const handleSend = async () => {
     if (!chatId || !input.trim()) return;
+    
+    if (input.trim().length > 2000) {
+      setError("Message is too long (max 2000 characters).");
+      return;
+    }
+    
     setSending(true);
     setError(null);
 
@@ -299,7 +305,7 @@ export default function ChatThreadPage() {
         </button>
 
         {error && (
-          <div className="mb-6 rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
+          <div className="mb-6 rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
             {error}
           </div>
         )}
@@ -407,17 +413,23 @@ export default function ChatThreadPage() {
             </div>
             <div className="border-t border-gray-300 px-5 py-4">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                <textarea
-                  value={input}
-                  onChange={(event) => setInput(event.target.value)}
-                  placeholder="Write a message..."
-                  className="min-h-[80px] flex-1 resize-none rounded-2xl border-2 border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10"
-                />
+                <div className="flex-1">
+                  <textarea
+                    value={input}
+                    onChange={(event) => setInput(event.target.value)}
+                    placeholder="Write a message..."
+                    maxLength={2000}
+                    className="min-h-[80px] w-full resize-none rounded-2xl border-2 border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10"
+                  />
+                  <div className="mt-1 text-xs text-gray-500 text-right">
+                    {input.length}/2000
+                  </div>
+                </div>
                 <button
                   type="button"
                   onClick={handleSend}
                   disabled={sending || !input.trim()}
-                  className="rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+                  className="rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 shrink-0"
                 >
                   {sending ? "Sending..." : "Send"}
                 </button>

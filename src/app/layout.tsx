@@ -16,8 +16,54 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "LuxEstate - Find Your Dream Home",
-  description: "Discover luxury properties in exclusive locations",
+  title: {
+    default: "LuxEstate - Find Your Dream Home",
+    template: "%s | LuxEstate",
+  },
+  description:
+    "Discover luxury properties in exclusive locations. Browse premium real estate listings with advanced search, property comparison, and direct agent communication.",
+  keywords: [
+    "real estate",
+    "luxury homes",
+    "property listings",
+    "buy house",
+    "rent apartment",
+    "real estate agent",
+  ],
+  authors: [{ name: "LuxEstate" }],
+  creator: "LuxEstate",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  ),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: "/",
+    title: "LuxEstate - Find Your Dream Home",
+    description: "Discover luxury properties in exclusive locations",
+    siteName: "LuxEstate",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "LuxEstate - Find Your Dream Home",
+    description: "Discover luxury properties in exclusive locations",
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
+  viewport: {
+    width: "device-width",
+    initialScale: 1,
+    maximumScale: 5,
+  },
 };
 
 export default function RootLayout({

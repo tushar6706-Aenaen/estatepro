@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabaseBrowserClient } from "../../lib/supabase/client";
+import { validatePhone, sanitizeString } from "@/src/lib/validation";
 
 type RoleChoice = "buyer" | "agent";
 
@@ -107,9 +108,16 @@ export default function OnboardingPage() {
       return;
     }
 
-    if (roleChoice === "agent" && phone.trim().length < 6) {
-      setError("Please add a phone number so buyers can reach you.");
-      return;
+    if (roleChoice === "agent") {
+      const trimmedPhone = phone.trim();
+      if (!trimmedPhone) {
+        setError("Please add a phone number so buyers can reach you.");
+        return;
+      }
+      if (!validatePhone(trimmedPhone)) {
+        setError("Please enter a valid phone number (10-15 digits).");
+        return;
+      }
     }
 
     if (!isSupabaseConfigured) {
@@ -140,7 +148,7 @@ export default function OnboardingPage() {
     const payload = {
       id: user.id,
       role: nextRole,
-      phone: roleChoice === "agent" ? phone.trim() : null,
+      phone: roleChoice === "agent" ? sanitizeString(phone.trim()) : null,
     };
 
     const { error: upsertError } = await supabaseBrowserClient
@@ -262,13 +270,13 @@ export default function OnboardingPage() {
               )}
 
               {error && (
-                <div className="rounded-xl border border-red-300/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+                <div className="rounded-xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
                   {error}
                 </div>
               )}
 
               {success && (
-                <div className="rounded-xl border border-emerald-300/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
+                <div className="rounded-xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
                   You&apos;re all set. Your profile has been updated.
                 </div>
               )}
