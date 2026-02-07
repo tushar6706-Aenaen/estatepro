@@ -34,12 +34,45 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
 
   let properties: PropertyCard[] = [];
   let loadError: string | null = null;
+  let stats = {
+    properties: 0,
+    clients: 0,
+    agents: 0,
+  };
 
   // --- 1. Database Fetching Logic (Unchanged) ---
   if (!supabaseUrl || !supabaseAnonKey) {
     loadError = "Supabase environment variables are missing. Add them to .env.local.";
   } else {
     const supabase = createSupabaseServerClient();
+
+    // Fetch statistics
+    try {
+      // Count total approved properties
+      const { count: propertiesCount } = await supabase
+        .from("properties")
+        .select("*", { count: "exact", head: true })
+        .eq("status", "approved");
+
+      // Count users with agent role
+      const { count: agentsCount } = await supabase
+        .from("profiles")
+        .select("*", { count: "exact", head: true })
+        .eq("role", "agent");
+
+      // Count unique inquiries (as proxy for happy clients)
+      const { count: clientsCount } = await supabase
+        .from("inquiries")
+        .select("user_id", { count: "exact", head: true });
+
+      stats = {
+        properties: propertiesCount ?? 0,
+        agents: agentsCount ?? 0,
+        clients: clientsCount ?? 0,
+      };
+    } catch (error) {
+      console.error("Error fetching stats:", error);
+    }
 
     let query = supabase
       .from("properties")
@@ -87,7 +120,7 @@ export default async function Home({ searchParams }: { searchParams: SearchParam
 
       <main>
         {/* Hero Section with Animations */}
-        <AnimatedHero />
+        <AnimatedHero stats={stats} />
 
         {/* Filter Section - Desktop */}
         <div className="hidden md:block">

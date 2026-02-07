@@ -56,7 +56,15 @@ function AnimatedStatistic({ end, label, suffix = "", delay = 0 }: StatisticProp
   );
 }
 
-export function AnimatedHero() {
+type AnimatedHeroProps = {
+  stats?: {
+    properties: number;
+    clients: number;
+    agents: number;
+  };
+};
+
+export function AnimatedHero({ stats }: AnimatedHeroProps = {}) {
   const scrollYProgress = useMotionValue(0);
   const y = useTransform(scrollYProgress, [0, 1], [0, 300]);
   const ySmooth = useSpring(y, { stiffness: 100, damping: 30 });
@@ -133,9 +141,24 @@ export function AnimatedHero() {
 
           {/* Statistics Section */}
           <div className="grid grid-cols-3 gap-4 md:gap-8 pt-4 md:pt-8">
-            <AnimatedStatistic end={1000} label="Properties Listed" suffix="+" delay={200} />
-            <AnimatedStatistic end={500} label="Happy Clients" suffix="+" delay={400} />
-            <AnimatedStatistic end={50} label="Expert Agents" suffix="+" delay={600} />
+            <AnimatedStatistic 
+              end={stats?.properties ?? 0} 
+              label="Properties Listed" 
+              suffix="+" 
+              delay={200} 
+            />
+            <AnimatedStatistic 
+              end={stats?.clients ?? 0} 
+              label="Happy Clients" 
+              suffix="+" 
+              delay={400} 
+            />
+            <AnimatedStatistic 
+              end={stats?.agents ?? 0} 
+              label="Expert Agents" 
+              suffix="+" 
+              delay={600} 
+            />
           </div>
 
           {/* Simple Hero Search Bar */}
