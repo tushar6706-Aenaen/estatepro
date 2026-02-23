@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { usePathname, useSearchParams } from "next/navigation";
 
 import { supabaseBrowserClient } from "@/src/lib/supabase/client";
 import { Avatar, AvatarFallback } from "@/src/components/ui/avatar";
@@ -26,6 +26,7 @@ type ProfileRow = {
 };
 
 export function HomeHeader() {
+  const pathname = usePathname();
   const searchParams = useSearchParams();
   const activeListingType = searchParams.get("listingType") || "sale";
   
@@ -97,6 +98,8 @@ export function HomeHeader() {
     : isAgent
       ? "/agent/profile"
       : "/profile";
+  const isHomeRoute = pathname === "/";
+  const isMessagesRoute = pathname?.startsWith("/chats");
 
   const handleSignOut = async () => {
     await supabaseBrowserClient.auth.signOut();
@@ -107,7 +110,7 @@ export function HomeHeader() {
       return (
         <Link
           href="/auth?mode=signup&redirect=/onboarding"
-          className="rounded-full bg-gradient-to-r from-gray-900 to-gray-800 px-5 py-2.5 text-sm font-bold text-white shadow-lg transition hover:shadow-xl hover:scale-105 active:scale-95"
+          className="rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_30px_-14px_rgba(0,0,0,0.45)] transition hover:bg-zinc-800 active:scale-95"
         >
           List Property
         </Link>
@@ -118,7 +121,7 @@ export function HomeHeader() {
       return (
         <Link
           href="/admin"
-          className="rounded-full bg-gradient-to-r from-emerald-600 to-emerald-700 px-5 py-2.5 text-sm font-bold text-white shadow-lg transition hover:shadow-xl hover:scale-105 active:scale-95"
+          className="rounded-full bg-emerald-700 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_30px_-14px_rgba(0,0,0,0.45)] transition hover:bg-emerald-600 active:scale-95"
         >
           Admin Dashboard
         </Link>
@@ -129,7 +132,7 @@ export function HomeHeader() {
       return (
         <Link
           href="/agent"
-          className="rounded-full bg-gradient-to-r from-gray-900 to-gray-800 px-5 py-2.5 text-sm font-bold text-white shadow-lg transition hover:shadow-xl hover:scale-105 active:scale-95"
+          className="rounded-full bg-zinc-900 px-5 py-2.5 text-sm font-semibold text-white shadow-[0_10px_30px_-14px_rgba(0,0,0,0.45)] transition hover:bg-zinc-800 active:scale-95"
         >
           Agent Dashboard
         </Link>
@@ -139,7 +142,7 @@ export function HomeHeader() {
     return (
       <Link
         href="/onboarding?redirect=/"
-        className="rounded-full border-2 border-gray-900 bg-white px-5 py-2.5 text-sm font-bold text-gray-900 transition hover:bg-gradient-to-r hover:from-gray-50 hover:to-white hover:shadow-lg hover:scale-105 active:scale-95"
+        className="rounded-full border border-zinc-900/15 bg-[#f8f3e7] px-5 py-2.5 text-sm font-semibold text-zinc-900 transition hover:border-zinc-900/30 hover:bg-[#f1ead8] active:scale-95"
       >
         Become an Agent
       </Link>
@@ -147,10 +150,11 @@ export function HomeHeader() {
   };
 
   return (
-    <header className="sticky top-0 z-50 border-b-2 border-gray-200 bg-white/98 backdrop-blur-xl shadow-sm">
-      <div className="mx-auto flex w-full max-w-6xl items-center gap-3 md:gap-6 px-4 md:px-6 py-3 md:py-4">
-        <div className="flex items-center gap-2 md:gap-3">
-          <span className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl bg-gradient-to-br from-blue-500 to-blue-600 text-white shadow-md">
+    <header className="sticky top-0 z-50 border-b border-zinc-900/10 bg-[#efe8d8]/85 backdrop-blur-xl">
+      <div className="mx-auto w-full max-w-7xl px-3 py-3 md:px-6 md:py-4">
+        <div className="flex items-center gap-2 rounded-[1.2rem] border border-zinc-900/10 bg-white/80 px-3 py-2 shadow-[0_12px_40px_-28px_rgba(0,0,0,0.4)] backdrop-blur-sm md:gap-4 md:px-4">
+          <Link href="/" className="flex items-center gap-2 md:gap-3">
+            <span className="flex h-8 w-8 md:h-9 md:w-9 items-center justify-center rounded-xl bg-zinc-900 text-white shadow-sm">
             <svg
               width="16"
               height="16"
@@ -167,11 +171,13 @@ export function HomeHeader() {
               <path d="m4.9 4.9 14.2 14.2" />
               <path d="m19.1 4.9-14.2 14.2" />
             </svg>
-          </span>
-          <span className="text-base md:text-lg font-bold tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">LuxEstate</span>
-        </div>
+            </span>
+            <span className="text-base md:text-lg font-semibold tracking-tight text-zinc-950">
+              LuxEstate
+            </span>
+          </Link>
 
-        <div className="hidden flex-1 items-center gap-3 rounded-full border-2 border-gray-200 bg-gradient-to-r from-gray-50 to-white px-4 py-2.5 text-sm text-gray-700 md:flex hover:border-gray-300 transition-all shadow-sm">
+          <div className="hidden flex-1 items-center gap-3 rounded-full border border-zinc-900/10 bg-[#f8f3e7] px-4 py-2.5 text-sm text-zinc-700 shadow-inner md:flex">
           <svg
             width="16"
             height="16"
@@ -181,7 +187,7 @@ export function HomeHeader() {
             strokeWidth="2"
             strokeLinecap="round"
             strokeLinejoin="round"
-            className="text-gray-400"
+              className="text-zinc-400"
           >
             <circle cx="11" cy="11" r="8" />
             <path d="m21 21-4.3-4.3" />
@@ -189,47 +195,62 @@ export function HomeHeader() {
           <input
             type="text"
             placeholder="Search for city, neighborhood, or zip"
-            className="w-full bg-transparent text-sm text-gray-900 placeholder:text-gray-500 outline-none"
+              className="w-full bg-transparent text-sm text-zinc-900 placeholder:text-zinc-500 outline-none"
           />
-        </div>
+          </div>
 
-        <nav className="ml-auto hidden items-center gap-1 text-sm lg:flex">{navLinks.map((link) => {
-            const isActive = link.value === activeListingType || 
-                           (link.value === "sale" && !searchParams.get("listingType"));
-            
-            return (
-              <Link
-                key={link.value}
-                href={link.href}
-                className={`px-3 lg:px-4 py-2 rounded-full font-bold transition-all ${
-                  isActive && (link.value === "sale" || link.value === "rent")
-                    ? "bg-gradient-to-r from-gray-900 to-gray-800 text-white shadow-lg scale-105"
-                    : "text-gray-600 hover:text-gray-900 hover:bg-gradient-to-r hover:from-gray-100 hover:to-gray-50 hover:scale-105"
-                }`}
-              >
-                {link.label}
-              </Link>
-            );
-          })}
-        </nav>
+          <nav className="ml-auto hidden items-center gap-1.5 text-sm lg:flex">
+            {navLinks.map((link) => {
+              const isListingLink = link.value === "sale" || link.value === "rent";
+              const isActive = isHomeRoute
+                ? link.value === activeListingType ||
+                  (link.value === "sale" && !searchParams.get("listingType"))
+                : false;
 
-        <div className="hidden items-center gap-3 md:gap-4 md:flex">
+              return (
+                <Link
+                  key={link.value}
+                  href={link.href}
+                  className={`rounded-full px-3 py-2 text-sm font-semibold transition ${
+                    isListingLink && isActive
+                      ? "bg-zinc-900 text-white shadow-sm"
+                      : "text-zinc-600 hover:bg-[#f8f3e7] hover:text-zinc-900"
+                  }`}
+                >
+                  {link.label}
+                </Link>
+              );
+            })}
+
+            <Link
+              href="/chats"
+              className={`rounded-full border px-3 py-2 text-sm font-semibold transition ${
+                isMessagesRoute
+                  ? "border-zinc-900/20 bg-zinc-900 text-white"
+                  : "border-zinc-900/10 bg-white text-zinc-700 hover:border-zinc-900/25 hover:bg-[#f8f3e7]"
+              }`}
+            >
+              Messages
+            </Link>
+          </nav>
+
+          <div className="hidden items-center gap-2 md:gap-3 md:flex">
           {loading ? (
-            <div className="h-10 w-32 md:w-40 rounded-full bg-gray-200" />
+              <div className="h-10 w-32 rounded-full bg-zinc-200/80" />
           ) : (
             <>
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
-                  <button className="flex items-center gap-2 text-sm font-semibold text-gray-700 transition hover:text-gray-900">
+                    <button className="flex items-center gap-2 rounded-full border border-zinc-900/10 bg-white px-2 py-1.5 text-sm font-semibold text-zinc-700 transition hover:border-zinc-900/20 hover:bg-[#f8f3e7] hover:text-zinc-900">
                     <Avatar className="h-8 w-8 md:h-9 md:w-9">
                       <AvatarFallback>{avatarFallback}</AvatarFallback>
                     </Avatar>
                     <span className="hidden lg:inline">
                       {userEmail ? "Account" : "Sign In"}
                     </span>
-                  </button>
+                    </button>
                 </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
+                  <DropdownMenuContent align="end">
                   {userEmail ? (
                     <>
                       <DropdownMenuItem asChild>
@@ -268,15 +289,15 @@ export function HomeHeader() {
                       </DropdownMenuItem>
                     </>
                   )}
-                </DropdownMenuContent>
+                  </DropdownMenuContent>
               </DropdownMenu>
               {primaryAction()}
             </>
           )}
-        </div>
+          </div>
 
-        <button 
-          className="md:hidden ml-auto"
+          <button
+          className="ml-auto inline-flex h-10 w-10 items-center justify-center rounded-xl border border-zinc-900/10 bg-white text-zinc-900 shadow-sm transition hover:bg-[#f8f3e7] md:hidden"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
         >
@@ -311,33 +332,34 @@ export function HomeHeader() {
               <path d="M3 18h18" />
             </svg>
           )}
-        </button>
+          </button>
+        </div>
       </div>
 
       {/* Mobile Menu */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-gray-300 bg-white">
-          <div className="px-4 py-4 space-y-3">
+        <div className="mt-2 md:hidden">
+          <div className="space-y-3 rounded-[1.2rem] border border-zinc-900/10 bg-white/90 px-4 py-4 shadow-[0_16px_45px_-35px_rgba(0,0,0,0.45)] backdrop-blur-sm">
             {/* User Info Section */}
             {loading ? (
-              <div className="h-12 w-full rounded-lg bg-gray-200 animate-pulse" />
+              <div className="h-12 w-full rounded-xl bg-zinc-200/80 animate-pulse" />
             ) : userEmail ? (
-              <div className="flex items-center gap-3 pb-3 border-b border-gray-200">
+              <div className="flex items-center gap-3 rounded-xl border border-zinc-900/10 bg-[#f8f3e7] p-3">
                 <Avatar className="h-10 w-10">
                   <AvatarFallback>{avatarFallback}</AvatarFallback>
                 </Avatar>
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-900 truncate">{userEmail}</p>
-                  <p className="text-xs text-gray-600">
+                  <p className="truncate text-sm font-semibold text-zinc-900">{userEmail}</p>
+                  <p className="text-xs text-zinc-600">
                     {isAdmin ? "Administrator" : isAgent ? "Agent" : "Member"}
                   </p>
                 </div>
               </div>
             ) : (
-              <div className="pb-3 border-b border-gray-200">
+              <div>
                 <Link
                   href="/auth?mode=signin"
-                  className="block w-full text-center rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+                  className="block w-full rounded-xl bg-zinc-900 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-zinc-800"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Sign In
@@ -348,17 +370,20 @@ export function HomeHeader() {
             {/* Navigation Links */}
             <nav className="space-y-1">
               {navLinks.map((link) => {
-                const isActive = link.value === activeListingType || 
-                               (link.value === "sale" && !searchParams.get("listingType"));
+                const isListingLink = link.value === "sale" || link.value === "rent";
+                const isActive = isHomeRoute
+                  ? link.value === activeListingType ||
+                    (link.value === "sale" && !searchParams.get("listingType"))
+                  : false;
                 
                 return (
                   <Link
                     key={link.value}
                     href={link.href}
                     className={`block px-4 py-2.5 rounded-lg font-medium transition-all ${
-                      isActive && (link.value === "sale" || link.value === "rent")
-                        ? "bg-gray-900 text-white"
-                        : "text-gray-700 hover:bg-gray-100"
+                      isListingLink && isActive
+                        ? "bg-zinc-900 text-white"
+                        : "border border-transparent text-zinc-700 hover:border-zinc-900/10 hover:bg-[#f8f3e7]"
                     }`}
                     onClick={() => setMobileMenuOpen(false)}
                   >
@@ -370,24 +395,28 @@ export function HomeHeader() {
 
             {/* User Menu Items */}
             {userEmail && (
-              <div className="pt-3 border-t border-gray-200 space-y-1">
+              <div className="space-y-1 rounded-xl border border-zinc-900/10 bg-white p-2">
                 <Link
                   href="/chats"
-                  className="block px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition"
+                  className={`block rounded-lg px-4 py-2.5 font-medium transition ${
+                    isMessagesRoute
+                      ? "bg-zinc-900 text-white"
+                      : "text-zinc-700 hover:bg-[#f8f3e7]"
+                  }`}
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Messages
                 </Link>
                 <Link
                   href={profileDestination}
-                  className="block px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition"
+                  className="block rounded-lg px-4 py-2.5 text-zinc-700 hover:bg-[#f8f3e7] font-medium transition"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   Profile
                 </Link>
                 <Link
                   href={accountDestination}
-                  className="block px-4 py-2.5 rounded-lg text-gray-700 hover:bg-gray-100 font-medium transition"
+                  className="block rounded-lg px-4 py-2.5 text-zinc-700 hover:bg-[#f8f3e7] font-medium transition"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   {isAdmin ? "Admin Dashboard" : isAgent ? "Agent Dashboard" : "Account"}
@@ -396,11 +425,11 @@ export function HomeHeader() {
             )}
 
             {/* Action Button */}
-            <div className="pt-3 border-t border-gray-200">
+            <div className="border-t border-zinc-900/10 pt-3">
               {!userEmail ? (
                 <Link
                   href="/auth?mode=signup&redirect=/onboarding"
-                  className="block w-full text-center rounded-lg border-2 border-gray-900 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
+                  className="block w-full rounded-xl bg-zinc-900 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-zinc-800"
                   onClick={() => setMobileMenuOpen(false)}
                 >
                   List Property
@@ -410,7 +439,7 @@ export function HomeHeader() {
                   {isAdmin && (
                     <Link
                       href="/admin"
-                      className="block w-full text-center rounded-lg bg-emerald-600 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-emerald-700"
+                      className="block w-full rounded-xl bg-emerald-700 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-emerald-600"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Admin Dashboard
@@ -419,7 +448,7 @@ export function HomeHeader() {
                   {isAgent && !isAdmin && (
                     <Link
                       href="/agent"
-                      className="block w-full text-center rounded-lg bg-gray-900 px-4 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800"
+                      className="block w-full rounded-xl bg-zinc-900 px-4 py-2.5 text-center text-sm font-semibold text-white transition hover:bg-zinc-800"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Agent Dashboard
@@ -428,7 +457,7 @@ export function HomeHeader() {
                   {!isAgent && !isAdmin && (
                     <Link
                       href="/onboarding?redirect=/"
-                      className="block w-full text-center rounded-lg border-2 border-gray-900 bg-white px-4 py-2.5 text-sm font-semibold text-gray-900 transition hover:bg-gray-50"
+                      className="block w-full rounded-xl border border-zinc-900/15 bg-[#f8f3e7] px-4 py-2.5 text-center text-sm font-semibold text-zinc-900 transition hover:border-zinc-900/30 hover:bg-[#f1ead8]"
                       onClick={() => setMobileMenuOpen(false)}
                     >
                       Become an Agent
@@ -439,7 +468,7 @@ export function HomeHeader() {
                       handleSignOut();
                       setMobileMenuOpen(false);
                     }}
-                    className="mt-2 block w-full text-center rounded-lg border border-red-300 bg-red-50 px-4 py-2.5 text-sm font-semibold text-red-600 transition hover:bg-red-100"
+                    className="mt-2 block w-full rounded-xl border border-red-200 bg-red-50 px-4 py-2.5 text-center text-sm font-semibold text-red-700 transition hover:bg-red-100"
                   >
                     Sign Out
                   </button>

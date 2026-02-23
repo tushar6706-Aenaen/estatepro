@@ -1,15 +1,9 @@
 "use client";
 
-import { MouseEvent, useState } from "react";
+import { type ButtonHTMLAttributes, type MouseEvent, useState } from "react";
 import { motion } from "framer-motion";
 
-type RippleButtonProps = {
-  children: React.ReactNode;
-  onClick?: (e: MouseEvent<HTMLButtonElement>) => void;
-  className?: string;
-  type?: "button" | "submit" | "reset";
-  disabled?: boolean;
-};
+type RippleButtonProps = ButtonHTMLAttributes<HTMLButtonElement>;
 
 type Ripple = {
   x: number;
@@ -24,6 +18,7 @@ export function RippleButton({
   className = "",
   type = "button",
   disabled = false,
+  ...rest
 }: RippleButtonProps) {
   const [ripples, setRipples] = useState<Ripple[]>([]);
 
@@ -56,6 +51,7 @@ export function RippleButton({
       onClick={handleClick}
       disabled={disabled}
       className={`relative overflow-hidden ${className}`}
+      {...rest}
     >
       {children}
       {ripples.map((ripple) => (

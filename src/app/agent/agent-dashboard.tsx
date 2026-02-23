@@ -4,6 +4,13 @@ import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 
 import { supabaseBrowserClient } from "@/src/lib/supabase/client";
+import {
+  EditorialCard,
+  EditorialFieldShell,
+  EditorialNotice,
+  EditorialPill,
+  editorialButtonClass,
+} from "@/src/components/ui/editorial";
 import { Toast, type ToastVariant } from "@/src/components/ui/toast";
 
 type ListingStatus = "pending" | "approved" | "rejected" | string | null;
@@ -19,6 +26,8 @@ type PropertyRow = {
   bathrooms: number | null;
   area_sqft: number | null;
   description: string | null;
+  latitude: number | null;
+  longitude: number | null;
   agent_phone: string | null;
   review_feedback: string | null;
   created_at?: string | null;
@@ -38,6 +47,8 @@ type ListingFormState = {
   bathrooms: string;
   areaSqft: string;
   description: string;
+  latitude: string;
+  longitude: string;
 };
 
 const propertyTypes = [
@@ -49,7 +60,16 @@ const propertyTypes = [
 
 const storageBucket = "property-images";
 const propertySelect =
-  "id,title,city,price,property_type,status,bedrooms,bathrooms,area_sqft,description,agent_phone,review_feedback,created_at";
+  "id,title,city,price,property_type,status,bedrooms,bathrooms,area_sqft,description,latitude,longitude,agent_phone,review_feedback,created_at";
+const fieldLabelClass =
+  "text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500";
+const fieldHintClass = "text-xs text-zinc-500";
+const fieldInputClass =
+  "w-full border-0 bg-transparent p-0 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none";
+const fieldTextareaClass =
+  "min-h-[92px] w-full resize-y border-0 bg-transparent p-0 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none";
+const fieldSelectClass =
+  "w-full rounded-xl border-0 bg-transparent p-0 text-sm text-zinc-900 outline-none";
 
 export function AgentDashboard() {
   const supabaseReady = useMemo(() => {
@@ -74,6 +94,8 @@ export function AgentDashboard() {
     bathrooms: "",
     areaSqft: "",
     description: "",
+    latitude: "",
+    longitude: "",
   });
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
@@ -154,6 +176,8 @@ export function AgentDashboard() {
       bathrooms: "",
       areaSqft: "",
       description: "",
+      latitude: "",
+      longitude: "",
     });
     setImageFiles([]);
   };
@@ -242,6 +266,8 @@ export function AgentDashboard() {
       bathrooms: parseNumber(formState.bathrooms),
       area_sqft: parseNumber(formState.areaSqft),
       description: formState.description.trim() || null,
+      latitude: parseNumber(formState.latitude),
+      longitude: parseNumber(formState.longitude),
       status: "pending",
       agent_id: userId,
       agent_phone: profile?.phone ?? null,
@@ -287,6 +313,8 @@ export function AgentDashboard() {
       bathrooms: listing.bathrooms !== null ? String(listing.bathrooms) : "",
       areaSqft: listing.area_sqft !== null ? String(listing.area_sqft) : "",
       description: listing.description ?? "",
+      latitude: listing.latitude !== null ? String(listing.latitude) : "",
+      longitude: listing.longitude !== null ? String(listing.longitude) : "",
     });
     setEditError(null);
   };
@@ -328,6 +356,8 @@ export function AgentDashboard() {
       bathrooms: parseNumber(editState.bathrooms),
       area_sqft: parseNumber(editState.areaSqft),
       description: editState.description.trim() || null,
+      latitude: parseNumber(editState.latitude),
+      longitude: parseNumber(editState.longitude),
     };
 
     const { data, error } = await supabaseBrowserClient
@@ -401,31 +431,44 @@ export function AgentDashboard() {
   const statusBadge = (status: ListingStatus) => {
     switch (status) {
       case "approved":
-        return "bg-emerald-400/15 text-emerald-200";
+        return "border border-emerald-200 bg-emerald-50 text-emerald-700";
       case "rejected":
-        return "bg-rose-400/15 text-rose-200";
+        return "border border-rose-200 bg-rose-50 text-rose-700";
       case "pending":
       default:
-        return "bg-amber-400/15 text-amber-200";
+        return "border border-amber-200 bg-amber-50 text-amber-700";
     }
   };
 
+  const requiredFieldCount = [
+    formState.title,
+    formState.city,
+    formState.price,
+    formState.propertyType,
+  ].filter((value) => value.trim()).length;
+  const hasCoordinates = Boolean(
+    formState.latitude.trim() && formState.longitude.trim(),
+  );
+  const readinessPercent = Math.round((requiredFieldCount / 4) * 100);
+
   if (loading) {
     return (
-      <div className="rounded-2xl border border-gray-300 bg-gray-100 p-6 text-sm text-gray-700">
-        Loading your listings...
-      </div>
+      <EditorialCard className="p-5 sm:p-6">
+        <EditorialNotice tone="neutral">Loading your listings...</EditorialNotice>
+      </EditorialCard>
     );
   }
 
   if (loadError) {
     return (
-      <div className="rounded-2xl border border-red-300/40 bg-red-500/10 p-6 text-sm text-red-200">
-        {loadError}{" "}
-        <Link className="underline" href="/auth?redirect=/agent">
-          Go to auth
-        </Link>
-      </div>
+      <EditorialCard className="p-5 sm:p-6">
+        <EditorialNotice tone="error">
+          {loadError}{" "}
+          <Link className="underline underline-offset-4" href="/auth?redirect=/agent">
+            Go to auth
+          </Link>
+        </EditorialNotice>
+      </EditorialCard>
     );
   }
 
@@ -440,147 +483,428 @@ export function AgentDashboard() {
           />
         </div>
       )}
-      <section className="grid gap-4 md:gap-6 lg:grid-cols-[1.3fr,1fr]">
-        <form
-          onSubmit={handleCreateListing}
-          className="rounded-2xl md:rounded-3xl border border-gray-300 bg-gray-100 p-4 md:p-6 shadow-[0_25px_60px_-50px_rgba(0,0,0,0.8)]"
-        >
-          <div className="text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.28em] text-gray-600">
-            Create listing
-          </div>
-          <h2 className="mt-1 md:mt-2 text-xl md:text-2xl font-semibold text-gray-900">
-            Add a new property
-          </h2>
-          <p className="mt-1 md:mt-2 text-xs md:text-sm text-gray-700">
-            Listings start as pending until an admin approves them. Add images
-            from the bucket named &quot;{storageBucket}&quot; in Supabase Storage.
-          </p>
-
-          <div className="mt-4 md:mt-6 grid gap-3 md:gap-4">
-            <input
-              value={formState.title}
-              onChange={(event) => updateForm("title", event.target.value)}
-              placeholder="Listing title"
-              className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
-            />
-            <input
-              value={formState.city}
-              onChange={(event) => updateForm("city", event.target.value)}
-              placeholder="City"
-              className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
-            />
-            <div className="grid gap-2 md:gap-3 grid-cols-1 sm:grid-cols-2">
-              <input
-                value={formState.price}
-                onChange={(event) => updateForm("price", event.target.value)}
-                placeholder="Price"
-                type="number"
-                min="0"
-                className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
-              />
-              <select
-                value={formState.propertyType}
-                onChange={(event) => updateForm("propertyType", event.target.value)}
-                className="w-full appearance-none rounded-lg md:rounded-xl border-2 border-gray-200 bg-white px-3 md:px-4 py-2.5 md:py-3 pr-8 md:pr-10 text-xs md:text-sm font-medium text-gray-900 shadow-sm outline-none transition focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10 hover:border-gray-300"
-              >
-                <option value="">Property type</option>
-                {propertyTypes.map((type) => (
-                  <option key={type.value} value={type.value}>
-                    {type.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div className="grid gap-2 md:gap-3 grid-cols-3">
-              <input
-                value={formState.bedrooms}
-                onChange={(event) => updateForm("bedrooms", event.target.value)}
-                placeholder="Beds"
-                type="number"
-                min="0"
-                className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-2 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
-              />
-              <input
-                value={formState.bathrooms}
-                onChange={(event) => updateForm("bathrooms", event.target.value)}
-                placeholder="Baths"
-                type="number"
-                min="0"
-                step="0.5"
-                className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-2 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
-              />
-              <input
-                value={formState.areaSqft}
-                onChange={(event) => updateForm("areaSqft", event.target.value)}
-                placeholder="Sqft"
-                type="number"
-                min="0"
-                className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-2 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
-              />
-            </div>
-            <textarea
-              value={formState.description}
-              onChange={(event) => updateForm("description", event.target.value)}
-              placeholder="Description"
-              rows={4}
-              className="w-full rounded-xl md:rounded-2xl border border-gray-300 bg-white px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-900 placeholder:text-gray-500"
-            />
-            <div className="rounded-xl md:rounded-2xl border border-gray-300 bg-white px-3 md:px-4 py-2.5 md:py-3 text-xs md:text-sm text-gray-700">
-              <div className="text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.24em] text-gray-600">
-                Photos
-              </div>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={handleFiles}
-                className="mt-3 w-full text-sm text-gray-800"
-              />
-              {imageFiles.length > 0 && (
-                <div className="mt-2 text-xs text-gray-600">
-                  {imageFiles.length} image(s) selected. The first image becomes
-                  the primary photo.
+      <section className="grid gap-4 md:gap-6 lg:grid-cols-[minmax(0,1.35fr),minmax(0,1fr)]">
+        <EditorialCard tone="glass" className="p-4 md:p-6">
+          <form
+            onSubmit={handleCreateListing}
+            aria-busy={saving}
+            className="space-y-5 md:space-y-6"
+          >
+            <div className="flex flex-wrap items-start justify-between gap-4">
+              <div className="space-y-2">
+                <div className="text-[10px] uppercase tracking-[0.28em] text-zinc-500 sm:text-xs">
+                  Listing composer
                 </div>
-              )}
+                <h2 className="font-serif text-2xl leading-tight text-zinc-950 sm:text-3xl">
+                  Publish a new property dossier
+                </h2>
+                <p className="max-w-2xl text-sm text-zinc-700">
+                  New submissions enter review in <span className="font-semibold">pending</span>{" "}
+                  status. Upload photos from your device and the first image becomes
+                  the primary cover.
+                </p>
+              </div>
+              <div className="flex flex-wrap gap-2">
+                <EditorialPill tone="soft">
+                  Readiness {readinessPercent}%
+                </EditorialPill>
+                <EditorialPill tone={imageFiles.length > 0 ? "dark" : "default"}>
+                  {imageFiles.length} photo{imageFiles.length === 1 ? "" : "s"}
+                </EditorialPill>
+              </div>
             </div>
-          </div>
 
-          {formError && (
-            <div className="mt-4 rounded-2xl border border-red-300/30 bg-red-500/10 px-4 py-3 text-sm text-red-200">
-              {formError}
+            <EditorialCard tone="soft" radius="xl" className="p-4 sm:p-5">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <div className="text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:text-xs">
+                    Submission notes
+                  </div>
+                  <p className="mt-2 text-sm text-zinc-700">
+                    Required: title, city, price, and property type. Coordinates
+                    are optional but recommended for map visibility.
+                  </p>
+                </div>
+                <EditorialPill tone="soft" className="font-mono text-[11px]">
+                  bucket/{storageBucket}
+                </EditorialPill>
+              </div>
+            </EditorialCard>
+
+            <div className="grid gap-4">
+              <div className="grid gap-4">
+                <div className="text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:text-xs">
+                  Core details
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <EditorialFieldShell className="sm:col-span-2 items-start">
+                    <div className="grid w-full gap-1.5">
+                      <label className={fieldLabelClass} htmlFor="listing-title">
+                        Listing title
+                      </label>
+                      <input
+                        id="listing-title"
+                        value={formState.title}
+                        onChange={(event) => updateForm("title", event.target.value)}
+                        placeholder="Modern 3BHK with skyline balcony"
+                        className={fieldInputClass}
+                        autoComplete="off"
+                      />
+                    </div>
+                  </EditorialFieldShell>
+
+                  <EditorialFieldShell className="items-start">
+                    <div className="grid w-full gap-1.5">
+                      <label className={fieldLabelClass} htmlFor="listing-city">
+                        City
+                      </label>
+                      <input
+                        id="listing-city"
+                        value={formState.city}
+                        onChange={(event) => updateForm("city", event.target.value)}
+                        placeholder="Mumbai"
+                        className={fieldInputClass}
+                        autoComplete="address-level2"
+                      />
+                    </div>
+                  </EditorialFieldShell>
+
+                  <EditorialFieldShell className="items-start">
+                    <div className="grid w-full gap-1.5">
+                      <label className={fieldLabelClass} htmlFor="listing-type">
+                        Property type
+                      </label>
+                      <select
+                        id="listing-type"
+                        value={formState.propertyType}
+                        onChange={(event) =>
+                          updateForm("propertyType", event.target.value)
+                        }
+                        className={fieldSelectClass}
+                      >
+                        <option value="">Select a type</option>
+                        {propertyTypes.map((type) => (
+                          <option key={type.value} value={type.value}>
+                            {type.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </EditorialFieldShell>
+
+                  <EditorialFieldShell className="items-start sm:col-span-2">
+                    <div className="grid w-full gap-1.5">
+                      <label className={fieldLabelClass} htmlFor="listing-price">
+                        Asking price
+                      </label>
+                      <input
+                        id="listing-price"
+                        value={formState.price}
+                        onChange={(event) => updateForm("price", event.target.value)}
+                        placeholder="25000000"
+                        type="number"
+                        min="0"
+                        className={fieldInputClass}
+                        inputMode="numeric"
+                      />
+                    </div>
+                  </EditorialFieldShell>
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                <div className="text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:text-xs">
+                  Property metrics
+                </div>
+                <div className="grid gap-3 sm:grid-cols-3">
+                  <EditorialFieldShell className="items-start">
+                    <div className="grid w-full gap-1.5">
+                      <label className={fieldLabelClass} htmlFor="listing-beds">
+                        Bedrooms
+                      </label>
+                      <input
+                        id="listing-beds"
+                        value={formState.bedrooms}
+                        onChange={(event) => updateForm("bedrooms", event.target.value)}
+                        placeholder="3"
+                        type="number"
+                        min="0"
+                        className={fieldInputClass}
+                        inputMode="numeric"
+                      />
+                    </div>
+                  </EditorialFieldShell>
+
+                  <EditorialFieldShell className="items-start">
+                    <div className="grid w-full gap-1.5">
+                      <label className={fieldLabelClass} htmlFor="listing-baths">
+                        Bathrooms
+                      </label>
+                      <input
+                        id="listing-baths"
+                        value={formState.bathrooms}
+                        onChange={(event) =>
+                          updateForm("bathrooms", event.target.value)
+                        }
+                        placeholder="2.5"
+                        type="number"
+                        min="0"
+                        step="0.5"
+                        className={fieldInputClass}
+                        inputMode="decimal"
+                      />
+                    </div>
+                  </EditorialFieldShell>
+
+                  <EditorialFieldShell className="items-start">
+                    <div className="grid w-full gap-1.5">
+                      <label className={fieldLabelClass} htmlFor="listing-sqft">
+                        Area (sqft)
+                      </label>
+                      <input
+                        id="listing-sqft"
+                        value={formState.areaSqft}
+                        onChange={(event) => updateForm("areaSqft", event.target.value)}
+                        placeholder="1450"
+                        type="number"
+                        min="0"
+                        className={fieldInputClass}
+                        inputMode="numeric"
+                      />
+                    </div>
+                  </EditorialFieldShell>
+                </div>
+              </div>
+
+              <div className="grid gap-4">
+                <div className="text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:text-xs">
+                  Description
+                </div>
+                <EditorialFieldShell className="items-start">
+                  <div className="grid w-full gap-1.5">
+                    <label className={fieldLabelClass} htmlFor="listing-description">
+                      Property overview
+                    </label>
+                    <textarea
+                      id="listing-description"
+                      value={formState.description}
+                      onChange={(event) =>
+                        updateForm("description", event.target.value)
+                      }
+                      placeholder="Highlight the layout, neighborhood, condition, and key features."
+                      rows={4}
+                      className={fieldTextareaClass}
+                    />
+                  </div>
+                </EditorialFieldShell>
+              </div>
+
+              <div className="grid gap-4">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <div className="text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:text-xs">
+                    Map placement
+                  </div>
+                  <EditorialPill tone={hasCoordinates ? "dark" : "default"}>
+                    {hasCoordinates ? "Map ready" : "Coordinates optional"}
+                  </EditorialPill>
+                </div>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  <EditorialFieldShell className="items-start">
+                    <div className="grid w-full gap-1.5">
+                      <label className={fieldLabelClass} htmlFor="listing-latitude">
+                        Latitude
+                      </label>
+                      <input
+                        id="listing-latitude"
+                        value={formState.latitude}
+                        onChange={(event) => updateForm("latitude", event.target.value)}
+                        placeholder="19.0760"
+                        type="number"
+                        step="any"
+                        className={fieldInputClass}
+                        inputMode="decimal"
+                      />
+                    </div>
+                  </EditorialFieldShell>
+
+                  <EditorialFieldShell className="items-start">
+                    <div className="grid w-full gap-1.5">
+                      <label className={fieldLabelClass} htmlFor="listing-longitude">
+                        Longitude
+                      </label>
+                      <input
+                        id="listing-longitude"
+                        value={formState.longitude}
+                        onChange={(event) => updateForm("longitude", event.target.value)}
+                        placeholder="72.8777"
+                        type="number"
+                        step="any"
+                        className={fieldInputClass}
+                        inputMode="decimal"
+                      />
+                    </div>
+                  </EditorialFieldShell>
+                </div>
+                <p className={fieldHintClass}>
+                  Tip: copy coordinates directly from Google Maps to enable the
+                  interactive property map on the listing page.
+                </p>
+              </div>
+
+              <div className="grid gap-4">
+                <div className="text-[10px] uppercase tracking-[0.24em] text-zinc-500 sm:text-xs">
+                  Photos
+                </div>
+                <EditorialFieldShell className="items-start">
+                  <div className="grid w-full gap-2">
+                    <label className={fieldLabelClass} htmlFor="listing-photos">
+                      Upload images
+                    </label>
+                    <input
+                      id="listing-photos"
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleFiles}
+                      className="w-full text-sm text-zinc-700 file:mr-3 file:rounded-full file:border file:border-zinc-300 file:bg-white file:px-4 file:py-2 file:text-xs file:font-semibold file:text-zinc-800 hover:file:border-zinc-400"
+                    />
+                    <p className={fieldHintClass}>
+                      The first selected image is marked as the primary photo.
+                    </p>
+                    {imageFiles.length > 0 && (
+                      <div className="flex flex-wrap gap-2">
+                        {imageFiles.slice(0, 4).map((file) => (
+                          <EditorialPill
+                            key={`${file.name}-${file.lastModified}`}
+                            tone="soft"
+                            className="max-w-full"
+                            title={file.name}
+                          >
+                            {file.name}
+                          </EditorialPill>
+                        ))}
+                        {imageFiles.length > 4 && (
+                          <EditorialPill tone="soft">
+                            +{imageFiles.length - 4} more
+                          </EditorialPill>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                </EditorialFieldShell>
+              </div>
             </div>
-          )}
-          {formSuccess && (
-            <div className="mt-4 rounded-2xl border border-emerald-300/30 bg-emerald-500/10 px-4 py-3 text-sm text-emerald-100">
-              {formSuccess}
+
+            {formError && <EditorialNotice tone="error">{formError}</EditorialNotice>}
+            {formSuccess && (
+              <EditorialNotice tone="success">{formSuccess}</EditorialNotice>
+            )}
+
+            <div className="flex flex-wrap items-center gap-3">
+              <button
+                type="submit"
+                disabled={saving}
+                className={editorialButtonClass({
+                  tone: "primary",
+                  className: "min-w-[160px]",
+                })}
+              >
+                {saving ? "Saving..." : "Create listing"}
+              </button>
+              <button
+                type="button"
+                onClick={() => {
+                  resetForm();
+                  setFormError(null);
+                  setFormSuccess(null);
+                }}
+                className={editorialButtonClass({ tone: "secondary" })}
+              >
+                Clear draft
+              </button>
             </div>
-          )}
+          </form>
+        </EditorialCard>
 
-          <button
-            type="submit"
-            disabled={saving}
-            className="mt-5 inline-flex items-center justify-center rounded-full bg-gray-900 px-5 py-3 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
-          >
-            {saving ? "Saving..." : "Create listing"}
-          </button>
-        </form>
+        <div className="grid gap-4 content-start">
+          <EditorialCard tone="glass" className="p-5 sm:p-6">
+            <div className="space-y-4">
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.28em] text-zinc-500 sm:text-xs">
+                  Agent profile
+                </div>
+                <h3 className="mt-2 font-serif text-2xl leading-tight text-zinc-950">
+                  Contact routing
+                </h3>
+                <p className="mt-2 text-sm text-zinc-700">
+                  Buyer inquiries use the phone number from your onboarding profile.
+                </p>
+              </div>
 
-        <div className="rounded-3xl border border-gray-300 bg-gray-100 p-6">
-          <div className="text-xs uppercase tracking-[0.28em] text-gray-600">
-            Profile
-          </div>
-          <h3 className="mt-2 text-xl font-semibold text-gray-900">
-            Contact details
-          </h3>
-          <p className="mt-2 text-sm text-gray-700">
-            Phone shown on listings: {profile?.phone ?? "--"}
-          </p>
-          <Link
-            href="/onboarding"
-            className="mt-4 inline-flex text-sm font-semibold text-gray-700 hover:text-gray-800"
-          >
-            Update onboarding info
-          </Link>
+              <div className="grid gap-3">
+                <EditorialFieldShell tone="readonly" className="items-start">
+                  <div className="grid w-full gap-1.5">
+                    <div className={fieldLabelClass}>Phone shown on listings</div>
+                    <div className="text-sm font-medium text-zinc-900">
+                      {profile?.phone ?? "--"}
+                    </div>
+                  </div>
+                </EditorialFieldShell>
+                <EditorialFieldShell tone="readonly" className="items-start">
+                  <div className="grid w-full gap-1.5">
+                    <div className={fieldLabelClass}>Current role</div>
+                    <div className="capitalize text-sm font-medium text-zinc-900">
+                      {profile?.role ?? "public"}
+                    </div>
+                  </div>
+                </EditorialFieldShell>
+              </div>
+
+              <Link
+                href="/onboarding"
+                className={editorialButtonClass({
+                  tone: "secondary",
+                  className: "w-full justify-center",
+                })}
+              >
+                Update onboarding info
+              </Link>
+            </div>
+          </EditorialCard>
+
+          <EditorialCard tone="soft" className="p-5 sm:p-6">
+            <div className="space-y-4">
+              <div>
+                <div className="text-[10px] uppercase tracking-[0.28em] text-zinc-500 sm:text-xs">
+                  Submission checklist
+                </div>
+                <p className="mt-2 text-sm text-zinc-700">
+                  Quick preflight before you submit your listing for review.
+                </p>
+              </div>
+
+              <div className="grid gap-2 text-sm text-zinc-700">
+                <div className="flex items-center justify-between gap-3">
+                  <span>Required fields</span>
+                  <EditorialPill tone={requiredFieldCount === 4 ? "dark" : "soft"}>
+                    {requiredFieldCount}/4
+                  </EditorialPill>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span>Coordinates</span>
+                  <EditorialPill tone={hasCoordinates ? "dark" : "default"}>
+                    {hasCoordinates ? "Added" : "Optional"}
+                  </EditorialPill>
+                </div>
+                <div className="flex items-center justify-between gap-3">
+                  <span>Photos selected</span>
+                  <EditorialPill tone={imageFiles.length > 0 ? "dark" : "default"}>
+                    {imageFiles.length}
+                  </EditorialPill>
+                </div>
+              </div>
+            </div>
+          </EditorialCard>
         </div>
       </section>
 
@@ -703,6 +1027,28 @@ export function AgentDashboard() {
                       className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900"
                       placeholder="Description"
                     />
+                    <div className="grid gap-2 md:grid-cols-2">
+                      <input
+                        value={editState.latitude}
+                        onChange={(event) =>
+                          updateEditForm("latitude", event.target.value)
+                        }
+                        className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900"
+                        placeholder="Latitude"
+                        type="number"
+                        step="any"
+                      />
+                      <input
+                        value={editState.longitude}
+                        onChange={(event) =>
+                          updateEditForm("longitude", event.target.value)
+                        }
+                        className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900"
+                        placeholder="Longitude"
+                        type="number"
+                        step="any"
+                      />
+                    </div>
                     {editError && (
                       <div className="rounded-2xl border border-red-300/30 bg-red-500/10 px-4 py-2 text-xs text-red-200">
                         {editError}

@@ -5,6 +5,13 @@ import { useParams, useRouter } from "next/navigation";
 import { useEffect, useMemo, useState } from "react";
 
 import { HomeHeader } from "@/src/components/layout/home-header";
+import {
+  EditorialBackdrop,
+  EditorialCard,
+  EditorialNotice,
+  editorialButtonClass,
+  editorialPageRootClass,
+} from "@/src/components/ui/editorial";
 import { supabaseBrowserClient } from "@/src/lib/supabase/client";
 import { sendMessage } from "@/src/lib/chat/client";
 
@@ -44,6 +51,19 @@ const formatTimestamp = (value: string) => {
   const parsed = new Date(value);
   if (Number.isNaN(parsed.getTime())) return "";
   return parsed.toLocaleString();
+};
+
+const priceFormatter = new Intl.NumberFormat("en-IN", {
+  style: "currency",
+  currency: "INR",
+  maximumFractionDigits: 0,
+});
+
+const formatPrice = (value: number | string | null | undefined) => {
+  if (value == null) return "Price N/A";
+  const numericValue = Number(value);
+  if (Number.isNaN(numericValue)) return String(value);
+  return priceFormatter.format(numericValue);
 };
 
 export default function ChatThreadPage() {
@@ -263,12 +283,7 @@ export default function ChatThreadPage() {
   const primaryImage =
     property?.property_images?.find((img) => img.is_primary) ??
     property?.property_images?.[0];
-  const priceNumber = Number(property?.price);
-  const price = Number.isFinite(priceNumber)
-    ? `$${priceNumber.toLocaleString()}`
-    : property?.price
-      ? `$${property?.price}`
-      : "$0";
+  const price = formatPrice(property?.price);
   const otherName = otherProfile?.full_name?.trim() || "User";
   const otherInitials = otherName
     .split(" ")
@@ -277,16 +292,27 @@ export default function ChatThreadPage() {
     .slice(0, 2)
     .join("")
     .toUpperCase();
+  const composerInputId = "chat-thread-message";
+  const composerCountId = "chat-thread-message-count";
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className={`${editorialPageRootClass} flex flex-col`}>
       <HomeHeader />
 
-      <main className="mx-auto w-full max-w-6xl px-6 pb-16 pt-8">
+      <main className="relative isolate mx-auto flex-1 w-full max-w-7xl px-4 pb-16 pt-6 md:px-6 md:pt-8">
+        <EditorialBackdrop
+          radialClassName="bg-[radial-gradient(circle_at_10%_10%,rgba(37,99,235,0.12),transparent_35%),radial-gradient(circle_at_88%_18%,rgba(234,88,12,0.1),transparent_42%)]"
+        />
+
+        <div className="relative">
         <button
           type="button"
           onClick={() => router.push("/chats")}
-          className="mb-6 inline-flex items-center gap-2 text-sm text-gray-600 transition hover:text-gray-900"
+          className={editorialButtonClass({
+            tone: "secondary",
+            size: "sm",
+            className: "mb-4 gap-2 bg-white/80 font-medium",
+          })}
         >
           <svg
             width="16"
@@ -305,15 +331,15 @@ export default function ChatThreadPage() {
         </button>
 
         {error && (
-          <div className="mb-6 rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
+          <EditorialNotice tone="error" className="mb-4">
             {error}
-          </div>
+          </EditorialNotice>
         )}
 
-        <section className="rounded-3xl border border-gray-300 bg-white p-5">
+        <EditorialCard className="rounded-[1.7rem] p-4 md:p-5">
           <div className="flex flex-wrap items-center gap-4">
             <div
-              className="h-16 w-24 overflow-hidden rounded-2xl bg-gray-200"
+              className="relative h-20 w-full overflow-hidden rounded-2xl border border-zinc-900/10 bg-[#e7e2d8] sm:w-28"
               style={
                 primaryImage?.image_url
                   ? {
@@ -323,10 +349,15 @@ export default function ChatThreadPage() {
                     }
                   : undefined
               }
-            />
+            >
+              <div className="absolute inset-0 bg-gradient-to-t from-black/35 via-transparent to-transparent" />
+              <div className="absolute left-2 top-2 rounded-full border border-white/25 bg-black/30 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-[0.14em] text-white">
+                Thread
+              </div>
+            </div>
             <div className="flex flex-1 items-center gap-4">
               <div
-                className="relative h-12 w-12 overflow-hidden rounded-full border border-gray-300 bg-gray-200 text-sm font-semibold text-gray-900"
+                className="relative h-12 w-12 overflow-hidden rounded-2xl border border-zinc-900/10 bg-[#f8f3e7] text-sm font-semibold text-zinc-900"
                 style={
                   otherProfile?.avatar_url
                     ? {
@@ -344,36 +375,52 @@ export default function ChatThreadPage() {
                 )}
               </div>
               <div className="flex-1">
-                <p className="text-sm text-gray-500">
+                <p className="text-sm text-zinc-500">
                   Chat with {otherName}
                 </p>
-                <h1 className="text-xl font-semibold text-gray-900">
+                <h1 className="text-xl font-semibold text-zinc-900">
                   {property?.title ?? "Property conversation"}
                 </h1>
-                <p className="text-sm text-gray-800">
+                <p className="text-sm text-zinc-700">
                   {property?.city ?? "Location pending"} - {price}
                 </p>
               </div>
             </div>
             <Link
               href={property ? `/properties/${property.id}` : "/"}
-              className="rounded-full border-2 border-gray-200 bg-white px-4 py-2 text-xs font-semibold text-gray-900 transition hover:border-gray-900 hover:bg-gray-50"
+              className={editorialButtonClass({
+                tone: "secondary",
+                size: "sm",
+                className: "text-xs text-zinc-900",
+              })}
             >
               View listing
             </Link>
           </div>
-        </section>
+        </EditorialCard>
 
-        <section className="mt-6 grid gap-4 lg:grid-cols-[1fr_320px]">
-          <div className="flex h-[520px] flex-col rounded-3xl border border-gray-300 bg-white">
-            <div className="hide-scrollbar flex-1 space-y-3 overflow-y-auto px-5 py-5">
+        <section className="mt-4 grid gap-4 lg:grid-cols-[1fr_320px]">
+          <EditorialCard className="flex h-[560px] flex-col overflow-hidden rounded-[1.7rem] bg-white/90 shadow-[0_20px_60px_-48px_rgba(0,0,0,0.4)]">
+            <div className="border-b border-zinc-900/10 bg-[#faf5e9] px-5 py-3 text-xs font-semibold uppercase tracking-[0.18em] text-zinc-600">
+              Conversation Feed
+            </div>
+            <div
+              className="hide-scrollbar flex-1 space-y-3 overflow-y-auto px-4 py-4 md:px-5 md:py-5"
+              role="log"
+              aria-live="polite"
+              aria-relevant="additions text"
+              aria-busy={loading}
+              aria-label="Conversation messages"
+            >
               {loading && (
-                <div className="text-sm text-gray-700">Loading chat...</div>
+                <EditorialNotice className="rounded-xl text-zinc-700">
+                  Loading chat...
+                </EditorialNotice>
               )}
               {!loading && messages.length === 0 && (
-                <div className="text-sm text-gray-700">
+                <EditorialNotice className="rounded-xl text-zinc-700">
                   No messages yet. Say hello to get started.
-                </div>
+                </EditorialNotice>
               )}
               {!loading &&
                 messages.map((message) => {
@@ -389,20 +436,22 @@ export default function ChatThreadPage() {
                       className={`flex ${isSelf ? "justify-end" : "justify-start"}`}
                     >
                       <div
-                        className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm ${
+                        className={`max-w-[78%] rounded-2xl border px-4 py-3 text-sm shadow-sm ${
                           isSelf
-                            ? "bg-gray-900 text-white"
-                            : "bg-gray-100 text-gray-900"
+                            ? "border-zinc-900 bg-zinc-900 text-white"
+                            : "border-zinc-900/10 bg-[#fbf8f0] text-zinc-900"
                         }`}
                       >
                         <div className={`mb-1 text-[10px] font-semibold uppercase tracking-[0.2em] ${
-                          isSelf ? "text-gray-400" : "text-gray-500"
+                          isSelf ? "text-zinc-400" : "text-zinc-500"
                         }`}>
                           {senderLabel}
                         </div>
-                        <p>{message.content}</p>
+                        <p className="whitespace-pre-wrap break-words leading-6">
+                          {message.content}
+                        </p>
                         <span className={`mt-2 block text-[10px] ${
-                          isSelf ? "text-gray-400" : "text-gray-500"
+                          isSelf ? "text-zinc-400" : "text-zinc-500"
                         }`}>
                           {formatTimestamp(message.created_at)}
                         </span>
@@ -411,17 +460,22 @@ export default function ChatThreadPage() {
                   );
                 })}
             </div>
-            <div className="border-t border-gray-300 px-5 py-4">
+            <div className="border-t border-zinc-900/10 bg-white px-4 py-4 md:px-5">
               <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
                 <div className="flex-1">
+                  <label htmlFor={composerInputId} className="sr-only">
+                    Message
+                  </label>
                   <textarea
+                    id={composerInputId}
                     value={input}
                     onChange={(event) => setInput(event.target.value)}
                     placeholder="Write a message..."
                     maxLength={2000}
-                    className="min-h-[80px] w-full resize-none rounded-2xl border-2 border-gray-200 bg-white px-4 py-3 text-sm text-gray-900 placeholder:text-gray-400 outline-none focus:border-gray-900 focus:ring-2 focus:ring-gray-900/10"
+                    aria-describedby={composerCountId}
+                    className="min-h-[92px] w-full resize-none rounded-2xl border border-zinc-900/10 bg-[#fbf8f0] px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none transition focus:border-zinc-900/25 focus:bg-white focus:ring-2 focus:ring-zinc-900/5"
                   />
-                  <div className="mt-1 text-xs text-gray-500 text-right">
+                  <div id={composerCountId} className="mt-1 text-xs text-zinc-500 text-right">
                     {input.length}/2000
                   </div>
                 </div>
@@ -429,18 +483,24 @@ export default function ChatThreadPage() {
                   type="button"
                   onClick={handleSend}
                   disabled={sending || !input.trim()}
-                  className="rounded-full bg-gray-900 px-5 py-2 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60 shrink-0"
+                  aria-label={sending ? "Sending message" : "Send message"}
+                  className={editorialButtonClass({
+                    tone: "primary",
+                    className: "shrink-0 rounded-2xl px-5 disabled:opacity-60",
+                  })}
                 >
                   {sending ? "Sending..." : "Send"}
                 </button>
               </div>
             </div>
-          </div>
+          </EditorialCard>
 
-          <aside className="space-y-4">
-            <div className="rounded-3xl border-2 border-gray-200 bg-white p-5">
-              <h2 className="text-sm font-semibold text-gray-900">Chat details</h2>
-              <div className="mt-4 space-y-3 text-xs text-gray-700">
+          <aside className="space-y-4 lg:sticky lg:top-24 lg:self-start">
+            <EditorialCard className="rounded-[1.4rem] bg-white/90 p-5 shadow-[0_16px_50px_-40px_rgba(0,0,0,0.35)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-zinc-500">
+                Chat Details
+              </p>
+              <div className="mt-4 space-y-3 text-xs text-zinc-700">
                 <div className="flex items-center justify-between">
                   <span>Started</span>
                   <span>{chat ? formatTimestamp(chat.created_at) : "--"}</span>
@@ -454,13 +514,24 @@ export default function ChatThreadPage() {
                   <span>{chat ? "Active" : "--"}</span>
                 </div>
               </div>
-            </div>
-            <div className="rounded-3xl border-2 border-gray-200 bg-white p-5 text-xs text-gray-700">
-              Keep conversations respectful. Listings are updated regularly.
-            </div>
+              <EditorialNotice className="mt-4 rounded-xl px-3 py-3 text-xs text-zinc-600">
+                {otherName} is connected to this thread. New messages appear live when available.
+              </EditorialNotice>
+            </EditorialCard>
+            <EditorialCard tone="dark" className="rounded-[1.4rem] p-5 text-xs text-[#e3d6c2] shadow-[0_16px_50px_-35px_rgba(0,0,0,0.5)]">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.2em] text-[#d0c2aa]">
+                Message Etiquette
+              </p>
+              <p className="mt-3 leading-6">
+                Keep conversations respectful and specific. Share tour windows, budget constraints,
+                and listing questions early.
+              </p>
+            </EditorialCard>
           </aside>
         </section>
+        </div>
       </main>
     </div>
   );
 }
+

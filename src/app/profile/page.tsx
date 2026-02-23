@@ -4,6 +4,15 @@ import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
 
 import { HomeHeader } from "@/src/components/layout/home-header";
+import {
+  EditorialBackdrop,
+  EditorialCard,
+  EditorialFieldShell,
+  EditorialNotice,
+  EditorialPill,
+  editorialButtonClass,
+  editorialPageRootClass,
+} from "@/src/components/ui/editorial";
 import { supabaseBrowserClient } from "@/src/lib/supabase/client";
 
 type ProfileRow = {
@@ -19,11 +28,18 @@ type InquiryRow = {
   id: string;
   created_at: string | null;
   status: string | null;
-  property?: {
-    title: string | null;
-    city: string | null;
-    property_images?: { image_url: string | null; is_primary: boolean | null }[];
-  } | null;
+  property:
+    | {
+        title: string | null;
+        city: string | null;
+        property_images?: { image_url: string | null; is_primary: boolean | null }[];
+      }
+    | {
+        title: string | null;
+        city: string | null;
+        property_images?: { image_url: string | null; is_primary: boolean | null }[];
+      }[]
+    | null;
 };
 
 type ActivityItem = {
@@ -36,10 +52,10 @@ type ActivityItem = {
 };
 
 const statusStyles: Record<string, { label: string; className: string }> = {
-  pending: { label: "Pending", className: "bg-amber-500/20 text-amber-300" },
-  responded: { label: "Responded", className: "bg-sky-500/20 text-sky-300" },
-  closed: { label: "Closed", className: "bg-neutral-500/20 text-neutral-300" },
-  viewed: { label: "Viewed", className: "bg-emerald-500/20 text-emerald-300" },
+  pending: { label: "Pending", className: "border border-amber-200 bg-amber-50 text-amber-700" },
+  responded: { label: "Responded", className: "border border-sky-200 bg-sky-50 text-sky-700" },
+  closed: { label: "Closed", className: "border border-zinc-200 bg-zinc-100 text-zinc-700" },
+  viewed: { label: "Viewed", className: "border border-emerald-200 bg-emerald-50 text-emerald-700" },
 };
 
 const formatMonthYear = (dateString: string | null) => {
@@ -195,16 +211,20 @@ export default function UserProfilePage() {
         const statusKey = (item.status ?? "pending").toLowerCase();
         const statusMeta = statusStyles[statusKey] ?? {
           label: item.status ?? "Pending",
-          className: "bg-neutral-500/20 text-neutral-300",
+          className: "border border-zinc-200 bg-zinc-100 text-zinc-700",
         };
 
-        const images = item.property?.property_images ?? [];
+        // Supabase may return the joined property as an object or array
+        const propertyData = Array.isArray(item.property)
+          ? item.property[0]
+          : item.property;
+        const images = propertyData?.property_images ?? [];
         const primaryImage =
           images.find((image) => image.is_primary) ?? images[0];
 
         return {
           id: item.id,
-          title: item.property?.title ?? "Property inquiry",
+          title: propertyData?.title ?? "Property inquiry",
           date: formatShortDate(item.created_at),
           status: statusMeta.label,
           badgeClass: statusMeta.className,
@@ -345,15 +365,31 @@ export default function UserProfilePage() {
     ? "--"
     : `${inquiryDelta >= 0 ? "+" : ""}${inquiryDelta}`;
   const deltaText = loading ? "Loading activity..." : `${deltaLabel} since last month`;
+  const premiumLabel = profile?.is_premium ? "Premium User" : "Standard User";
+  const profileFieldsCompleted = [fullName, city, regionState].filter(
+    (value) => value.trim().length > 0,
+  ).length;
+  const profileCompletionPercent = Math.round((profileFieldsCompleted / 3) * 100);
+  const readinessLabel =
+    profileCompletionPercent === 100 ? "Complete" : profileCompletionPercent >= 67 ? "Strong" : "Needs update";
 
   return (
-    <div className="min-h-screen bg-gray-50 text-gray-900">
+    <div className={editorialPageRootClass}>
       <HomeHeader />
 
-      <main className="mx-auto w-full max-w-6xl px-6 pb-16 pt-8">
+      <main className="relative isolate mx-auto w-full max-w-7xl px-4 pb-16 pt-6 md:px-6 md:pt-8">
+        <EditorialBackdrop
+          radialClassName="bg-[radial-gradient(circle_at_10%_10%,rgba(37,99,235,0.12),transparent_35%),radial-gradient(circle_at_88%_18%,rgba(234,88,12,0.1),transparent_42%)]"
+        />
+
+        <div className="relative">
         <Link
           href="/"
-          className="flex items-center gap-2 text-sm text-gray-600 transition hover:text-gray-900"
+          className={editorialButtonClass({
+            tone: "secondary",
+            size: "sm",
+            className: "gap-2 bg-white/80 font-medium",
+          })}
         >
           <svg
             width="16"
@@ -371,10 +407,11 @@ export default function UserProfilePage() {
           Dashboard
         </Link>
 
-        <section className="mt-6 rounded-3xl border border-gray-300 bg-white p-6 md:p-8">
-          <div className="flex flex-wrap items-center gap-6">
+        <EditorialCard className="mt-4 overflow-hidden p-5 md:p-6">
+          <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr] xl:items-start">
+            <div className="flex flex-wrap items-center gap-5">
             <div
-              className="relative h-20 w-20 overflow-hidden rounded-full border border-gray-300 bg-gray-200 text-lg font-semibold text-gray-900"
+              className="relative h-24 w-24 overflow-hidden rounded-3xl border border-zinc-900/10 bg-[#f8f3e7] text-xl font-semibold text-zinc-900 shadow-sm"
               style={
                 avatarUrl
                   ? {
@@ -390,13 +427,15 @@ export default function UserProfilePage() {
                   {initials || "U"}
                 </div>
               )}
-              <label
+                <label
                 htmlFor="user-avatar-upload"
-                className="absolute bottom-0 right-0 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-4 border-white bg-gray-900 text-xs font-bold"
+                  aria-label={uploading ? "Uploading profile photo" : "Upload profile photo"}
+                  title={uploading ? "Uploading profile photo" : "Upload profile photo"}
+                  className="absolute bottom-1 right-1 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border-2 border-white bg-zinc-900 text-xs font-bold text-white shadow"
               >
-                E
-              </label>
-              <input
+                  {uploading ? "..." : "E"}
+                </label>
+                <input
                 id="user-avatar-upload"
                 type="file"
                 accept="image/*"
@@ -407,143 +446,331 @@ export default function UserProfilePage() {
                     handleAvatarUpload(file);
                   }
                 }}
-              />
+                />
             </div>
             <div className="flex-1">
-              <div className="flex flex-wrap items-center gap-3">
-                <h1 className="text-2xl font-semibold text-gray-900">
+                <div className="flex flex-wrap items-center gap-2">
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
+                    Profile Studio
+                  </p>
+                  <EditorialPill tone="soft">
+                    {readinessLabel}
+                  </EditorialPill>
+                </div>
+              <div className="mt-2 flex flex-wrap items-center gap-3">
+                  <h1 className="text-2xl font-semibold text-zinc-950 md:text-3xl">
                   {loading ? "Loading..." : displayName}
                 </h1>
-                <span className="rounded-full border border-gray-500/40 bg-gray-500/10 px-3 py-1 text-xs font-semibold text-gray-800">
-                  {profile?.is_premium ? "Premium User" : "Standard User"}
-                </span>
+                  <EditorialPill className="text-zinc-800">
+                  {premiumLabel}
+                </EditorialPill>
               </div>
-              <p className="mt-1 text-sm text-gray-600">
+                <p className="mt-1 text-sm text-zinc-600">
                 {email ?? "your.email@example.com"}
               </p>
-              <div className="mt-3 flex flex-wrap gap-2 text-xs text-gray-700">
-                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                <div className="mt-3 flex flex-wrap gap-2 text-xs text-zinc-700">
+                  <EditorialPill tone="soft" className="py-1.5 font-medium">
                   Location: {locationText}
-                </span>
-                <span className="rounded-full border border-white/10 bg-white/5 px-3 py-1">
+                </EditorialPill>
+                  <EditorialPill tone="soft" className="py-1.5 font-medium">
                   {joinedText}
-                </span>
+                </EditorialPill>
+                  <EditorialPill tone="soft" className="py-1.5 font-medium">
+                    Completion: {loading ? "--" : `${profileCompletionPercent}%`}
+                  </EditorialPill>
+                </div>
               </div>
             </div>
+
+            <EditorialCard tone="dark" radius="xl" className="p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d1c4af]">
+                Activity Snapshot
+              </p>
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-[#cdbfa8]">
+                    Total inquiries
+                  </p>
+                  <p className="mt-2 text-3xl font-semibold text-white">
+                    {loading ? "--" : totalInquiries}
+                  </p>
+                  <p className="mt-1 text-xs text-[#d7cab6]">{deltaText}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-[#cdbfa8]">
+                    Profile readiness
+                  </p>
+                  <p className="mt-2 text-3xl font-semibold text-white">
+                    {loading ? "--" : `${profileCompletionPercent}%`}
+                  </p>
+                  <p className="mt-1 text-xs text-[#d7cab6]">
+                    Keep city and state updated for better inquiry routing.
+                  </p>
+                </div>
+              </div>
+            </EditorialCard>
           </div>
-        </section>
+        </EditorialCard>
 
-        <section className="mt-8 rounded-3xl border border-gray-300 bg-white p-6">
-          <h2 className="text-xl font-semibold text-gray-900">Edit Profile</h2>
-          <p className="mt-1 text-sm text-gray-600">
-            Update your details for saved searches and inquiries.
-          </p>
+        <EditorialCard className="mt-6 p-5 md:p-6">
+          <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
+            <div>
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
+                Edit Profile
+              </p>
+              <h2 className="mt-2 text-2xl font-semibold text-zinc-950 md:text-3xl">
+                Keep your account details current
+              </h2>
+              <p className="mt-2 text-sm leading-6 text-zinc-600">
+                Update your contact and location details for saved searches, inquiries, and role-based
+                experiences across the platform.
+              </p>
 
-          <form onSubmit={handleSubmit} className="mt-6 grid gap-4 md:grid-cols-2">
-            <label className="space-y-2 text-sm text-gray-700">
-              Full Name
-              <div className="flex items-center gap-2 rounded-xl border border-gray-300 bg-gray-100 px-4 py-2">
-                <input
-                  value={fullName}
-                  onChange={(event) => setFullName(event.target.value)}
-                  placeholder="Full name"
-                  className="w-full bg-transparent text-sm text-gray-800 placeholder:text-gray-500 outline-none"
-                />
-              </div>
-            </label>
-            <label className="space-y-2 text-sm text-gray-700">
-              Email Address (Read only)
-              <div className="flex items-center gap-2 rounded-xl border border-gray-300 bg-gray-100 px-4 py-2">
-                <input
-                  value={email ?? ""}
-                  readOnly
-                  className="w-full bg-transparent text-sm text-gray-600 outline-none"
-                />
-              </div>
-            </label>
-            <label className="space-y-2 text-sm text-neutral-300">
-              City
-              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2">
-                <input
-                  value={city}
-                  onChange={(event) => setCity(event.target.value)}
-                  placeholder="City"
-                  className="w-full bg-transparent text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
-                />
-              </div>
-            </label>
-            <label className="space-y-2 text-sm text-neutral-300">
-              State
-              <div className="flex items-center gap-2 rounded-xl border border-white/10 bg-neutral-950/60 px-4 py-2">
-                <input
-                  value={regionState}
-                  onChange={(event) => setRegionState(event.target.value)}
-                  placeholder="State"
-                  className="w-full bg-transparent text-sm text-neutral-200 placeholder:text-neutral-500 outline-none"
-                />
-              </div>
-            </label>
-
-            <div className="md:col-span-2">
-              {error && (
-                <div className="mb-4 rounded-2xl border border-red-400/30 bg-red-500/10 px-4 py-3 text-xs text-red-200">
-                  {error}
-                </div>
-              )}
-              {success && (
-                <div className="mb-4 rounded-2xl border border-emerald-400/30 bg-emerald-500/10 px-4 py-3 text-xs text-emerald-200">
-                  {success}
-                </div>
-              )}
-              <button
-                type="submit"
-                disabled={saving || loading || uploading}
-                className="rounded-full bg-gray-900 px-6 py-2.5 text-sm font-semibold text-white transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-60"
+              <form
+                onSubmit={handleSubmit}
+                className="mt-6 grid gap-4 md:grid-cols-2"
+                aria-busy={loading || saving || uploading}
               >
-                {saving ? "Saving..." : "Save Changes"}
-              </button>
-            </div>
-          </form>
-        </section>
+                <label className="space-y-2 text-sm text-zinc-700">
+                  Full Name
+                  <EditorialFieldShell>
+                    <input
+                      value={fullName}
+                      onChange={(event) => setFullName(event.target.value)}
+                      placeholder="Full name"
+                      className="w-full bg-transparent text-sm text-zinc-800 placeholder:text-zinc-500 outline-none"
+                    />
+                  </EditorialFieldShell>
+                </label>
+                <label className="space-y-2 text-sm text-zinc-700">
+                  Email Address (Read only)
+                  <EditorialFieldShell tone="readonly">
+                    <input
+                      value={email ?? ""}
+                      readOnly
+                      className="w-full bg-transparent text-sm text-zinc-600 outline-none"
+                    />
+                  </EditorialFieldShell>
+                </label>
+                <label className="space-y-2 text-sm text-zinc-700">
+                  City
+                  <EditorialFieldShell>
+                    <input
+                      value={city}
+                      onChange={(event) => setCity(event.target.value)}
+                      placeholder="City"
+                      className="w-full bg-transparent text-sm text-zinc-800 placeholder:text-zinc-500 outline-none"
+                    />
+                  </EditorialFieldShell>
+                </label>
+                <label className="space-y-2 text-sm text-zinc-700">
+                  State
+                  <EditorialFieldShell>
+                    <input
+                      value={regionState}
+                      onChange={(event) => setRegionState(event.target.value)}
+                      placeholder="State"
+                      className="w-full bg-transparent text-sm text-zinc-800 placeholder:text-zinc-500 outline-none"
+                    />
+                  </EditorialFieldShell>
+                </label>
 
-        <section className="mt-8 grid gap-6 lg:grid-cols-[1fr_2fr]">
-          <div className="rounded-3xl border border-gray-300 bg-white p-6">
-            <div className="flex items-center justify-between text-xs text-gray-500">
-              <span>THIS MONTH</span>
-              <span className="rounded-full bg-white/5 px-2 py-1">
-                {deltaLabel}
-              </span>
+                <div className="md:col-span-2">
+                  {error && (
+                    <EditorialNotice tone="error" className="mb-4">
+                      {error}
+                    </EditorialNotice>
+                  )}
+                  {success && (
+                    <EditorialNotice tone="success" className="mb-4">
+                      {success}
+                    </EditorialNotice>
+                  )}
+                  <div className="flex flex-wrap items-center gap-3">
+                    <button
+                      type="submit"
+                      disabled={saving || loading || uploading}
+                      className={editorialButtonClass({
+                        tone: "primary",
+                        size: "sm",
+                        className: "px-6 disabled:opacity-60",
+                      })}
+                    >
+                      {saving ? "Saving..." : "Save Changes"}
+                    </button>
+                    <span className="text-xs text-zinc-500" aria-live="polite">
+                      {uploading ? "Uploading avatar..." : "Profile updates sync immediately."}
+                    </span>
+                  </div>
+                </div>
+              </form>
             </div>
-            <div className="mt-6 text-4xl font-semibold text-gray-900">
-              {loading ? "--" : totalInquiries}
-            </div>
-            <p className="mt-2 text-sm text-gray-600">Total Inquiries</p>
-            <p className="mt-8 text-xs text-emerald-300">{deltaText}</p>
+
+            <EditorialCard tone="dark" radius="xl" className="p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d2c4ad]">
+                Profile Settings Notes
+              </p>
+              <div className="mt-4 space-y-3 text-sm text-[#e2d5c1]">
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                  Add your city and state so inquiry summaries and recommendations stay relevant.
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                  Upload a profile image to make chats and inquiries easier to identify.
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                  Your email address is managed by authentication and stays read-only here.
+                </div>
+              </div>
+              <div className="mt-4 rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3 text-xs text-[#d8ccb9]">
+                Profile completion score is based on your name, city, and state fields.
+              </div>
+            </EditorialCard>
+          </div>
+        </EditorialCard>
+
+        <section className="mt-8 grid gap-6 xl:grid-cols-[0.95fr_2.05fr]">
+          <div className="space-y-6">
+            <EditorialCard className="p-5 md:p-6">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
+                Profile Ledger
+              </p>
+              <h3 className="mt-2 text-xl font-semibold text-zinc-950">
+                Readiness and account health
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-zinc-600">
+                A quick view of profile completeness and recent inquiry momentum.
+              </p>
+
+              <EditorialCard tone="soft" radius="lg" className="mt-5 p-4">
+                <div className="flex flex-wrap items-center justify-between gap-3">
+                  <div>
+                    <p className="text-[11px] font-semibold uppercase tracking-[0.18em] text-zinc-500">
+                      Completion score
+                    </p>
+                    <p className="mt-2 text-3xl font-semibold text-zinc-950">
+                      {loading ? "--" : `${profileCompletionPercent}%`}
+                    </p>
+                  </div>
+                  <EditorialPill className="text-zinc-800">
+                    {readinessLabel}
+                  </EditorialPill>
+                </div>
+                <div className="mt-4 h-2 overflow-hidden rounded-full bg-white">
+                  <div
+                    className="h-full rounded-full bg-gradient-to-r from-zinc-900 via-zinc-700 to-amber-600 transition-[width] duration-500"
+                    style={{
+                      width: `${loading ? 18 : Math.max(profileCompletionPercent, 10)}%`,
+                    }}
+                  />
+                </div>
+              </EditorialCard>
+
+              <div className="mt-4 space-y-2">
+                {[
+                  { label: "Full name", value: fullName.trim() },
+                  { label: "City", value: city.trim() },
+                  { label: "State", value: regionState.trim() },
+                ].map((field) => (
+                  <EditorialCard
+                    key={field.label}
+                    tone="plain"
+                    radius="lg"
+                    className="flex items-center justify-between px-4 py-3 text-sm"
+                  >
+                    <span className="text-zinc-700">{field.label}</span>
+                    <span
+                      className={`rounded-full px-2.5 py-1 text-xs font-semibold ${
+                        field.value
+                          ? "border border-emerald-200 bg-emerald-50 text-emerald-700"
+                          : "border border-amber-200 bg-amber-50 text-amber-700"
+                      }`}
+                    >
+                      {field.value ? "Added" : "Missing"}
+                    </span>
+                  </EditorialCard>
+                ))}
+              </div>
+
+              <div className="mt-4 grid gap-3 sm:grid-cols-2 xl:grid-cols-1">
+                <EditorialCard tone="plain" radius="lg" className="px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                    Membership
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-zinc-900">
+                    {premiumLabel}
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">{joinedText}</p>
+                </EditorialCard>
+                <EditorialCard tone="plain" radius="lg" className="px-4 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.16em] text-zinc-500">
+                    Inquiry momentum
+                  </p>
+                  <p className="mt-1 text-sm font-semibold text-zinc-900">
+                    {loading ? "--" : totalInquiries} total
+                  </p>
+                  <p className="mt-1 text-xs text-zinc-500">{deltaText}</p>
+                </EditorialCard>
+              </div>
+            </EditorialCard>
+
+            <EditorialCard tone="dark" radius="xl" className="rounded-[1.6rem] p-5">
+              <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d1c4af]">
+                Workflow Notes
+              </p>
+              <div className="mt-4 space-y-3 text-sm text-[#e3d7c4]">
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                  Keep your profile updated so agents can identify you quickly in chats.
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                  Location details improve property recommendations and inquiry summaries.
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-4 py-3">
+                  Avatar updates appear across conversations after the profile save completes.
+                </div>
+              </div>
+            </EditorialCard>
           </div>
 
-          <div className="rounded-3xl border border-gray-300 bg-white p-6">
-            <div className="flex items-center justify-between">
-              <h3 className="text-lg font-semibold text-gray-900">Recent Activity</h3>
-              <button className="text-sm font-semibold text-gray-700 transition hover:text-gray-900">
-                View All
-              </button>
+          <EditorialCard className="p-5 md:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
+                  Activity Feed
+                </p>
+                <h3 className="mt-2 text-xl font-semibold text-zinc-950 md:text-2xl">
+                  Recent inquiry activity
+                </h3>
+                <p className="mt-1 text-sm text-zinc-600">
+                  Latest property inquiries and their current status.
+                </p>
+              </div>
+              <Link
+                href="/chats"
+                className={editorialButtonClass({ tone: "secondary", size: "sm" })}
+              >
+                Open Messages
+              </Link>
             </div>
-            <div className="mt-5 space-y-4">
+
+            <div className="mt-5 space-y-3">
               {loading && (
-                <div className="text-sm text-gray-600">
+                <EditorialNotice>
                   Loading activity...
-                </div>
+                </EditorialNotice>
               )}
               {!loading && activity.length === 0 && (
-                <div className="text-sm text-gray-600">
-                  No activity yet.
-                </div>
+                <EditorialNotice>
+                  No activity yet. Start exploring listings and send an inquiry to build your timeline.
+                </EditorialNotice>
               )}
               {!loading &&
                 activity.map((item) => (
-                  <div key={item.id} className="flex items-center gap-4">
+                  <div
+                    key={item.id}
+                    className="flex flex-col gap-3 rounded-2xl border border-zinc-900/10 bg-white p-4 shadow-[0_12px_35px_-28px_rgba(0,0,0,0.4)] sm:flex-row sm:items-center"
+                  >
                     <div
-                      className="h-12 w-12 rounded-2xl bg-gray-100"
+                      className="relative h-14 w-14 shrink-0 overflow-hidden rounded-2xl border border-zinc-900/10 bg-[#efe8d8]"
                       style={
                         item.imageUrl
                           ? {
@@ -553,26 +780,31 @@ export default function UserProfilePage() {
                             }
                           : undefined
                       }
-                    />
-                    <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-900">
+                    >
+                      {!item.imageUrl && (
+                        <div className="absolute inset-0 opacity-60 [background-image:linear-gradient(to_right,#111_1px,transparent_1px),linear-gradient(to_bottom,#111_1px,transparent_1px)] [background-size:14px_14px]" />
+                      )}
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm font-semibold text-zinc-900 md:text-base">
                         {item.title}
                       </p>
-                      <p className="text-xs text-gray-500">
+                      <p className="mt-1 text-xs text-zinc-500">
                         Inquired on {item.date}
                       </p>
                     </div>
-                    <span className={`rounded-full px-3 py-1 text-xs ${item.badgeClass}`}>
+                    <span
+                      className={`inline-flex w-fit rounded-full px-3 py-1 text-xs font-semibold ${item.badgeClass}`}
+                    >
                       {item.status}
                     </span>
                   </div>
                 ))}
             </div>
-          </div>
+          </EditorialCard>
         </section>
+        </div>
       </main>
     </div>
   );
 }
-
-

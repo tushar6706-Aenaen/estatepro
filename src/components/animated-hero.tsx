@@ -105,7 +105,7 @@ export function AnimatedHero({ stats }: AnimatedHeroProps = {}) {
         style={{ y: ySmooth }}
       />
       <div className="absolute inset-0 bg-gradient-to-r from-black/70 via-black/50 to-black/30" />
-      <div className="relative mx-auto grid min-h-[500px] md:min-h-[600px] w-full max-w-6xl items-center px-4 md:px-6 py-12 md:py-20">
+      <div className="relative mx-auto grid w-full max-w-6xl items-center px-4 md:px-6 py-6 md:py-8">
         <div className="space-y-6 md:space-y-8">
           <motion.div
             initial={{ opacity: 0, y: 20 }}

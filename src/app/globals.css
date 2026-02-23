@@ -3,6 +3,48 @@
 :root {
   --background: #ffffff;
   --foreground: #0a0a0a;
+
+  /* Editorial UI tokens (shared page/card/button/pill system) */
+  --editorial-color-page-bg: #efe8d8;
+  --editorial-color-page-text: #18181b;
+
+  --editorial-color-border-soft: rgb(24 24 27 / 0.1);
+  --editorial-color-border-strong: rgb(24 24 27 / 0.15);
+  --editorial-color-border-hover: rgb(24 24 27 / 0.2);
+  --editorial-color-border-dark: rgb(255 255 255 / 0.1);
+
+  --editorial-color-card-glass: rgb(255 255 255 / 0.85);
+  --editorial-color-card-soft: #fbf8f0;
+  --editorial-color-card-plain: #ffffff;
+  --editorial-color-card-dark: #151413;
+  --editorial-color-card-dark-text: #f5efe4;
+
+  --editorial-color-pill-soft: #f8f3e7;
+  --editorial-color-field-readonly: #f1ede4;
+
+  --editorial-color-text-muted: #52525b;
+  --editorial-color-text-secondary: #3f3f46;
+
+  --editorial-color-primary: #18181b;
+  --editorial-color-primary-hover: #27272a;
+  --editorial-color-primary-text: #ffffff;
+
+  --editorial-color-success-bg: #ecfdf5;
+  --editorial-color-success-border: #a7f3d0;
+  --editorial-color-success-text: #047857;
+  --editorial-color-error-bg: #fef2f2;
+  --editorial-color-error-border: #fecaca;
+  --editorial-color-error-text: #b91c1c;
+  --editorial-color-warning-bg: #fffbeb;
+  --editorial-color-warning-border: #fde68a;
+  --editorial-color-warning-text: #92400e;
+
+  --editorial-radius-lg: 0.75rem;
+  --editorial-radius-xl: 1.3rem;
+  --editorial-radius-2xl: 1.8rem;
+
+  --editorial-shadow-card: 0 22px 70px -55px rgb(0 0 0 / 0.4);
+  --editorial-shadow-card-dark: 0 18px 55px -35px rgb(0 0 0 / 0.5);
 }
 
 @theme inline {
@@ -23,6 +65,21 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-geist-sans), system-ui, sans-serif;
+}
+
+/* Global keyboard focus visibility */
+:where(
+  a,
+  button,
+  input,
+  textarea,
+  select,
+  summary,
+  [role="button"],
+  [tabindex]:not([tabindex="-1"])
+):focus-visible {
+  outline: 2px solid rgb(24 24 27 / 0.45);
+  outline-offset: 2px;
 }
 
 /* Custom Scrollbar */
@@ -245,4 +302,29 @@ html {
   }
 }
 
+/* Reduced motion accessibility */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+
+  .typewriter {
+    animation: none !important;
+    border-right: 0;
+    white-space: normal;
+  }
+
+  .property-card:hover,
+  .property-card:hover .property-card-image {
+    transform: none !important;
+  }
+}

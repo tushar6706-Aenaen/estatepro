@@ -1,4 +1,5 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ToastProvider } from "@/src/components/ui/toast-provider";
@@ -59,11 +60,12 @@ export const metadata: Metadata = {
       "max-snippet": -1,
     },
   },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 5,
-  },
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
 };
 
 export default function RootLayout({
@@ -79,7 +81,9 @@ export default function RootLayout({
         <ToastProvider>
           <ComparisonProvider>
             {children}
-            <MobileNavigation />
+            <Suspense fallback={null}>
+              <MobileNavigation />
+            </Suspense>
           </ComparisonProvider>
         </ToastProvider>
       </body>

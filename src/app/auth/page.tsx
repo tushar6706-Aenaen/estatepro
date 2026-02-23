@@ -4,6 +4,13 @@ import Link from "next/link";
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
+import {
+  EditorialBackdrop,
+  EditorialCard,
+  EditorialNotice,
+  editorialButtonClass,
+  editorialPageRootClass,
+} from "@/src/components/ui/editorial";
 import { supabaseBrowserClient } from "@/src/lib/supabase/client";
 import { validateEmail, validatePassword } from "@/src/lib/validation";
 
@@ -207,16 +214,33 @@ export default function AuthPage() {
     }
   };
 
-  return (
-    <div className="relative max-h-screen overflow-hidden bg-gray-50 text-gray-900">
-      <div className="pointer-events-none absolute inset-0 opacity-70">
-        <div className="absolute -left-24 -top-24 h-96 w-96 rounded-full bg-white/40 blur-3xl" />
-        <div className="absolute bottom-0 right-0 h-[420px] w-[420px] rounded-full bg-gray-200/30 blur-3xl" />
-      </div>
+  const isSignUp = mode === "signup";
+  const panelTitle = isSignUp ? "Create your account" : "Welcome back";
+  const panelSubtitle = isSignUp
+    ? "Set up your account to start listing, messaging agents, and managing your property journey."
+    : "Sign in to continue your listings, messages, and onboarding progress.";
+  const roleRoutingNote = redirect
+    ? `After sign-in, you'll continue to: ${redirect}`
+    : "After sign-in, you'll be routed based on your role (admin, agent, or member).";
+  const emailInputId = "auth-email";
+  const passwordInputId = "auth-password";
+  const confirmPasswordInputId = "auth-confirm-password";
+  const passwordRulesId = "auth-password-rules";
+  const authErrorId = "auth-form-error";
+  const authNoticeId = "auth-form-notice";
+  const authPendingId = "auth-pending-email";
 
-      <main className="relative mx-auto flex min-h-screen w-full max-w-6xl flex-col justify-center px-6 py-16">
-        <div className="mb-10 flex items-center gap-3 text-sm text-gray-700">
-          <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-gray-100 text-gray-800">
+  return (
+    <div className={editorialPageRootClass}>
+      <EditorialBackdrop className="absolute inset-y-0" gridClassName="opacity-[0.07]" />
+
+      <main className="relative mx-auto flex min-h-screen w-full max-w-7xl flex-col justify-center px-4 py-8 md:px-6 md:py-12">
+        <EditorialCard
+          radius="xl"
+          className="mb-6 flex flex-wrap items-center justify-between gap-4 bg-white/80 px-4 py-3 shadow-[0_16px_50px_-40px_rgba(0,0,0,0.35)] md:mb-8 md:px-5"
+        >
+          <div className="flex items-center gap-3 text-sm text-zinc-700">
+            <span className="flex h-9 w-9 items-center justify-center rounded-xl bg-zinc-900 text-white shadow-sm">
             <svg
               width="18"
               height="18"
@@ -234,23 +258,108 @@ export default function AuthPage() {
             </svg>
           </span>
           <div>
-            <div className="text-xs uppercase tracking-[0.28em] text-gray-500">
-              Phase 2
+              <div className="text-[10px] uppercase tracking-[0.28em] text-zinc-500">
+              Auth Studio
             </div>
-            <div className="font-semibold text-gray-900">Authentication & Roles</div>
+              <div className="font-semibold text-zinc-900">Authentication & Roles</div>
           </div>
         </div>
-
-        <div className="max-w-xl mx-auto w-full">
-          
-          <form
-            onSubmit={handleAuth}
-            className="relative space-y-6 rounded-3xl border border-gray-300 bg-white p-8 shadow-[0_30px_80px_-60px_rgba(0,0,0,0.9)]"
+          <Link
+            href="/"
+            className={editorialButtonClass({
+              tone: "secondary",
+              size: "sm",
+              className: "bg-[#f8f3e7] text-zinc-900 hover:bg-[#f1ead8]",
+            })}
           >
-            <div className="flex items-center justify-between gap-3">
-              <div className="flex gap-2 rounded-full bg-gray-100 p-1 text-xs font-semibold text-gray-900">
+            Back home
+          </Link>
+        </EditorialCard>
+
+        <section className="grid gap-6 lg:grid-cols-[1.05fr_0.95fr] lg:items-stretch">
+          <EditorialCard
+            tone="dark"
+            className="overflow-hidden text-[#f5efe4] shadow-[0_26px_85px_-50px_rgba(0,0,0,0.55)]"
+          >
+            <div className="pointer-events-none absolute hidden" />
+            <div className="relative p-5 md:p-6">
+              <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4 md:p-5">
+                <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-[#d0c5b4]">
+                  Secure Access
+                </p>
+                <h2 className="mt-3 font-serif text-3xl leading-tight text-white md:text-4xl">
+                  Sign in, get routed, keep moving.
+                </h2>
+                <p className="mt-3 text-sm leading-6 text-[#e1d5c2]">
+                  Built for buyers, agents, and admins with role-aware routing after authentication.
+                </p>
+              </div>
+
+              <div className="mt-4 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-[#cdbfa8]">Mode</p>
+                  <p className="mt-2 text-lg font-semibold text-white">
+                    {isSignUp ? "Create Account" : "Sign In"}
+                  </p>
+                  <p className="mt-1 text-xs text-[#d8ccb9]">
+                    {isSignUp ? "Email confirmation may be required." : "Resume your existing account."}
+                  </p>
+                </div>
+                <div className="rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                  <p className="text-[10px] uppercase tracking-[0.18em] text-[#cdbfa8]">Next Step</p>
+                  <p className="mt-2 text-lg font-semibold text-white">Role Routing</p>
+                  <p className="mt-1 text-xs text-[#d8ccb9]">
+                    {redirect ? "Custom redirect requested." : "Agent/Admin/Public destinations."}
+                  </p>
+                </div>
+              </div>
+
+              <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4">
+                <p className="text-[10px] uppercase tracking-[0.18em] text-[#cdbfa8]">Flow Notes</p>
+                <ul className="mt-3 space-y-2 text-sm text-[#e4d8c5]">
+                  <li className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2">
+                    Email/password validation runs before Supabase requests.
+                  </li>
+                  <li className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2">
+                    Missing profiles are auto-created with a public role.
+                  </li>
+                  <li className="rounded-xl border border-white/10 bg-white/[0.02] px-3 py-2">
+                    Confirmation email can be resent if signup is pending.
+                  </li>
+                </ul>
+              </div>
+
+              <div className="mt-4 rounded-2xl border border-white/10 bg-white/[0.03] p-4 text-xs text-[#d8ccb9]">
+                {roleRoutingNote}
+              </div>
+            </div>
+          </EditorialCard>
+
+          <div className="w-full">
+            <form
+              onSubmit={handleAuth}
+              className="relative space-y-6"
+              aria-busy={busy || resendBusy}
+            >
+              <EditorialCard className="space-y-6 bg-white/90 p-5 shadow-[0_26px_85px_-55px_rgba(0,0,0,0.45)] md:p-7">
+              <div className="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                  <p className="text-[11px] font-semibold uppercase tracking-[0.22em] text-zinc-500">
+                    {isSignUp ? "Account Creation" : "Account Access"}
+                  </p>
+                  <h1 className="mt-2 text-2xl font-semibold text-zinc-950 md:text-3xl">
+                    {panelTitle}
+                  </h1>
+                  <p className="mt-2 max-w-md text-sm leading-6 text-zinc-600">{panelSubtitle}</p>
+                </div>
+                <div
+                  className="flex gap-2 rounded-full border border-zinc-900/10 bg-[#f8f3e7] p-1 text-xs font-semibold text-zinc-900"
+                  role="group"
+                  aria-label="Authentication mode"
+                >
                 <button
                   type="button"
+                  aria-pressed={mode === "signin"}
                   onClick={() => {
                     setMode("signin");
                     setPendingEmail(null);
@@ -259,14 +368,15 @@ export default function AuthPage() {
                   }}
                   className={`rounded-full px-4 py-2 transition ${
                     mode === "signin"
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-600 hover:text-gray-900"
+                        ? "bg-zinc-900 text-white shadow-sm"
+                        : "text-zinc-600 hover:text-zinc-900"
                   }`}
                 >
                   Sign in
                 </button>
                 <button
                   type="button"
+                  aria-pressed={mode === "signup"}
                   onClick={() => {
                     setMode("signup");
                     setPendingEmail(null);
@@ -275,117 +385,174 @@ export default function AuthPage() {
                   }}
                   className={`rounded-full px-4 py-2 transition ${
                     mode === "signup"
-                      ? "bg-blue-600 text-white"
-                      : "text-gray-600 hover:text-gray-900"
+                        ? "bg-zinc-900 text-white shadow-sm"
+                        : "text-zinc-600 hover:text-zinc-900"
                   }`}
                 >
                   Create account
                 </button>
+                </div>
               </div>
-              <Link
-                href="/"
-                className="text-xs font-semibold text-gray-600 transition hover:text-gray-900"
-              >
-                Back home
-              </Link>
-            </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-sm font-semibold text-gray-800">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label htmlFor={emailInputId} className="text-sm font-semibold text-zinc-800">
                   Email
                 </label>
                 <input
+                  id={emailInputId}
                   type="email"
                   autoComplete="email"
                   required
                   value={email}
                   onChange={(event) => setEmail(event.target.value)}
-                  className="w-full rounded-2xl border border-gray-300 bg-gray-100 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-300/40"
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={error ? authErrorId : undefined}
+                    className="w-full rounded-2xl border border-zinc-900/10 bg-[#fbf8f0] px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-500 outline-none transition focus:border-zinc-900/25 focus:bg-white focus:ring-2 focus:ring-zinc-900/5"
                   placeholder="you@example.com"
                 />
               </div>
 
               <div className="space-y-2">
-                <label className="flex items-center justify-between text-sm font-semibold text-gray-800">
+                  <label htmlFor={passwordInputId} className="flex items-center justify-between gap-2 text-sm font-semibold text-zinc-800">
                   <span>Password</span>
-                  {mode === "signup" && (
-                    <span className="text-xs font-normal text-gray-600">
+                    {mode === "signup" && (
+                      <span id={passwordRulesId} className="text-xs font-normal text-zinc-600">
                       8+ chars, uppercase, lowercase, number
                     </span>
                   )}
                 </label>
                 <input
+                  id={passwordInputId}
                   type="password"
                   autoComplete={mode === "signup" ? "new-password" : "current-password"}
                   required
                   value={password}
                   onChange={(event) => setPassword(event.target.value)}
-                  className="w-full rounded-2xl border border-gray-300 bg-gray-100 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-300/40"
+                  aria-invalid={Boolean(error)}
+                  aria-describedby={
+                    mode === "signup"
+                      ? `${passwordRulesId}${error ? ` ${authErrorId}` : ""}`
+                      : error
+                        ? authErrorId
+                        : undefined
+                  }
+                    className="w-full rounded-2xl border border-zinc-900/10 bg-[#fbf8f0] px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-500 outline-none transition focus:border-zinc-900/25 focus:bg-white focus:ring-2 focus:ring-zinc-900/5"
                   placeholder="********"
                 />
               </div>
 
               {mode === "signup" && (
                 <div className="space-y-2">
-                  <label className="text-sm font-semibold text-gray-800">
+                    <label htmlFor={confirmPasswordInputId} className="text-sm font-semibold text-zinc-800">
                     Confirm password
                   </label>
                   <input
+                    id={confirmPasswordInputId}
                     type="password"
                     autoComplete="new-password"
                     required
                     value={confirmPassword}
                     onChange={(event) => setConfirmPassword(event.target.value)}
-                    className="w-full rounded-2xl border border-gray-300 bg-gray-100 px-4 py-3 text-sm text-gray-900 placeholder:text-gray-500 outline-none focus:border-gray-400 focus:ring-2 focus:ring-gray-300/40"
+                    aria-invalid={Boolean(error)}
+                    aria-describedby={error ? authErrorId : undefined}
+                      className="w-full rounded-2xl border border-zinc-900/10 bg-[#fbf8f0] px-4 py-3 text-sm text-zinc-900 placeholder:text-zinc-500 outline-none transition focus:border-zinc-900/25 focus:bg-white focus:ring-2 focus:ring-zinc-900/5"
                     placeholder="Repeat password"
                   />
                 </div>
               )}
-            </div>
-
-            {error && (
-              <div className="rounded-2xl border border-red-300 bg-red-50 px-4 py-3 text-sm text-red-700">
-                {error}
               </div>
-            )}
-            {notice && (
-              <div className="rounded-2xl border border-emerald-300 bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-                {notice}
-              </div>
-            )}
 
-            {pendingEmail && (
-              <div className="rounded-2xl border border-gray-300 bg-gray-100 px-4 py-3 text-xs text-gray-700">
-                <div className="font-semibold text-gray-900">
-                  Waiting for confirmation
-                </div>
-                <div className="mt-1">
-                  We sent a confirmation link to {pendingEmail}. If you do not
-                  see it, check your spam folder or resend below.
-                </div>
-                <button
-                  type="button"
-                  onClick={handleResend}
-                  disabled={resendBusy}
-                  className="mt-3 inline-flex items-center rounded-full border border-gray-300 bg-gray-100 px-3 py-1 text-xs font-semibold text-gray-700 hover:text-gray-900 disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  {resendBusy ? "Sending..." : "Resend confirmation email"}
-                </button>
-              </div>
-            )}
+              {error && (
+                <EditorialNotice id={authErrorId} tone="error">
+                  {error}
+                </EditorialNotice>
+              )}
+              {notice && (
+                <EditorialNotice id={authNoticeId} tone="success">
+                  {notice}
+                </EditorialNotice>
+              )}
 
-            <button
-              type="submit"
-              disabled={busy}
-              className="flex w-full items-center justify-center gap-2 rounded-2xl bg-gray-900 px-4 py-3 text-sm font-semibold text-white shadow-[0_20px_50px_-35px_rgba(0,0,0,0.8)] transition hover:bg-gray-800 disabled:cursor-not-allowed disabled:opacity-70"
-            >
-              {busy ? "Working..." : mode === "signup" ? "Create account" : "Sign in"}
-            </button>
+              {pendingEmail && (
+                <EditorialNotice id={authPendingId} className="text-xs leading-5">
+                  <div className="font-semibold text-zinc-900">
+                    Waiting for confirmation
+                  </div>
+                  <div className="mt-1">
+                    We sent a confirmation link to {pendingEmail}. If you do not
+                    see it, check your spam folder or resend below.
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleResend}
+                    disabled={resendBusy}
+                    aria-describedby={authPendingId}
+                    className={editorialButtonClass({
+                      tone: "secondary",
+                      size: "sm",
+                      className: "mt-3 px-3 py-1.5 text-xs disabled:opacity-60",
+                    })}
+                  >
+                    {resendBusy ? "Sending..." : "Resend confirmation email"}
+                  </button>
+                </EditorialNotice>
+              )}
 
-            
-          </form>
-        </div>
+              <button
+                type="submit"
+                disabled={busy}
+                aria-describedby={
+                  error ? authErrorId : notice ? authNoticeId : pendingEmail ? authPendingId : undefined
+                }
+                className={editorialButtonClass({
+                  tone: "primary",
+                  className:
+                    "flex w-full gap-2 rounded-2xl shadow-[0_20px_50px_-35px_rgba(0,0,0,0.55)]",
+                })}
+              >
+                {busy ? "Working..." : mode === "signup" ? "Create account" : "Sign in"}
+              </button>
+
+              <EditorialCard tone="plain" radius="lg" className="px-4 py-3 text-xs text-zinc-600">
+                {isSignUp ? (
+                  <span>
+                    Already have an account?{" "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode("signin");
+                        setPendingEmail(null);
+                        setError(null);
+                        setNotice(null);
+                      }}
+                      className="font-semibold text-zinc-900 underline"
+                    >
+                      Sign in
+                    </button>
+                  </span>
+                ) : (
+                  <span>
+                    New here?{" "}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setMode("signup");
+                        setPendingEmail(null);
+                        setError(null);
+                        setNotice(null);
+                      }}
+                      className="font-semibold text-zinc-900 underline"
+                    >
+                      Create an account
+                    </button>
+                  </span>
+                )}
+              </EditorialCard>
+              </EditorialCard>
+            </form>
+          </div>
+        </section>
       </main>
     </div>
   );

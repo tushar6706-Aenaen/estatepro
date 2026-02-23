@@ -102,6 +102,8 @@ export function FloatingActionButton({ actions }: FloatingActionButtonProps) {
                     action.onClick();
                     setIsOpen(false);
                   }}
+                  aria-label={action.label}
+                  title={action.label}
                   className={`${
                     action.color || "bg-gradient-to-r from-gray-900 to-gray-800"
                   } text-white w-14 h-14 rounded-full shadow-2xl flex items-center justify-center transition hover:scale-110 active:scale-95`}
@@ -117,6 +119,8 @@ export function FloatingActionButton({ actions }: FloatingActionButtonProps) {
       {/* Main FAB */}
       <RippleButton
         onClick={() => setIsOpen(!isOpen)}
+        aria-label={isOpen ? "Close quick actions" : "Open quick actions"}
+        title={isOpen ? "Close quick actions" : "Open quick actions"}
         className="bg-gradient-to-r from-gray-900 to-gray-800 text-white w-16 h-16 rounded-full shadow-2xl flex items-center justify-center hover:scale-110 transition active:scale-95 border-2 border-gray-700"
       >
         <motion.div

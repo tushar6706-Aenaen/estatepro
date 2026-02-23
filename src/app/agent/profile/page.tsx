@@ -232,7 +232,7 @@ export default function AgentProfilePage() {
             : "$0";
 
         const statusInfo =
-          (item.status && statusMap[item.status]) ?? {
+          (item.status ? statusMap[item.status] : undefined) ?? {
             label: item.status ? item.status : "Draft",
             className: "bg-neutral-500/20 text-neutral-300",
           };
