@@ -114,8 +114,8 @@ export function AdminDashboard() {
       if (pendingResponse.error) {
         setLoadError(pendingResponse.error.message);
       } else {
-        const pending = pendingResponse.data ?? [];
-        setPendingListings(pending as PropertyRow[]);
+        const pending = (pendingResponse.data ?? []) as PropertyRow[];
+        setPendingListings(pending);
         setFeedbackById((prev) => {
           const next = { ...prev };
           pending.forEach((item) => {
@@ -150,7 +150,13 @@ export function AdminDashboard() {
             .select("id,title,city")
             .in("id", propertyIds);
 
-          (propertyData ?? []).forEach((property) => {
+          const properties = (propertyData ?? []) as Array<{
+            id: string;
+            title: string | null;
+            city: string | null;
+          }>;
+
+          properties.forEach((property) => {
             propertyMap.set(property.id, {
               title: property.title ?? null,
               city: property.city ?? null,
