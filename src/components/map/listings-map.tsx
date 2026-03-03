@@ -91,7 +91,7 @@ export function ListingsMap({
         <div style="font-family: system-ui, sans-serif; min-width: 180px; max-width: 240px;">
           ${
             property.imageUrl
-              ? `<img src="${property.imageUrl}" alt="${property.title}" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;" />`
+              ? `<img src="${property.imageUrl}" alt="${property.title}" loading="lazy" style="width: 100%; height: 100px; object-fit: cover; border-radius: 8px; margin-bottom: 8px;" />`
               : ""
           }
           <strong style="font-size: 13px; display: block; line-height: 1.3;">${property.title}</strong>

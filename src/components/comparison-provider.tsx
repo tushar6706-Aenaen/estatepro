@@ -121,6 +121,7 @@ export function ComparisonProvider({ children }: { children: ReactNode }) {
                         fill
                         className="object-cover"
                         sizes="80px"
+                        loading="lazy"
                       />
                     )}
                   </div>
@@ -187,6 +188,7 @@ export function ComparisonProvider({ children }: { children: ReactNode }) {
                             fill
                             className="object-cover"
                             sizes="320px"
+                            loading="lazy"
                           />
                         )}
                       </div>

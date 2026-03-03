@@ -64,7 +64,7 @@ export function PropertyCardCarousel({ properties }: PropertyCardMobileProps) {
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 80vw"
-                    priority
+                    loading="lazy"
                   />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />

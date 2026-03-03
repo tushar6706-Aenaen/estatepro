@@ -63,7 +63,7 @@ export function PropertyQuickView({ isOpen, onClose, property }: PropertyQuickVi
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 960px"
-                    priority
+                    loading="lazy"
                   />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />

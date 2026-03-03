@@ -155,6 +155,7 @@ export function PropertyCard({
                       onLoad={() => setImageLoaded(true)}
                       style={{ opacity: imageLoaded ? 1 : 0 }}
                       priority={index < 3}
+                      loading={index < 3 ? "eager" : "lazy"}
                     />
                     {/* Gradient Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/20" />
