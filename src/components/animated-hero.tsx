@@ -175,7 +175,7 @@ export function AnimatedHero({ stats }: AnimatedHeroProps = {}) {
   const text = "Find Your Dream Home";
 
   return (
-    <section className="relative overflow-hidden">
+    <section className="relative overflow-visible">
       <motion.div
         className="absolute inset-0 bg-[url('/landing_page.png')] bg-cover bg-center"
         style={{ y: ySmooth }}
@@ -268,7 +268,7 @@ export function AnimatedHero({ stats }: AnimatedHeroProps = {}) {
                 className="w-full bg-transparent text-sm text-gray-900 outline-none placeholder:text-gray-400"
               />
               {showDropdown && (
-                <div className="absolute left-0 top-[calc(100%+10px)] z-50 w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl">
+                <div className="absolute bottom-[calc(100%+10px)] left-0 z-50 w-full overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-2xl">
                   {loadingSuggestions ? (
                     <div className="px-4 py-3 text-sm text-gray-500">Searching properties...</div>
                   ) : suggestions.length > 0 ? (
