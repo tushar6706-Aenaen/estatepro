@@ -25,6 +25,7 @@ type SearchParams = {
   priceMin?: string;
   priceMax?: string;
   q?: string;
+  listingType?: string;
 };
 
 type PropertyCard = {
@@ -81,6 +82,7 @@ function median(values: number[]) {
 
 export default async function Home({ searchParams }: { searchParams: Promise<SearchParams> }) {
   const resolvedParams = await searchParams;
+  const isRentView = resolvedParams.listingType === "rent";
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
@@ -131,9 +133,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
       .select(
         "id,title,city,price,property_type,bedrooms,bathrooms,area_sqft,latitude,longitude,status,property_images(image_url,is_primary)",
       )
-      .eq("status", "approved")
-      .order("created_at", { ascending: false })
-      .limit(24);
+      .eq("status", "approved");
 
     if (resolvedParams.city) {
       query = query.ilike("city", `%${resolvedParams.city}%`);
@@ -154,13 +154,23 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
       }
     }
 
+    query = isRentView
+      ? query.order("price", { ascending: true })
+      : query.order("created_at", { ascending: false });
+
+    query = query.limit(24);
+
     const { data, error } = await query;
     if (error) {
       loadError = error.message;
     } else if (data) {
       properties = data.map((p) => ({
         ...p,
-        badge: p.property_type === "commercial" ? "Featured" : "For Sale",
+        badge: isRentView
+          ? "For Rent"
+          : p.property_type === "commercial"
+            ? "Featured"
+            : "For Sale",
       }));
     }
   }
@@ -192,6 +202,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
   }, new Map());
   const topType = [...typeCounts.entries()].sort((a, b) => b[1] - a[1])[0];
   const activeFilters = [
+    resolvedParams.listingType ? { label: "Mode", value: isRentView ? "Rent" : "Buy" } : null,
     resolvedParams.city ? { label: "City", value: resolvedParams.city } : null,
     resolvedParams.type ? { label: "Type", value: titleCase(resolvedParams.type) } : null,
     resolvedParams.priceMin ? { label: "Min", value: formatCurrency(resolvedParams.priceMin) } : null,
@@ -224,11 +235,14 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                       Search Context
                     </p>
                     <h2 className="mt-2 font-serif text-2xl text-zinc-950 md:text-3xl">
-                      Buyer-ready browsing, now organized around decisions.
+                      {isRentView
+                        ? "Rental-ready browsing, now organized around decisions."
+                        : "Buyer-ready browsing, now organized around decisions."}
                     </h2>
                     <p className="mt-2 text-sm text-zinc-600">
-                      Filter by city, type, and budget. Compare in grid view. Then switch to map view for
-                      location context without changing your result set.
+                      {isRentView
+                        ? "Filter by city, type, and budget. Rent mode surfaces cheaper properties first, then you can compare in grid view or switch to map view."
+                        : "Filter by city, type, and budget. Compare in grid view. Then switch to map view for location context without changing your result set."}
                     </p>
                   </div>
                   <div className="flex flex-col gap-2 text-xs text-zinc-600">
@@ -352,7 +366,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                     Search Workbench
                   </p>
                   <h2 className="mt-2 font-serif text-2xl text-zinc-950 md:text-3xl">
-                    Filter once, review everywhere.
+                    {isRentView ? "Rent mode, review everywhere." : "Filter once, review everywhere."}
                   </h2>
                   <p className="mt-2 text-sm text-zinc-600">
                     Desktop filters sit above the listing grid; mobile gets the compact filter experience.
