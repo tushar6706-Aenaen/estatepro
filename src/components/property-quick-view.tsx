@@ -2,7 +2,6 @@
 
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
-import Image from "next/image";
 
 type PropertyQuickViewProps = {
   isOpen: boolean;
@@ -57,13 +56,20 @@ export function PropertyQuickView({ isOpen, onClose, property }: PropertyQuickVi
               {/* Image Section */}
               <div className="relative h-96 bg-gray-200">
                 {property.imageUrl && (
-                  <Image
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
                     src={property.imageUrl}
                     alt={property.title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 960px"
+                    className="absolute inset-0 h-full w-full object-cover"
                     loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    onError={() =>
+                      console.error("[PropertyQuickView] image failed", {
+                        id: property.id,
+                        imageUrl: property.imageUrl,
+                      })
+                    }
                   />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-black/20" />

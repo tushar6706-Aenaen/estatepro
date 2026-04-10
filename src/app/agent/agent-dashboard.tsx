@@ -2,6 +2,14 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
+import L from "leaflet";
+import {
+  MapContainer,
+  Marker,
+  TileLayer,
+  useMap,
+  useMapEvents,
+} from "react-leaflet";
 
 import { supabaseBrowserClient } from "@/src/lib/supabase/client";
 import {
@@ -49,6 +57,13 @@ type ListingFormState = {
   description: string;
   latitude: string;
   longitude: string;
+  imageUrls: string[];
+};
+
+type NominatimResult = {
+  lat: string;
+  lon: string;
+  display_name: string;
 };
 
 const propertyTypes = [
@@ -58,7 +73,7 @@ const propertyTypes = [
   { value: "commercial", label: "Commercial" },
 ];
 
-const storageBucket = "property-images";
+const storageBucket = "images";
 const propertySelect =
   "id,title,city,price,property_type,status,bedrooms,bathrooms,area_sqft,description,latitude,longitude,agent_phone,review_feedback,created_at";
 const fieldLabelClass =
@@ -70,6 +85,50 @@ const fieldTextareaClass =
   "min-h-[92px] w-full resize-y border-0 bg-transparent p-0 text-sm text-zinc-900 placeholder:text-zinc-400 outline-none";
 const fieldSelectClass =
   "w-full rounded-xl border-0 bg-transparent p-0 text-sm text-zinc-900 outline-none";
+const defaultMapCenter: [number, number] = [20.5937, 78.9629];
+const defaultMapZoom = 5;
+const mapMarkerIcon = L.icon({
+  iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41],
+});
+
+function MapClickHandler({
+  onPick,
+}: {
+  onPick: (position: { lat: number; lng: number }) => void;
+}) {
+  useMapEvents({
+    click(event) {
+      onPick({
+        lat: event.latlng.lat,
+        lng: event.latlng.lng,
+      });
+    },
+  });
+
+  return null;
+}
+
+function MapViewportUpdater({
+  center,
+  zoom,
+}: {
+  center: [number, number];
+  zoom: number;
+}) {
+  const map = useMap();
+
+  useEffect(() => {
+    map.setView(center, zoom);
+  }, [center, map, zoom]);
+
+  return null;
+}
 
 export function AgentDashboard() {
   const supabaseReady = useMemo(() => {
@@ -96,11 +155,23 @@ export function AgentDashboard() {
     description: "",
     latitude: "",
     longitude: "",
+    imageUrls: [],
   });
   const [imageFiles, setImageFiles] = useState<File[]>([]);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState<string | null>(null);
   const [formSuccess, setFormSuccess] = useState<string | null>(null);
+  const [selectedCoordinates, setSelectedCoordinates] = useState<{
+    lat: number;
+    lng: number;
+  } | null>(null);
+  const [mapCenter, setMapCenter] = useState<[number, number]>(defaultMapCenter);
+  const [mapZoom, setMapZoom] = useState(defaultMapZoom);
+  const [locationQuery, setLocationQuery] = useState("");
+  const [searchingLocation, setSearchingLocation] = useState(false);
+  const [locationSuggestions, setLocationSuggestions] = useState<NominatimResult[]>(
+    [],
+  );
 
   const [editId, setEditId] = useState<string | null>(null);
   const [editState, setEditState] = useState<ListingFormState | null>(null);
@@ -158,7 +229,10 @@ export function AgentDashboard() {
     loadListings();
   }, [supabaseReady]);
 
-  const updateForm = (field: keyof ListingFormState, value: string) => {
+  const updateForm = <K extends keyof ListingFormState>(
+    field: K,
+    value: ListingFormState[K],
+  ) => {
     setFormState((prev) => ({ ...prev, [field]: value }));
   };
 
@@ -178,55 +252,155 @@ export function AgentDashboard() {
       description: "",
       latitude: "",
       longitude: "",
+      imageUrls: [],
     });
     setImageFiles([]);
+    setSelectedCoordinates(null);
+    setMapCenter(defaultMapCenter);
+    setMapZoom(defaultMapZoom);
+    setLocationQuery("");
+    setLocationSuggestions([]);
+  };
+
+  const applySelectedLocation = (lat: number, lng: number, zoom?: number) => {
+    setSelectedCoordinates({ lat, lng });
+    updateForm("latitude", lat.toFixed(6));
+    updateForm("longitude", lng.toFixed(6));
+    setMapCenter([lat, lng]);
+    if (zoom !== undefined) {
+      setMapZoom(zoom);
+    }
+  };
+
+  useEffect(() => {
+    const query = locationQuery.trim();
+    if (query.length <= 2) {
+      setLocationSuggestions([]);
+      setSearchingLocation(false);
+      return;
+    }
+
+    const controller = new AbortController();
+    const timer = setTimeout(async () => {
+      setSearchingLocation(true);
+
+      try {
+        const response = await fetch(
+          `https://nominatim.openstreetmap.org/search?q=${encodeURIComponent(query)}&format=json&addressdetails=1&limit=5`,
+          { signal: controller.signal },
+        );
+
+        if (!response.ok) {
+          throw new Error("Location search failed. Please try again.");
+        }
+
+        const results = (await response.json()) as NominatimResult[];
+        setLocationSuggestions(results.slice(0, 5));
+      } catch (error) {
+        if (
+          error instanceof DOMException &&
+          error.name === "AbortError"
+        ) {
+          return;
+        }
+
+        setLocationSuggestions([]);
+      } finally {
+        setSearchingLocation(false);
+      }
+    }, 300);
+
+    return () => {
+      controller.abort();
+      clearTimeout(timer);
+    };
+  }, [locationQuery]);
+
+  const handleSuggestionSelect = (suggestion: NominatimResult) => {
+    const lat = Number(suggestion.lat);
+    const lng = Number(suggestion.lon);
+
+    if (!Number.isFinite(lat) || !Number.isFinite(lng)) {
+      setFormError("Invalid location returned by search.");
+      return;
+    }
+
+    setFormError(null);
+    setLocationQuery(suggestion.display_name);
+    setLocationSuggestions([]);
+    applySelectedLocation(lat, lng, 13);
+  };
+
+  const handleSearchSubmit = () => {
+    if (locationSuggestions.length === 0) {
+      if (locationQuery.trim().length > 2) {
+        setFormError("No matching location found. Try another search.");
+      }
+      return;
+    }
+    handleSuggestionSelect(locationSuggestions[0]);
   };
 
   const handleFiles = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(event.target.files ?? []);
+    if (files.length === 0) {
+      setImageFiles([]);
+      updateForm("imageUrls", []);
+      return;
+    }
+
     setImageFiles(files);
-  };
 
-  const parseNumber = (value: string) => {
-    if (!value.trim()) return null;
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : null;
-  };
+    if (!userId) {
+      setFormError("Please sign in before uploading images.");
+      return;
+    }
 
-  const uploadImages = async (propertyId: string, files: File[]) => {
-    if (files.length === 0 || !userId) return;
+    setFormError(null);
 
-    const uploads = await Promise.all(
-      files.map(async (file, index) => {
+    void (async () => {
+      const uploadedUrls: string[] = [];
+
+      for (const file of files) {
         const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-        const path = `properties/${userId}/${propertyId}/${Date.now()}-${index}-${safeName}`;
+        const path = `uploads/${Date.now()}-${safeName}`;
+
         const { error: uploadError } = await supabaseBrowserClient.storage
           .from(storageBucket)
           .upload(path, file, { upsert: false, cacheControl: "3600" });
 
         if (uploadError) {
-          throw new Error(uploadError.message);
+          console.error("Image upload failed", uploadError);
+          setFormError(uploadError.message);
+          continue;
         }
 
         const { data: publicData } = supabaseBrowserClient.storage
           .from(storageBucket)
           .getPublicUrl(path);
 
-        return {
-          property_id: propertyId,
-          image_url: publicData.publicUrl,
-          is_primary: index === 0,
-        };
-      }),
-    );
+        if (!publicData.publicUrl) {
+          console.error("Public URL generation failed for image", { path });
+          continue;
+        }
 
-    const { error: insertError } = await supabaseBrowserClient
-      .from("property_images")
-      .insert(uploads);
+        console.log("[AgentForm] image public URL", {
+          bucket: storageBucket,
+          path,
+          publicUrl: publicData.publicUrl,
+        });
 
-    if (insertError) {
-      throw new Error(insertError.message);
-    }
+        uploadedUrls.push(publicData.publicUrl);
+      }
+
+      updateForm("imageUrls", uploadedUrls);
+    })();
+  };
+
+  const parseNumber = (value: string) => {
+    if (!value.trim()) return null;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : null;
   };
 
   const handleCreateListing = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -285,14 +459,23 @@ export function AgentDashboard() {
       return;
     }
 
-    try {
-      await uploadImages(data.id, imageFiles);
-    } catch (uploadError) {
-      const message =
-        uploadError instanceof Error
-          ? uploadError.message
-          : "Image upload failed.";
-      setFormError(`Listing saved but images failed to upload. ${message}`);
+    if (formState.imageUrls.length > 0) {
+      const uploads = formState.imageUrls.map((imageUrl, index) => ({
+        property_id: data.id,
+        image_url: imageUrl,
+        is_primary: index === 0,
+      }));
+
+      const { error: insertError } = await supabaseBrowserClient
+        .from("property_images")
+        .insert(uploads);
+
+      if (insertError) {
+        console.error("Image metadata insert failed", insertError);
+        setFormError(
+          `Listing saved but image metadata failed to save. ${insertError.message}`,
+        );
+      }
     }
 
     setListings((prev) => [data, ...prev]);
@@ -315,6 +498,7 @@ export function AgentDashboard() {
       description: listing.description ?? "",
       latitude: listing.latitude !== null ? String(listing.latitude) : "",
       longitude: listing.longitude !== null ? String(listing.longitude) : "",
+      imageUrls: [],
     });
     setEditError(null);
   };
@@ -416,9 +600,9 @@ export function AgentDashboard() {
     if (price === null || price === undefined || price === "") return "--";
     const value = Number(price);
     if (!Number.isFinite(value)) return "--";
-    return new Intl.NumberFormat("en-US", {
+    return new Intl.NumberFormat("en-IN", {
       style: "currency",
-      currency: "USD",
+      currency: "INR",
       maximumFractionDigits: 0,
     }).format(value);
   };
@@ -595,13 +779,13 @@ export function AgentDashboard() {
                   <EditorialFieldShell className="items-start sm:col-span-2">
                     <div className="grid w-full gap-1.5">
                       <label className={fieldLabelClass} htmlFor="listing-price">
-                        Asking price
+                        Asking price (₹)
                       </label>
                       <input
                         id="listing-price"
                         value={formState.price}
                         onChange={(event) => updateForm("price", event.target.value)}
-                        placeholder="25000000"
+                        placeholder="₹25000000"
                         type="number"
                         min="0"
                         className={fieldInputClass}
@@ -708,46 +892,84 @@ export function AgentDashboard() {
                     {hasCoordinates ? "Map ready" : "Coordinates optional"}
                   </EditorialPill>
                 </div>
-                <div className="grid gap-3 sm:grid-cols-2">
-                  <EditorialFieldShell className="items-start">
-                    <div className="grid w-full gap-1.5">
-                      <label className={fieldLabelClass} htmlFor="listing-latitude">
-                        Latitude
-                      </label>
+                <div className="w-full overflow-hidden rounded-2xl border border-zinc-900/10 bg-white">
+                  <div className="border-b border-zinc-900/10 p-3">
+                    <div className="flex gap-2">
                       <input
-                        id="listing-latitude"
-                        value={formState.latitude}
-                        onChange={(event) => updateForm("latitude", event.target.value)}
-                        placeholder="19.0760"
-                        type="number"
-                        step="any"
-                        className={fieldInputClass}
-                        inputMode="decimal"
+                        value={locationQuery}
+                        onChange={(event) => setLocationQuery(event.target.value)}
+                        onKeyDown={(event) => {
+                          if (event.key === "Enter") {
+                            event.preventDefault();
+                            handleSearchSubmit();
+                          }
+                        }}
+                        placeholder="Search location..."
+                        className="w-full rounded-xl border border-zinc-900/10 bg-white px-3 py-2 text-sm text-zinc-900 outline-none transition focus:border-zinc-900/25 focus:ring-2 focus:ring-zinc-900/5"
                       />
+                      <button
+                        type="button"
+                        onClick={handleSearchSubmit}
+                        disabled={searchingLocation}
+                        className={editorialButtonClass({
+                          tone: "secondary",
+                          size: "sm",
+                        })}
+                      >
+                        {searchingLocation ? "Searching..." : "Search"}
+                      </button>
                     </div>
-                  </EditorialFieldShell>
-
-                  <EditorialFieldShell className="items-start">
-                    <div className="grid w-full gap-1.5">
-                      <label className={fieldLabelClass} htmlFor="listing-longitude">
-                        Longitude
-                      </label>
-                      <input
-                        id="listing-longitude"
-                        value={formState.longitude}
-                        onChange={(event) => updateForm("longitude", event.target.value)}
-                        placeholder="72.8777"
-                        type="number"
-                        step="any"
-                        className={fieldInputClass}
-                        inputMode="decimal"
+                    {searchingLocation && (
+                      <p className="mt-2 text-xs text-zinc-500">Searching places...</p>
+                    )}
+                    {locationQuery.trim().length > 2 &&
+                      locationSuggestions.length > 0 && (
+                        <div className="mt-2 max-h-56 overflow-auto rounded-xl border border-zinc-900/10 bg-white">
+                          {locationSuggestions.map((suggestion) => (
+                            <button
+                              key={`${suggestion.lat}-${suggestion.lon}-${suggestion.display_name}`}
+                              type="button"
+                              onClick={() => handleSuggestionSelect(suggestion)}
+                              className="block w-full border-b border-zinc-900/5 px-3 py-2 text-left text-xs text-zinc-700 transition last:border-b-0 hover:bg-zinc-100"
+                            >
+                              {suggestion.display_name}
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                  </div>
+                  <MapContainer
+                    center={mapCenter}
+                    zoom={mapZoom}
+                    className="h-[400px] w-full"
+                    style={{ height: "400px", width: "100%" }}
+                  >
+                    <MapViewportUpdater center={mapCenter} zoom={mapZoom} />
+                    <TileLayer
+                      attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+                      url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                    />
+                    <MapClickHandler
+                      onPick={({ lat, lng }) => {
+                        applySelectedLocation(lat, lng);
+                      }}
+                    />
+                    {selectedCoordinates && (
+                      <Marker
+                        position={[selectedCoordinates.lat, selectedCoordinates.lng]}
+                        icon={mapMarkerIcon}
                       />
-                    </div>
-                  </EditorialFieldShell>
+                    )}
+                  </MapContainer>
                 </div>
                 <p className={fieldHintClass}>
-                  Tip: copy coordinates directly from Google Maps to enable the
-                  interactive property map on the listing page.
+                  Click anywhere on the map to set your listing location.
+                </p>
+                <p className={fieldHintClass}>
+                  Selected:{" "}
+                  {selectedCoordinates
+                    ? `${selectedCoordinates.lat.toFixed(6)}, ${selectedCoordinates.lng.toFixed(6)}`
+                    : "No location selected yet"}
                 </p>
               </div>
 
@@ -769,7 +991,8 @@ export function AgentDashboard() {
                       className="w-full text-sm text-zinc-700 file:mr-3 file:rounded-full file:border file:border-zinc-300 file:bg-white file:px-4 file:py-2 file:text-xs file:font-semibold file:text-zinc-800 hover:file:border-zinc-400"
                     />
                     <p className={fieldHintClass}>
-                      The first selected image is marked as the primary photo.
+                      Images upload to the "images" bucket. The first uploaded
+                      image is marked as primary.
                     </p>
                     {imageFiles.length > 0 && (
                       <div className="flex flex-wrap gap-2">
@@ -970,7 +1193,7 @@ export function AgentDashboard() {
                         value={editState.price}
                         onChange={(event) => updateEditForm("price", event.target.value)}
                         className="w-full rounded-2xl border border-gray-300 bg-white px-4 py-2 text-sm text-gray-900"
-                        placeholder="Price"
+                        placeholder="Price (₹)"
                         type="number"
                       />
                       <select

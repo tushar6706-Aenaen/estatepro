@@ -1,5 +1,32 @@
 import type { NextConfig } from "next";
 
+type RemotePattern = NonNullable<
+  NonNullable<NextConfig["images"]>["remotePatterns"]
+>[number];
+
+const supabaseRemotePatterns: RemotePattern[] = [];
+
+if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+  try {
+    const { hostname } = new URL(process.env.NEXT_PUBLIC_SUPABASE_URL);
+    // No pathname: allow all paths on project host (storage, redirects, etc.)
+    supabaseRemotePatterns.push({
+      protocol: "https",
+      hostname,
+    });
+  } catch {
+    supabaseRemotePatterns.push({
+      protocol: "https",
+      hostname: "*.supabase.co",
+    });
+  }
+} else {
+  supabaseRemotePatterns.push({
+    protocol: "https",
+    hostname: "*.supabase.co",
+  });
+}
+
 const nextConfig: NextConfig = {
   // Production optimizations
   reactStrictMode: true,
@@ -8,10 +35,7 @@ const nextConfig: NextConfig = {
   // Image optimization - add your Supabase storage domain here
   images: {
     remotePatterns: [
-      {
-        protocol: "https",
-        hostname: "*.supabase.co",
-      },
+      ...supabaseRemotePatterns,
       {
         protocol: "https",
         hostname: "images.unsplash.com",

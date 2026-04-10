@@ -18,7 +18,6 @@ const navLinks = [
   { label: "Buy", value: "sale", href: "/?listingType=sale" },
   { label: "Rent", value: "rent", href: "/?listingType=rent" },
   { label: "Sell", value: "sell", href: "/onboarding?redirect=/" },
-  { label: "Agents", value: "agents", href: "/agents" },
 ];
 
 type ProfileRow = {
@@ -176,28 +175,6 @@ export function HomeHeader() {
               LuxEstate
             </span>
           </Link>
-
-          <div className="hidden flex-1 items-center gap-3 rounded-full border border-zinc-900/10 bg-[#f8f3e7] px-4 py-2.5 text-sm text-zinc-700 shadow-inner md:flex">
-          <svg
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="2"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-              className="text-zinc-400"
-          >
-            <circle cx="11" cy="11" r="8" />
-            <path d="m21 21-4.3-4.3" />
-          </svg>
-          <input
-            type="text"
-            placeholder="Search for city, neighborhood, or zip"
-              className="w-full bg-transparent text-sm text-zinc-900 placeholder:text-zinc-500 outline-none"
-          />
-          </div>
 
           <nav className="ml-auto hidden items-center gap-1.5 text-sm lg:flex">
             {navLinks.map((link) => {

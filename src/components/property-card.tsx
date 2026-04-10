@@ -3,10 +3,58 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import Image from "next/image";
 import { useComparison } from "./comparison-provider";
 import { useToast } from "./ui/toast-provider";
 import { PropertyQuickView } from "./property-quick-view";
+
+function PropertyCardHeroImage({
+  id,
+  title,
+  imageUrl,
+  index,
+}: {
+  id: string;
+  title: string;
+  imageUrl: string;
+  index: number;
+}) {
+  const [loaded, setLoaded] = useState(false);
+  const [broken, setBroken] = useState(false);
+
+  if (broken) {
+    return null;
+  }
+
+  return (
+    <>
+      {!loaded && <div className="absolute inset-0 skeleton" />}
+      <motion.div
+        initial={{ scale: 1 }}
+        whileHover={{ scale: 1.1 }}
+        transition={{ duration: 0.6, ease: "easeOut" }}
+        className="absolute inset-0"
+      >
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src={imageUrl}
+          alt={title}
+          className="absolute inset-0 h-full w-full object-cover"
+          loading={index < 3 ? "eager" : "lazy"}
+          decoding="async"
+          referrerPolicy="no-referrer"
+          onLoad={() => setLoaded(true)}
+          onError={() => {
+            console.error("[PropertyCard] image failed to load", { id, imageUrl });
+            setBroken(true);
+            setLoaded(true);
+          }}
+          style={{ opacity: loaded ? 1 : 0 }}
+        />
+        <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/20" />
+      </motion.div>
+    </>
+  );
+}
 
 type PropertyCardProps = {
   id: string;
@@ -49,7 +97,6 @@ export function PropertyCard({
   priceChange = null,
   priceChangePercent = 0,
 }: PropertyCardProps) {
-  const [imageLoaded, setImageLoaded] = useState(false);
   const [showQuickView, setShowQuickView] = useState(false);
   const [isFavorite, setIsFavorite] = useState(false);
   const { addProperty, isInComparison } = useComparison();
@@ -135,32 +182,15 @@ export function PropertyCard({
             >
               {/* Image Container with Skeleton */}
               <div className="relative h-48 md:h-56 bg-gray-200 overflow-hidden">
-                {/* Skeleton Loader */}
-                {!imageLoaded && <div className="absolute inset-0 skeleton" />}
-
-                {/* Actual Image */}
-                {imageUrl && (
-                  <motion.div
-                    initial={{ scale: 1 }}
-                    whileHover={{ scale: 1.1 }}
-                    transition={{ duration: 0.6, ease: "easeOut" }}
-                    className="absolute inset-0"
-                  >
-                    <Image
-                      src={imageUrl}
-                      alt={title}
-                      fill
-                      className="object-cover"
-                      sizes="(max-width: 768px) 100vw, 33vw"
-                      onLoad={() => setImageLoaded(true)}
-                      style={{ opacity: imageLoaded ? 1 : 0 }}
-                      priority={index < 3}
-                      loading={index < 3 ? "eager" : "lazy"}
-                    />
-                    {/* Gradient Overlay */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/0 to-black/20" />
-                  </motion.div>
-                )}
+                {imageUrl ? (
+                  <PropertyCardHeroImage
+                    key={imageUrl}
+                    id={id}
+                    title={title}
+                    imageUrl={imageUrl}
+                    index={index}
+                  />
+                ) : null}
 
                 {/* Top Badges */}
                 <div className="absolute top-2 md:top-3 left-2 md:left-3 flex gap-1.5 md:gap-2 z-20">

@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
 
 :root {
   --background: #ffffff;
@@ -327,4 +328,9 @@ html {
   .property-card:hover .property-card-image {
     transform: none !important;
   }
+}
+
+.leaflet-container {
+  height: 400px;
+  width: 100%;
 }

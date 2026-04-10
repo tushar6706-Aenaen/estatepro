@@ -78,6 +78,16 @@ export default function AuthPage() {
     return data.role ?? "public";
   };
 
+  const getRoleForRouting = async (userId: string) => {
+    try {
+      return await ensureProfileRow(userId);
+    } catch (profileError) {
+      // Do not block sign-in/signup routing when profile RLS is misconfigured.
+      console.warn("Profile bootstrap failed during auth", profileError);
+      return "public";
+    }
+  };
+
   const handleAuth = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
     setError(null);
@@ -135,7 +145,7 @@ export default function AuthPage() {
         }
 
         if (data.session) {
-          await ensureProfileRow(userId);
+          await getRoleForRouting(userId);
           setNotice("Account created. Let's finish your profile.");
           setPendingEmail(null);
           router.push("/onboarding");
@@ -164,7 +174,7 @@ export default function AuthPage() {
           throw new Error("Sign-in succeeded but no user was returned.");
         }
 
-        const role = await ensureProfileRow(userId);
+        const role = await getRoleForRouting(userId);
 
         const destination =
           redirect ||

@@ -1,7 +1,6 @@
 "use client";
 
 import { createContext, useContext, useState, ReactNode } from "react";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
 type Property = {
@@ -113,15 +112,16 @@ export function ComparisonProvider({ children }: { children: ReactNode }) {
             <div className="mt-4 flex gap-3 overflow-x-auto pb-2 scrollbar-hide">
               {properties.map((property) => (
                 <div key={property.id} className="relative group flex-shrink-0">
-                  <div className="w-20 h-20 rounded-xl bg-white/10 overflow-hidden border-2 border-white/20 transition-all group-hover:border-white/40">
+                  <div className="relative h-20 w-20 overflow-hidden rounded-xl border-2 border-white/20 bg-white/10 transition-all group-hover:border-white/40">
                     {property.imageUrl && (
-                      <Image
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
                         src={property.imageUrl}
                         alt={property.title}
-                        fill
-                        className="object-cover"
-                        sizes="80px"
+                        className="absolute inset-0 h-full w-full object-cover"
                         loading="lazy"
+                        decoding="async"
+                        referrerPolicy="no-referrer"
                       />
                     )}
                   </div>
@@ -180,15 +180,16 @@ export function ComparisonProvider({ children }: { children: ReactNode }) {
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
                   {properties.map((property) => (
                     <div key={property.id} className="space-y-4">
-                      <div className="aspect-video rounded-xl bg-gray-200 overflow-hidden">
+                      <div className="relative aspect-video overflow-hidden rounded-xl bg-gray-200">
                         {property.imageUrl && (
-                          <Image
+                          // eslint-disable-next-line @next/next/no-img-element
+                          <img
                             src={property.imageUrl}
                             alt={property.title}
-                            fill
-                            className="object-cover"
-                            sizes="320px"
+                            className="absolute inset-0 h-full w-full object-cover"
                             loading="lazy"
+                            decoding="async"
+                            referrerPolicy="no-referrer"
                           />
                         )}
                       </div>

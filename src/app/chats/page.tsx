@@ -87,7 +87,7 @@ export default function ChatsPage() {
 
     const loadChats = async () => {
       if (!supabaseReady) {
-        setError("Supabase environment variables are missing in .env.local.");
+        setError("Supabase environment variables are missing in .env or .env.local.");
         setLoading(false);
         return;
       }
@@ -99,7 +99,7 @@ export default function ChatsPage() {
         await supabaseBrowserClient.auth.getUser();
 
       if (authError || !authData.user) {
-        setError("Sign in to view your messages.");
+        setError(authError?.message ?? "Sign in to view your messages.");
         setLoading(false);
         return;
       }
@@ -163,12 +163,13 @@ export default function ChatsPage() {
 
       if (cancelled) return;
 
-      if (propertyResponse.error) {
-        setError(propertyResponse.error.message);
-      }
-
-      if (profileResponse.error) {
-        setError(profileResponse.error.message);
+      // Keep rendering chat rows even if related lookups fail due to partial RLS rules.
+      if (propertyResponse.error || profileResponse.error || messageResponse.error) {
+        console.warn("Some chat metadata failed to load", {
+          propertyError: propertyResponse.error?.message,
+          profileError: profileResponse.error?.message,
+          messageError: messageResponse.error?.message,
+        });
       }
 
       const propertyMap = new Map(

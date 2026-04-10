@@ -1,7 +1,8 @@
-﻿import Link from "next/link";
+import Link from "next/link";
 import { Cormorant_Garamond, Manrope } from "next/font/google";
 
 import { createSupabaseServerClient } from "@/src/lib/supabase/server";
+import { resolveStorageImageUrl } from "@/src/lib/supabase/resolve-storage-image-url";
 import { HomeHeader } from "@/src/components/layout/home-header";
 import { PropertyMap } from "@/src/components/map";
 import {
@@ -11,7 +12,6 @@ import {
   editorialButtonClass,
   editorialPageRootClass,
 } from "@/src/components/ui/editorial";
-import { InquiryForm } from "./inquiry-form";
 import { MessageAgentButton } from "./message-agent-button";
 
 type PropertyDetail = {
@@ -159,7 +159,7 @@ export default async function PropertyDetailPage({
   const hasMapCoordinates = hasCoordinates(typedProperty);
 
   const galleryImages = (typedProperty.property_images ?? [])
-    .map((img) => img.image_url)
+    .map((img) => resolveStorageImageUrl(img.image_url))
     .filter((img): img is string => Boolean(img));
 
   const gallerySlots = Array.from({ length: 5 }, (_, index) => {
@@ -343,9 +343,14 @@ export default async function PropertyDetailPage({
         <section className="mt-4 md:mt-6 grid gap-3 md:gap-4 lg:grid-cols-[2.2fr_1fr]">
           <div className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-zinc-900/10 bg-white shadow-[0_18px_50px_-40px_rgba(0,0,0,0.35)]">
             {gallerySlots[0] ? (
-              <div
-                className="h-56 sm:h-72 w-full bg-cover bg-center md:h-[420px]"
-                style={{ backgroundImage: `url(${gallerySlots[0]})` }}
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={gallerySlots[0]}
+                alt={typedProperty.title}
+                className="h-56 w-full object-cover sm:h-72 md:h-[420px]"
+                loading="eager"
+                decoding="async"
+                referrerPolicy="no-referrer"
               />
             ) : (
               <div className="h-56 sm:h-72 w-full bg-[#e7e2d8] md:h-[420px]" />
@@ -377,9 +382,14 @@ export default async function PropertyDetailPage({
                 className="overflow-hidden rounded-xl md:rounded-2xl border border-zinc-900/10 bg-white shadow-sm"
               >
                 {imageUrl ? (
-                  <div
-                    className="h-28 sm:h-36 w-full bg-cover bg-center md:h-[200px]"
-                    style={{ backgroundImage: `url(${imageUrl})` }}
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={imageUrl}
+                    alt=""
+                    className="h-28 w-full object-cover sm:h-36 md:h-[200px]"
+                    loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
                   />
                 ) : (
                   <div className="flex h-28 sm:h-36 w-full items-center justify-center bg-[#e7e2d8] text-[10px] md:text-xs text-zinc-500 md:h-[200px]">
@@ -628,13 +638,6 @@ export default async function PropertyDetailPage({
                   <MessageAgentButton
                     propertyId={typedProperty.id}
                     agentId={typedProperty.agent_id}
-                  />
-                </div>
-
-                <div className="mt-5 border-t border-zinc-900/10 pt-5">
-                  <InquiryForm
-                    propertyId={typedProperty.id}
-                    propertyTitle={typedProperty.title}
                   />
                 </div>
               </div>

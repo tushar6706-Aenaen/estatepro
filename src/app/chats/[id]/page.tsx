@@ -93,7 +93,7 @@ export default function ChatThreadPage() {
 
     const loadThread = async () => {
       if (!supabaseReady) {
-        setError("Supabase environment variables are missing in .env.local.");
+        setError("Supabase environment variables are missing in .env or .env.local.");
         setLoading(false);
         return;
       }
@@ -108,7 +108,7 @@ export default function ChatThreadPage() {
         await supabaseBrowserClient.auth.getUser();
 
       if (authError || !authData.user) {
-        setError("Sign in to view this chat.");
+        setError(authError?.message ?? "Sign in to view this chat.");
         setLoading(false);
         return;
       }
@@ -165,16 +165,16 @@ export default function ChatThreadPage() {
 
       if (cancelled) return;
 
-      if (propertyResponse.error) {
-        setError(propertyResponse.error.message);
-      }
-
       if (messagesResponse.error) {
         setError(messagesResponse.error.message);
       }
 
-      if (profileResponse.error) {
-        setError(profileResponse.error.message);
+      // Property/profile lookups are non-blocking for the thread itself.
+      if (propertyResponse.error || profileResponse.error) {
+        console.warn("Some thread metadata failed to load", {
+          propertyError: propertyResponse.error?.message,
+          profileError: profileResponse.error?.message,
+        });
       }
 
       setProperty(propertyResponse.data ?? null);

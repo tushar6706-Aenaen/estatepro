@@ -17,6 +17,7 @@ import {
   editorialPageRootClass,
 } from "@/src/components/ui/editorial";
 import { createSupabaseServerClient } from "@/src/lib/supabase/server";
+import { resolveStorageImageUrl } from "@/src/lib/supabase/resolve-storage-image-url";
 
 type SearchParams = {
   city?: string;
@@ -57,10 +58,11 @@ function formatCurrency(value: number | string) {
 }
 
 function getPrimaryImage(listing: PropertyCard) {
-  return (
-    listing.property_images?.find((img) => img.is_primary)?.image_url ||
-    listing.property_images?.[0]?.image_url
-  );
+  const raw =
+    listing.property_images?.find((img) => img.is_primary)?.image_url ??
+    listing.property_images?.[0]?.image_url;
+
+  return resolveStorageImageUrl(raw) ?? undefined;
 }
 
 function titleCase(value: string) {

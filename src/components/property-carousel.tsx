@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { motion, AnimatePresence, type PanInfo } from "framer-motion";
-import Image from "next/image";
 
 type PropertyCardMobileProps = {
   properties: Array<{
@@ -58,13 +57,20 @@ export function PropertyCardCarousel({ properties }: PropertyCardMobileProps) {
               {/* Image */}
               <div className="relative h-56 bg-gradient-to-br from-gray-200 to-gray-300">
                 {properties[currentIndex].imageUrl && (
-                  <Image
-                    src={properties[currentIndex].imageUrl}
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    src={properties[currentIndex].imageUrl!}
                     alt={properties[currentIndex].title}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 80vw"
+                    className="absolute inset-0 h-full w-full object-cover"
                     loading="lazy"
+                    decoding="async"
+                    referrerPolicy="no-referrer"
+                    onError={() =>
+                      console.error("[PropertyCardCarousel] image failed", {
+                        id: properties[currentIndex].id,
+                        imageUrl: properties[currentIndex].imageUrl,
+                      })
+                    }
                   />
                 )}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-transparent to-black/20" />
