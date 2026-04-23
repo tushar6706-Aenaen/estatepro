@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { SearchWithAutocomplete } from "./search-autocomplete";
 import { RippleButton } from "./ui/ripple-button";
 import { motion } from "framer-motion";
+import { supabaseBrowserClient } from "@/src/lib/supabase/client";
 
 // --- Types ---
 type Option = {
@@ -128,27 +129,61 @@ export function PropertyFilters() {
   const [priceMax, setPriceMax] = useState(searchParams.get("priceMax") ?? "");
   const [resultCount, setResultCount] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const debounceRef = useRef<number | null>(null);
 
-  // Fetch result count in real-time
+  // Fetch result count in real-time using current filter values.
   useEffect(() => {
     const fetchCount = async () => {
       setIsLoading(true);
-      const params = new URLSearchParams();
-      if (city) params.set("city", city);
-      if (type) params.set("type", type);
-      if (priceMin) params.set("priceMin", priceMin);
-      if (priceMax) params.set("priceMax", priceMax);
-      
-      // Simulate API call (replace with actual API)
-      setTimeout(() => {
-        // Mock result count based on filters
-        const mockCount = Math.floor(Math.random() * 50) + 10;
-        setResultCount(mockCount);
+      let query = supabaseBrowserClient
+        .from("properties")
+        .select("id", { count: "exact", head: true })
+        .eq("status", "approved");
+
+      if (city) {
+        query = query.ilike("city", `%${city}%`);
+      }
+      if (type) {
+        query = query.eq("property_type", type);
+      }
+      if (priceMin) {
+        const min = Number(priceMin);
+        if (!Number.isNaN(min)) {
+          query = query.gte("price", min);
+        }
+      }
+      if (priceMax) {
+        const max = Number(priceMax);
+        if (!Number.isNaN(max)) {
+          query = query.lte("price", max);
+        }
+      }
+
+      try {
+        const { count, error } = await query;
+        if (error) {
+          setResultCount(null);
+          return;
+        }
+        setResultCount(count ?? 0);
+      } finally {
         setIsLoading(false);
-      }, 300);
+      }
     };
 
-    fetchCount();
+    if (debounceRef.current) {
+      window.clearTimeout(debounceRef.current);
+    }
+
+    debounceRef.current = window.setTimeout(() => {
+      fetchCount();
+    }, 300);
+
+    return () => {
+      if (debounceRef.current) {
+        window.clearTimeout(debounceRef.current);
+      }
+    };
   }, [city, type, priceMin, priceMax]);
 
   const handleApply = () => {

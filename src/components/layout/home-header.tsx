@@ -16,7 +16,6 @@ import {
 
 const navLinks = [
   { label: "Buy", value: "sale", href: "/?listingType=sale" },
-  { label: "Rent", value: "rent", href: "/?listingType=rent" },
   { label: "Sell", value: "sell", href: "/onboarding?redirect=/" },
 ];
 
@@ -178,7 +177,7 @@ export function HomeHeader() {
 
           <nav className="ml-auto hidden items-center gap-1.5 text-sm lg:flex">
             {navLinks.map((link) => {
-              const isListingLink = link.value === "sale" || link.value === "rent";
+              const isListingLink = link.value === "sale";
               const isActive = isHomeRoute
                 ? link.value === activeListingType ||
                   (link.value === "sale" && !searchParams.get("listingType"))
@@ -347,7 +346,7 @@ export function HomeHeader() {
             {/* Navigation Links */}
             <nav className="space-y-1">
               {navLinks.map((link) => {
-                const isListingLink = link.value === "sale" || link.value === "rent";
+                const isListingLink = link.value === "sale";
                 const isActive = isHomeRoute
                   ? link.value === activeListingType ||
                     (link.value === "sale" && !searchParams.get("listingType"))

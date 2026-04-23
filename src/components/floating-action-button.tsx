@@ -4,7 +4,6 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import { RippleButton } from "./ui/ripple-button";
-import { useToast } from "./ui/toast-provider";
 
 type FABAction = {
   icon: React.ReactNode;
@@ -19,7 +18,6 @@ type FloatingActionButtonProps = {
 
 export function FloatingActionButton({ actions }: FloatingActionButtonProps) {
   const [isOpen, setIsOpen] = useState(false);
-  const { showToast } = useToast();
   const router = useRouter();
 
   const defaultActions: FABAction[] = [
@@ -48,14 +46,7 @@ export function FloatingActionButton({ actions }: FloatingActionButtonProps) {
       ),
       label: "Favorites",
       onClick: () => {
-        // Store current favorites to localStorage for now
-        const favorites = localStorage.getItem('favorites');
-        if (!favorites || JSON.parse(favorites).length === 0) {
-          showToast("No favorites yet. Add properties to favorites!", "info");
-        } else {
-          showToast(`You have ${JSON.parse(favorites).length} favorites`, "success");
-          // Could navigate to a favorites page: router.push('/favorites');
-        }
+        router.push("/favorites");
       },
       color: "bg-red-500 hover:bg-red-600",
     },

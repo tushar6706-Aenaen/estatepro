@@ -17,6 +17,7 @@ type PropertyRow = {
   id: string;
   title: string | null;
   city: string | null;
+  agent_id?: string | null;
   price: number | string | null;
   property_type: string | null;
   status: ListingStatus;
@@ -43,10 +44,21 @@ type InquiryWithProperty = InquiryRow & {
   property?: { title: string | null; city: string | null };
 };
 
+type ManagedUserRole = "public" | "agent" | "admin" | null;
+
+type ManagedUser = {
+  id: string;
+  full_name: string | null;
+  role: ManagedUserRole;
+  phone: string | null;
+  created_at?: string | null;
+};
+
 const propertySelect =
-  "id,title,city,price,property_type,status,bedrooms,bathrooms,area_sqft,description,agent_phone,created_at,review_feedback,property_images(image_url,is_primary)";
+  "id,title,city,agent_id,price,property_type,status,bedrooms,bathrooms,area_sqft,description,agent_phone,created_at,review_feedback,property_images(image_url,is_primary)";
 
 const inquirySelect = "id,property_id,name,email,message,created_at";
+const managedUsersSelect = "id,full_name,role,phone,created_at";
 
 export function AdminDashboard() {
   const supabaseReady = useMemo(() => {
@@ -57,7 +69,9 @@ export function AdminDashboard() {
   }, []);
 
   const [pendingListings, setPendingListings] = useState<PropertyRow[]>([]);
+  const [allListings, setAllListings] = useState<PropertyRow[]>([]);
   const [inquiries, setInquiries] = useState<InquiryWithProperty[]>([]);
+  const [managedUsers, setManagedUsers] = useState<ManagedUser[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
   const [loadError, setLoadError] = useState<string | null>(null);
@@ -65,6 +79,10 @@ export function AdminDashboard() {
   const [feedbackById, setFeedbackById] = useState<Record<string, string>>({});
   const [decisionErrors, setDecisionErrors] = useState<Record<string, string>>({});
   const [decisionLoading, setDecisionLoading] = useState<Record<string, boolean>>({});
+  const [userActionLoading, setUserActionLoading] = useState<Record<string, boolean>>({});
+  const [userActionErrors, setUserActionErrors] = useState<Record<string, string>>({});
+  const [listingActionLoading, setListingActionLoading] = useState<Record<string, boolean>>({});
+  const [listingActionErrors, setListingActionErrors] = useState<Record<string, string>>({});
   const [toast, setToast] = useState<{ message: string; variant: ToastVariant } | null>(
     null,
   );
@@ -99,7 +117,8 @@ export function AdminDashboard() {
         return;
       }
 
-      const [pendingResponse, inquiryResponse] = await Promise.all([
+      const [pendingResponse, inquiryResponse, managedUsersResponse, allListingsResponse] =
+        await Promise.all([
         supabaseBrowserClient
           .from("properties")
           .select(propertySelect)
@@ -109,7 +128,17 @@ export function AdminDashboard() {
           .from("inquiries")
           .select(inquirySelect)
           .order("created_at", { ascending: false }),
-      ]);
+        supabaseBrowserClient
+          .from("profiles")
+          .select(managedUsersSelect)
+          .in("role", ["public", "agent"])
+          .order("created_at", { ascending: false }),
+        supabaseBrowserClient
+          .from("properties")
+          .select("id,title,city,agent_id,price,property_type,status,created_at")
+          .order("created_at", { ascending: false })
+          .limit(40),
+        ]);
 
       if (pendingResponse.error) {
         setLoadError(pendingResponse.error.message);
@@ -172,6 +201,18 @@ export function AdminDashboard() {
         );
       }
 
+      if (managedUsersResponse.error) {
+        setLoadError(managedUsersResponse.error.message);
+      } else {
+        setManagedUsers((managedUsersResponse.data ?? []) as ManagedUser[]);
+      }
+
+      if (allListingsResponse.error) {
+        setLoadError(allListingsResponse.error.message);
+      } else {
+        setAllListings((allListingsResponse.data ?? []) as PropertyRow[]);
+      }
+
       setLoading(false);
       setRefreshing(false);
     },
@@ -219,6 +260,136 @@ export function AdminDashboard() {
       status === "approved" ? "Listing approved." : "Listing rejected.",
       status === "approved" ? "success" : "info",
     );
+  };
+
+  const handleDeleteManagedUser = async (user: ManagedUser) => {
+    if (!user.id) return;
+    const confirmDelete = window.confirm(
+      `Delete this ${user.role ?? "user"} profile and related records? This action cannot be undone.`,
+    );
+    if (!confirmDelete) return;
+
+    setUserActionErrors((prev) => ({ ...prev, [user.id]: "" }));
+    setUserActionLoading((prev) => ({ ...prev, [user.id]: true }));
+
+    if (user.role === "agent") {
+      const { error: propertiesError } = await supabaseBrowserClient
+        .from("properties")
+        .delete()
+        .eq("agent_id", user.id);
+      if (propertiesError) {
+        setUserActionErrors((prev) => ({ ...prev, [user.id]: propertiesError.message }));
+        setUserActionLoading((prev) => ({ ...prev, [user.id]: false }));
+        showToast("Could not remove agent listings.", "error");
+        return;
+      }
+    }
+
+    const { error: inquiriesError } = await supabaseBrowserClient
+      .from("inquiries")
+      .delete()
+      .eq("user_id", user.id);
+    if (inquiriesError) {
+      setUserActionErrors((prev) => ({ ...prev, [user.id]: inquiriesError.message }));
+      setUserActionLoading((prev) => ({ ...prev, [user.id]: false }));
+      showToast("Could not remove user inquiries.", "error");
+      return;
+    }
+
+    const { error: profileError } = await supabaseBrowserClient
+      .from("profiles")
+      .delete()
+      .eq("id", user.id);
+    if (profileError) {
+      setUserActionErrors((prev) => ({ ...prev, [user.id]: profileError.message }));
+      setUserActionLoading((prev) => ({ ...prev, [user.id]: false }));
+      showToast("Could not remove profile.", "error");
+      return;
+    }
+
+    setManagedUsers((prev) => prev.filter((item) => item.id !== user.id));
+    setUserActionLoading((prev) => ({ ...prev, [user.id]: false }));
+    showToast("User profile deleted.", "success");
+  };
+
+  const handleUpdateUserRole = async (user: ManagedUser, role: Exclude<ManagedUserRole, null>) => {
+    if (!user.id) return;
+    setUserActionErrors((prev) => ({ ...prev, [user.id]: "" }));
+    setUserActionLoading((prev) => ({ ...prev, [user.id]: true }));
+
+    const { error } = await supabaseBrowserClient
+      .from("profiles")
+      .update({ role })
+      .eq("id", user.id);
+
+    if (error) {
+      setUserActionErrors((prev) => ({ ...prev, [user.id]: error.message }));
+      setUserActionLoading((prev) => ({ ...prev, [user.id]: false }));
+      showToast("Could not update user role.", "error");
+      return;
+    }
+
+    setManagedUsers((prev) =>
+      prev.map((item) => (item.id === user.id ? { ...item, role } : item)),
+    );
+    setUserActionLoading((prev) => ({ ...prev, [user.id]: false }));
+    showToast(`Role updated to ${role}.`, "success");
+  };
+
+  const handleListingStatusUpdate = async (
+    listingId: string,
+    status: Exclude<ListingStatus, null>,
+  ) => {
+    setListingActionErrors((prev) => ({ ...prev, [listingId]: "" }));
+    setListingActionLoading((prev) => ({ ...prev, [listingId]: true }));
+
+    const { error } = await supabaseBrowserClient
+      .from("properties")
+      .update({ status })
+      .eq("id", listingId);
+
+    if (error) {
+      setListingActionErrors((prev) => ({ ...prev, [listingId]: error.message }));
+      setListingActionLoading((prev) => ({ ...prev, [listingId]: false }));
+      showToast("Could not update listing status.", "error");
+      return;
+    }
+
+    setAllListings((prev) =>
+      prev.map((listing) => (listing.id === listingId ? { ...listing, status } : listing)),
+    );
+    setPendingListings((prev) =>
+      status === "approved" ? prev.filter((listing) => listing.id !== listingId) : prev,
+    );
+    setListingActionLoading((prev) => ({ ...prev, [listingId]: false }));
+    showToast(`Listing marked ${status}.`, "success");
+  };
+
+  const handleDeleteListing = async (listingId: string) => {
+    const confirmDelete = window.confirm(
+      "Delete this listing permanently? This action cannot be undone.",
+    );
+    if (!confirmDelete) return;
+
+    setListingActionErrors((prev) => ({ ...prev, [listingId]: "" }));
+    setListingActionLoading((prev) => ({ ...prev, [listingId]: true }));
+
+    const { error } = await supabaseBrowserClient
+      .from("properties")
+      .delete()
+      .eq("id", listingId);
+
+    if (error) {
+      setListingActionErrors((prev) => ({ ...prev, [listingId]: error.message }));
+      setListingActionLoading((prev) => ({ ...prev, [listingId]: false }));
+      showToast("Could not delete listing.", "error");
+      return;
+    }
+
+    setAllListings((prev) => prev.filter((listing) => listing.id !== listingId));
+    setPendingListings((prev) => prev.filter((listing) => listing.id !== listingId));
+    setListingActionLoading((prev) => ({ ...prev, [listingId]: false }));
+    showToast("Listing deleted.", "success");
   };
 
   const formatPrice = (price: PropertyRow["price"]) => {
@@ -408,6 +579,163 @@ export function AdminDashboard() {
                     </button>
                   </div>
                 </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      <section className="rounded-2xl md:rounded-3xl border border-gray-300 bg-gray-100 p-4 md:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 md:gap-4">
+          <div>
+            <div className="text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.28em] text-gray-600">
+              Access control
+            </div>
+            <h2 className="mt-1 md:mt-2 text-xl md:text-2xl font-semibold text-gray-900">
+              User and agent management
+            </h2>
+            <p className="mt-1 md:mt-2 text-xs md:text-sm text-gray-700">
+              Remove public or agent profiles and related data from the marketplace.
+            </p>
+          </div>
+          <div className="text-[10px] md:text-xs text-gray-600">{managedUsers.length} profiles</div>
+        </div>
+
+        {managedUsers.length === 0 && (
+          <div className="mt-3 md:mt-4 rounded-xl md:rounded-2xl border border-gray-300 bg-gray-50 px-3 md:px-4 py-3 md:py-4 text-xs md:text-sm text-gray-700">
+            No managed profiles found.
+          </div>
+        )}
+
+        <div className="mt-4 md:mt-6 grid gap-3 md:gap-4">
+          {managedUsers.map((user) => (
+            <div
+              key={user.id}
+              className="rounded-xl md:rounded-2xl border border-gray-300 bg-white px-3 md:px-4 py-3 md:py-4"
+            >
+              <div className="flex flex-wrap items-start justify-between gap-2 md:gap-3">
+                <div>
+                  <div className="text-xs md:text-sm font-semibold text-gray-900">
+                    {user.full_name?.trim() || "Unnamed user"}
+                  </div>
+                  <div className="mt-1 text-[10px] md:text-xs text-gray-600">
+                    Role: {user.role ?? "public"} {user.phone ? `· ${user.phone}` : ""}
+                  </div>
+                  <div className="mt-1 text-[10px] md:text-xs text-gray-500">
+                    Joined: {formatDate(user.created_at)} · ID: {user.id}
+                  </div>
+                </div>
+                <div className="flex flex-wrap gap-2">
+                  {user.role !== "agent" && (
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateUserRole(user, "agent")}
+                      disabled={Boolean(userActionLoading[user.id])}
+                      className="rounded-full border border-emerald-300/40 bg-emerald-500/10 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-semibold text-emerald-800 disabled:opacity-70"
+                    >
+                      Make agent
+                    </button>
+                  )}
+                  {user.role !== "public" && (
+                    <button
+                      type="button"
+                      onClick={() => handleUpdateUserRole(user, "public")}
+                      disabled={Boolean(userActionLoading[user.id])}
+                      className="rounded-full border border-gray-300 bg-gray-50 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-semibold text-gray-700 disabled:opacity-70"
+                    >
+                      Set public
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={() => handleDeleteManagedUser(user)}
+                    disabled={Boolean(userActionLoading[user.id])}
+                    className="rounded-full border border-red-300/40 bg-red-500/10 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-semibold text-red-800 disabled:opacity-70"
+                  >
+                    {userActionLoading[user.id] ? "Working..." : `Delete ${user.role ?? "user"}`}
+                  </button>
+                </div>
+              </div>
+              {userActionErrors[user.id] && (
+                <div className="mt-2 rounded-lg md:rounded-xl border border-red-300/30 bg-red-500/10 px-2 md:px-3 py-1.5 md:py-2 text-[10px] md:text-xs text-red-200">
+                  {userActionErrors[user.id]}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </section>
+
+      <section className="rounded-2xl md:rounded-3xl border border-gray-300 bg-gray-100 p-4 md:p-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 md:gap-4">
+          <div>
+            <div className="text-[10px] md:text-xs uppercase tracking-[0.2em] md:tracking-[0.28em] text-gray-600">
+              Marketplace control
+            </div>
+            <h2 className="mt-1 md:mt-2 text-xl md:text-2xl font-semibold text-gray-900">
+              Listing moderation
+            </h2>
+            <p className="mt-1 md:mt-2 text-xs md:text-sm text-gray-700">
+              Quickly approve, reject, or delete listings from one place.
+            </p>
+          </div>
+          <div className="text-[10px] md:text-xs text-gray-600">{allListings.length} recent listings</div>
+        </div>
+
+        <div className="mt-4 md:mt-6 grid gap-3 md:gap-4">
+          {allListings.map((listing) => {
+            const listingBusy = Boolean(listingActionLoading[listing.id]);
+            const listingError = listingActionErrors[listing.id];
+            return (
+              <div
+                key={listing.id}
+                className="rounded-xl md:rounded-2xl border border-gray-300 bg-white px-3 md:px-4 py-3 md:py-4"
+              >
+                <div className="flex flex-wrap items-start justify-between gap-3">
+                  <div>
+                    <div className="text-xs md:text-sm font-semibold text-gray-900">
+                      {listing.title ?? "Untitled listing"}
+                    </div>
+                    <div className="mt-1 text-[10px] md:text-xs text-gray-600">
+                      {listing.city ?? "Unknown city"} · {formatPrice(listing.price)} · Status:{" "}
+                      {listing.status ?? "unknown"}
+                    </div>
+                    <div className="mt-1 text-[10px] md:text-xs text-gray-500">
+                      Agent: {listing.agent_id ?? "Unknown"} · Created: {formatDate(listing.created_at)}
+                    </div>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
+                    <button
+                      type="button"
+                      onClick={() => handleListingStatusUpdate(listing.id, "approved")}
+                      disabled={listingBusy}
+                      className="rounded-full bg-emerald-500 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-semibold text-white disabled:opacity-70"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleListingStatusUpdate(listing.id, "rejected")}
+                      disabled={listingBusy}
+                      className="rounded-full border border-rose-300/40 bg-rose-500/10 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-semibold text-rose-800 disabled:opacity-70"
+                    >
+                      Reject
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => handleDeleteListing(listing.id)}
+                      disabled={listingBusy}
+                      className="rounded-full border border-red-300/40 bg-red-500/10 px-3 md:px-4 py-1.5 md:py-2 text-[10px] md:text-xs font-semibold text-red-800 disabled:opacity-70"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+                {listingError && (
+                  <div className="mt-2 rounded-lg md:rounded-xl border border-red-300/30 bg-red-500/10 px-2 md:px-3 py-1.5 md:py-2 text-[10px] md:text-xs text-red-800">
+                    {listingError}
+                  </div>
+                )}
               </div>
             );
           })}

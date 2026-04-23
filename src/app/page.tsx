@@ -89,9 +89,9 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
   let properties: PropertyCard[] = [];
   let loadError: string | null = null;
   let stats = {
-    properties: 0,
-    clients: 0,
-    agents: 0,
+    properties: null as number | null,
+    clients: null as number | null,
+    agents: null as number | null,
   };
 
   // --- 1. Database Fetching Logic (Unchanged) ---
@@ -99,68 +99,54 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
     loadError = "Supabase environment variables are missing. Add them to .env.local.";
   } else {
     const supabase = createSupabaseServerClient();
-
-    // Fetch statistics
-    try {
-      // Count total approved properties
-      const { count: propertiesCount } = await supabase
-        .from("properties")
-        .select("*", { count: "exact", head: true })
-        .eq("status", "approved");
-
-      // Count users with agent role
-      const { count: agentsCount } = await supabase
-        .from("profiles")
-        .select("*", { count: "exact", head: true })
-        .eq("role", "agent");
-
-      // Count unique inquiries (as proxy for happy clients)
-      const { count: clientsCount } = await supabase
-        .from("inquiries")
-        .select("user_id", { count: "exact", head: true });
-
-      stats = {
-        properties: propertiesCount ?? 0,
-        agents: agentsCount ?? 0,
-        clients: clientsCount ?? 0,
-      };
-    } catch (error) {
-      console.error("Error fetching stats:", error);
-    }
-
-    let query = supabase
+    let listingsQuery = supabase
       .from("properties")
       .select(
-        "id,title,city,price,property_type,bedrooms,bathrooms,area_sqft,latitude,longitude,status,property_images(image_url,is_primary)",
+        "id,title,city,price,property_type,bedrooms,bathrooms,area_sqft,latitude,longitude,property_images(image_url,is_primary)",
       )
       .eq("status", "approved");
 
     if (resolvedParams.city) {
-      query = query.ilike("city", `%${resolvedParams.city}%`);
+      listingsQuery = listingsQuery.ilike("city", `%${resolvedParams.city}%`);
     }
     if (resolvedParams.type) {
-      query = query.eq("property_type", resolvedParams.type);
+      listingsQuery = listingsQuery.eq("property_type", resolvedParams.type);
     }
     if (resolvedParams.priceMin) {
       const min = Number(resolvedParams.priceMin);
       if (!Number.isNaN(min)) {
-        query = query.gte("price", min);
+        listingsQuery = listingsQuery.gte("price", min);
       }
     }
     if (resolvedParams.priceMax) {
       const max = Number(resolvedParams.priceMax);
       if (!Number.isNaN(max)) {
-        query = query.lte("price", max);
+        listingsQuery = listingsQuery.lte("price", max);
       }
     }
 
-    query = isRentView
-      ? query.order("price", { ascending: true })
-      : query.order("created_at", { ascending: false });
+    listingsQuery = isRentView
+      ? listingsQuery.order("price", { ascending: true })
+      : listingsQuery.order("created_at", { ascending: false });
 
-    query = query.limit(24);
+    listingsQuery = listingsQuery.limit(24);
 
-    const { data, error } = await query;
+    // Run independent requests in parallel for faster home page response.
+    const [dataResponse, propertiesCountResponse, agentsCountResponse, clientsCountResponse] =
+      await Promise.all([
+        listingsQuery,
+        supabase
+          .from("properties")
+          .select("id", { count: "exact", head: true })
+          .eq("status", "approved"),
+        supabase
+          .from("profiles")
+          .select("id", { count: "exact", head: true })
+          .eq("role", "agent"),
+        supabase.from("inquiries").select("id", { count: "exact", head: true }),
+      ]);
+
+    const { data, error } = dataResponse;
     if (error) {
       loadError = error.message;
     } else if (data) {
@@ -173,6 +159,12 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
             : "For Sale",
       }));
     }
+
+    stats = {
+      properties: propertiesCountResponse.count ?? null,
+      agents: agentsCountResponse.count ?? null,
+      clients: clientsCountResponse.count ?? null,
+    };
   }
 
   const priceValues = properties
@@ -519,7 +511,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                     Homepage shows the newest 24 approved listings.
                   </p>
                 </div>
-                <button
+                <Link
+                  href="/properties"
                   className={editorialButtonClass({
                     tone: "secondary",
                     className:
@@ -527,7 +520,7 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                   })}
                 >
                   Load More Properties
-                </button>
+                </Link>
               </EditorialCard>
             </div>
           </section>
@@ -537,8 +530,8 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
         </main>
 
         <footer className="mt-6 border-t border-zinc-900/10 bg-[#141312] text-[#efe7d9] md:mt-8">
-          <div className="mx-auto flex w-full max-w-7xl flex-col gap-5 px-4 py-8 md:flex-row md:items-center md:justify-between md:px-6">
-            <div>
+          <div className="mx-auto grid w-full max-w-7xl gap-8 px-4 py-10 md:grid-cols-6 md:px-6">
+            <div className="md:col-span-2">
               <div className="inline-flex items-center gap-3">
                 <span className="inline-flex h-9 w-9 items-center justify-center rounded-xl border border-white/15 bg-white/5 text-sm font-semibold">
                   LE
@@ -548,22 +541,74 @@ export default async function Home({ searchParams }: { searchParams: Promise<Sea
                   <p className="text-xs text-[#cabfae]">Map-first property discovery</p>
                 </div>
               </div>
-              <p className="mt-3 text-sm text-[#d6ccbc]">
-                Curated listings, cleaner filters, and faster shortlisting.
+              <p className="mt-3 max-w-xl text-sm leading-6 text-[#d6ccbc]">
+                Discover verified listings, compare properties, connect with agents instantly,
+                and track your real estate journey through modern tools built for buyers and sellers.
               </p>
+              <div className="mt-4 flex flex-wrap gap-2 text-xs">
+                <EditorialPill tone="soft">24/7 listings</EditorialPill>
+                <EditorialPill tone="soft">Map-enabled search</EditorialPill>
+                <EditorialPill tone="soft">Instant messaging</EditorialPill>
+              </div>
+              <div className="mt-5 grid grid-cols-3 gap-3 text-center text-xs">
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-2 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.12em] text-[#bfae97]">Listings</p>
+                  <p className="mt-1 text-base font-semibold text-white">{stats.properties}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-2 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.12em] text-[#bfae97]">Agents</p>
+                  <p className="mt-1 text-base font-semibold text-white">{stats.agents}</p>
+                </div>
+                <div className="rounded-xl border border-white/10 bg-white/[0.03] px-2 py-3">
+                  <p className="text-[10px] uppercase tracking-[0.12em] text-[#bfae97]">Client Leads</p>
+                  <p className="mt-1 text-base font-semibold text-white">{stats.clients}</p>
+                </div>
+              </div>
             </div>
 
-            <div className="flex flex-wrap items-center gap-4 text-sm text-[#e8dece]">
-              <a className="transition hover:text-white" href="#">About Us</a>
-              <a className="transition hover:text-white" href="#">For Agents</a>
-              <a className="transition hover:text-white" href="#">Support</a>
-              <a className="transition hover:text-white" href="#">Privacy</a>
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#cabfae]">Quick Links</p>
+              <div className="mt-3 grid gap-2 text-sm text-[#e8dece]">
+                <Link className="transition hover:text-white" href="/">Home</Link>
+                <Link className="transition hover:text-white" href="/chats">Messages</Link>
+                <Link className="transition hover:text-white" href="/onboarding">Become an Agent</Link>
+                <Link className="transition hover:text-white" href="/auth?mode=signin">Sign In</Link>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#cabfae]">Marketplace</p>
+              <div className="mt-3 grid gap-2 text-sm text-[#e8dece]">
+                <Link className="transition hover:text-white" href="/?listingType=sale">Browse homes</Link>
+                <Link className="transition hover:text-white" href="/onboarding?redirect=/">List property</Link>
+                <Link className="transition hover:text-white" href="/admin">Admin tools</Link>
+                <Link className="transition hover:text-white" href="/agent">Agent dashboard</Link>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#cabfae]">Contact</p>
+              <div className="mt-3 grid gap-2 text-sm text-[#e8dece]">
+                <p>support@luxestate.com</p>
+                <p>+91 90000 12345</p>
+                <p>Mumbai, India</p>
+                <p className="text-xs text-[#bcae97]">Mon - Sat | 9:00 AM - 7:00 PM</p>
+              </div>
+            </div>
+
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#cabfae]">Trust & Legal</p>
+              <div className="mt-3 grid gap-2 text-sm text-[#e8dece]">
+                <Link className="transition hover:text-white" href="/auth?mode=signup">Create account</Link>
+                <Link className="transition hover:text-white" href="/chats">Secure conversations</Link>
+                <p className="text-xs text-[#bcae97]">Verified listings through admin review queue.</p>
+              </div>
             </div>
           </div>
           <div className="border-t border-white/10">
             <div className="mx-auto flex w-full max-w-7xl flex-col gap-2 px-4 py-4 text-xs text-[#bcae97] md:flex-row md:items-center md:justify-between md:px-6">
               <span>(c) 2026 LuxEstate Inc.</span>
-              <span>Homepage redesign: editorial shell + market pulse + map toggle listings.</span>
+              <span>Editorial shell + market pulse + map toggle listings.</span>
             </div>
           </div>
         </footer>

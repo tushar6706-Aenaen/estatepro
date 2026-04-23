@@ -66,6 +66,81 @@ function formatCoordinate(value: number | undefined) {
   return value.toFixed(5);
 }
 
+function getSnapshotIcon(label: string) {
+  switch (label) {
+    case "Property Type":
+      return (
+        <>
+          <path d="M3 11l9-7 9 7" />
+          <path d="M5 10v10h14V10" />
+          <path d="M10 20v-6h4v6" />
+        </>
+      );
+    case "Bedrooms":
+      return (
+        <>
+          <path d="M4 12h16" />
+          <path d="M7 12V8a2 2 0 0 1 2-2h6a2 2 0 0 1 2 2v4" />
+          <path d="M5 20v-6h14v6" />
+        </>
+      );
+    case "Bathrooms":
+      return (
+        <>
+          <path d="M7 7h10" />
+          <path d="M6 7h12l1 5H5l1-5z" />
+          <path d="M6 12v6a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2v-6" />
+        </>
+      );
+    case "Area":
+      return (
+        <>
+          <rect x="4" y="4" width="16" height="16" rx="2" />
+          <path d="M4 12h16" />
+          <path d="M12 4v16" />
+        </>
+      );
+    case "Photos Uploaded":
+      return (
+        <>
+          <rect x="3" y="5" width="18" height="14" rx="2" />
+          <circle cx="9" cy="10" r="1.5" />
+          <path d="m21 15-4.5-4.5L11 16l-2.5-2.5L3 19" />
+        </>
+      );
+    case "Map Coordinates":
+      return (
+        <>
+          <path d="M12 21s-6-4.4-6-10a6 6 0 1 1 12 0c0 5.6-6 10-6 10z" />
+          <circle cx="12" cy="11" r="2" />
+        </>
+      );
+    case "Price / sqft":
+      return (
+        <>
+          <path d="M12 3v18" />
+          <path d="M17 7.5c0-1.9-2.2-3.5-5-3.5s-5 1.6-5 3.5 2.2 3.5 5 3.5 5 1.6 5 3.5-2.2 3.5-5 3.5-5-1.6-5-3.5" />
+        </>
+      );
+    case "City":
+      return (
+        <>
+          <path d="M3 21h18" />
+          <path d="M6 21V9l6-4 6 4v12" />
+          <path d="M10 21v-6h4v6" />
+        </>
+      );
+    default:
+      return (
+        <>
+          <circle cx="12" cy="12" r="9" />
+          <path d="M12 8v8" />
+          <path d="M8 12h8" />
+        </>
+      );
+  }
+}
+
 export default async function PropertyDetailPage({
   params,
 }: {
@@ -341,19 +416,19 @@ export default async function PropertyDetailPage({
           </EditorialCard>
 
         <section className="mt-4 md:mt-6 grid gap-3 md:gap-4 lg:grid-cols-[2.2fr_1fr]">
-          <div className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-zinc-900/10 bg-white shadow-[0_18px_50px_-40px_rgba(0,0,0,0.35)]">
+          <div className="relative overflow-hidden rounded-2xl md:rounded-3xl border border-zinc-900/10 bg-zinc-100 shadow-[0_18px_50px_-40px_rgba(0,0,0,0.35)]">
             {gallerySlots[0] ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img
                 src={gallerySlots[0]}
                 alt={typedProperty.title}
-                className="h-56 w-full object-cover sm:h-72 md:h-[420px]"
+                className="aspect-square w-full max-h-[70vh] object-contain object-center md:max-h-[78vh]"
                 loading="eager"
                 decoding="async"
                 referrerPolicy="no-referrer"
               />
             ) : (
-              <div className="h-56 sm:h-72 w-full bg-[#e7e2d8] md:h-[420px]" />
+              <div className="aspect-square w-full max-h-[70vh] bg-[#e7e2d8] md:max-h-[78vh]" />
             )}
             <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/10 to-transparent" />
             <div className="absolute left-3 top-3 md:left-4 md:top-4 flex flex-wrap gap-2">
@@ -386,13 +461,13 @@ export default async function PropertyDetailPage({
                   <img
                     src={imageUrl}
                     alt=""
-                    className="h-28 w-full object-cover sm:h-36 md:h-[200px]"
+                    className="aspect-square w-full bg-zinc-100 object-contain object-center"
                     loading="lazy"
                     decoding="async"
                     referrerPolicy="no-referrer"
                   />
                 ) : (
-                  <div className="flex h-28 sm:h-36 w-full items-center justify-center bg-[#e7e2d8] text-[10px] md:text-xs text-zinc-500 md:h-[200px]">
+                  <div className="flex aspect-square w-full items-center justify-center bg-[#e7e2d8] text-[10px] md:text-xs text-zinc-500">
                     Empty slot
                   </div>
                 )}
@@ -505,8 +580,7 @@ export default async function PropertyDetailPage({
                         strokeLinecap="round"
                         strokeLinejoin="round"
                       >
-                        <path d="M12 3v18" />
-                        <path d="M3 12h18" />
+                        {getSnapshotIcon(item.label)}
                       </svg>
                     </span>
                     <span className="min-w-0">

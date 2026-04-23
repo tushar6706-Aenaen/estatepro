@@ -7,7 +7,7 @@ import { RippleButton } from "./ui/ripple-button";
 import { supabaseBrowserClient } from "@/src/lib/supabase/client";
 
 type StatisticProps = {
-  end: number;
+  end: number | null;
   label: string;
   suffix?: string;
   delay?: number;
@@ -19,6 +19,11 @@ function AnimatedStatistic({ end, label, suffix = "", delay = 0 }: StatisticProp
   const isInView = useInView(ref, { once: true });
 
   useEffect(() => {
+    if (end == null) {
+      setCount(0);
+      return;
+    }
+
     if (isInView) {
       const duration = 2000;
       const steps = 60;
@@ -49,8 +54,7 @@ function AnimatedStatistic({ end, label, suffix = "", delay = 0 }: StatisticProp
       className="text-center"
     >
       <div className="text-2xl md:text-4xl font-bold text-white">
-        {count.toLocaleString()}
-        {suffix}
+        {end == null ? "--" : `${count.toLocaleString()}${suffix}`}
       </div>
       <div className="mt-1 md:mt-2 text-xs md:text-sm text-white/80">{label}</div>
     </motion.div>
@@ -59,9 +63,9 @@ function AnimatedStatistic({ end, label, suffix = "", delay = 0 }: StatisticProp
 
 type AnimatedHeroProps = {
   stats?: {
-    properties: number;
-    clients: number;
-    agents: number;
+    properties: number | null;
+    clients: number | null;
+    agents: number | null;
   };
 };
 
@@ -215,26 +219,23 @@ export function AnimatedHero({ stats }: AnimatedHeroProps = {}) {
             lifestyle.
           </motion.p>
 
-          {/* Statistics Section */}
-          <div className="grid grid-cols-3 gap-4 md:gap-8 pt-4 md:pt-8">
-            <AnimatedStatistic 
-              end={stats?.properties ?? 0} 
-              label="Properties Listed" 
-              suffix="+" 
-              delay={200} 
-            />
-            <AnimatedStatistic 
-              end={stats?.clients ?? 0} 
-              label="Happy Clients" 
-              suffix="+" 
-              delay={400} 
-            />
-            <AnimatedStatistic 
-              end={stats?.agents ?? 0} 
-              label="Expert Agents" 
-              suffix="+" 
-              delay={600} 
-            />
+          {/* Marketplace Highlights */}
+          <div className="grid grid-cols-1 gap-3 pt-4 sm:grid-cols-3 md:gap-5 md:pt-8">
+            <div className="rounded-2xl border border-white/20 bg-black/20 px-4 py-3 backdrop-blur-sm">
+              <AnimatedStatistic
+                end={stats?.properties ?? null}
+                label="Verified Listings"
+                delay={200}
+              />
+            </div>
+            <div className="rounded-2xl border border-white/20 bg-black/20 px-4 py-3 backdrop-blur-sm text-white">
+              <p className="text-2xl md:text-3xl font-bold">Map-Ready</p>
+              <p className="mt-1 text-xs md:text-sm text-white/80">Explore location context instantly</p>
+            </div>
+            <div className="rounded-2xl border border-white/20 bg-black/20 px-4 py-3 backdrop-blur-sm text-white">
+              <p className="text-2xl md:text-3xl font-bold">Live Chat</p>
+              <p className="mt-1 text-xs md:text-sm text-white/80">Message agents directly from listings</p>
+            </div>
           </div>
 
           {/* Simple Hero Search Bar */}

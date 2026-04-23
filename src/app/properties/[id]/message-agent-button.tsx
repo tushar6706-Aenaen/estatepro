@@ -48,9 +48,14 @@ export function MessageAgentButton({
         type="button"
         onClick={handleClick}
         disabled={disabled}
-        className="w-full rounded-2xl border border-zinc-900/10 bg-[#f8f3e7] px-4 py-3 text-sm font-semibold text-zinc-900 transition hover:border-zinc-900/25 hover:bg-[#f1ead8] disabled:cursor-not-allowed disabled:opacity-60"
+        className="group relative w-full overflow-hidden rounded-2xl border border-indigo-900/30 bg-gradient-to-r from-indigo-600 via-violet-600 to-fuchsia-600 px-4 py-3 text-sm font-semibold text-white shadow-[0_16px_40px_-24px_rgba(79,70,229,0.85)] transition duration-200 hover:-translate-y-0.5 hover:brightness-110 hover:shadow-[0_20px_45px_-22px_rgba(99,102,241,0.9)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400/70 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-60"
       >
-        {loading ? "Starting chat..." : "Message Agent"}
+        <span className="absolute inset-0 bg-[radial-gradient(circle_at_top,rgba(255,255,255,0.35),transparent_45%)] opacity-90" />
+        <span className="absolute right-3 top-1/2 h-2.5 w-2.5 -translate-y-1/2 rounded-full bg-white/90 shadow-[0_0_0_6px_rgba(255,255,255,0.15)]" />
+        <span className="relative inline-flex items-center gap-2">
+          <span className="inline-block h-2 w-2 rounded-full bg-white animate-pulse" />
+          <span>{loading ? "Starting chat..." : "Message Agent Now"}</span>
+        </span>
       </button>
       {error && (
         <div className="rounded-xl border border-zinc-900/10 bg-white px-3 py-2 text-xs text-zinc-600">

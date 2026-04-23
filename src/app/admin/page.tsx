@@ -13,11 +13,11 @@ export default function AdminPage() {
               Admin
             </div>
             <h1 className="text-3xl font-semibold tracking-tight text-gray-900">
-              Review queue
+              Control center
             </h1>
             <p className="mt-2 text-sm text-gray-700">
-              Access for admins only. Use this page as the entry point for
-              Phase 4 review tools.
+              Access for admins only. Moderate listings, manage users/agents,
+              and review incoming marketplace activity.
             </p>
           </div>
           <Link
